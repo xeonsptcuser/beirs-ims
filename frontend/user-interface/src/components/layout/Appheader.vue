@@ -8,7 +8,7 @@ import BeirsLogo from '@/assets/images/beirs-logo.png'
         <img :src="BeirsLogo" alt="app-logo" height="65"></img>
        <div class="ms-2 d-flex flex-column">
         <p class="text-white fw-bold mb-0">BEIRS-IMS</p>
-        <small class=" leading-5 text-white">Barangay Emergency Incident Reporting System</small>
+        <small class=" leading-5 text-white">Barangay E-Blotter and Incident Reporting System</small>
       </div>
       </a>
       <div class="pt-2">
