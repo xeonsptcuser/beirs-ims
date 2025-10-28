@@ -1,4 +1,5 @@
 import AppLayout from "@/components/layout/AppLayout.vue";
+import LoginPage from "@/views/LandingPage/components/LoginPage.vue";
 import LandingPage from "@/views/LandingPage/LandingPage.vue";
 import {
   createRouter,
@@ -9,15 +10,22 @@ import {
 const routes: RouteRecordRaw[] = [
   {
     path: "/",
-    redirect: "/landing",
     component: AppLayout,
     children: [
       {
-        path: "/landing",
+        path: "/",
         name: "LandingPage",
         component: LandingPage,
         meta: {
           title: "Home",
+        },
+      },
+      {
+        path: "/signin",
+        name: "LoginPage",
+        component: LoginPage,
+        meta: {
+          title: "Login",
         },
       },
     ],
