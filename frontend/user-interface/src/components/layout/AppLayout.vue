@@ -4,9 +4,9 @@ import Appheader from './Appheader.vue';
 
 </script>
 <template>
-  <div>
     <Appheader></Appheader>
-    <router-view></router-view>
+    <div class="container">
+      <router-view></router-view>
+    </div>
     <AppFooter />
-  </div>
 </template>

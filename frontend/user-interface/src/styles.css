@@ -3,7 +3,7 @@
 
 :root {
   --strong-blue: #12243f;
-  --light-red: #ff9cba;
+  --light-red: #ee3030d9;
 }
 body {
   font-family: "Roboto Mono", monospace;
@@ -22,4 +22,31 @@ body {
 
 .bg-light-red {
   background: var(--light-red);
+}
+
+.text-responsive {
+  color: #333333;
+}
+
+@media (min-width: 768px) {
+  .text-responsive {
+    color: #ffffff;
+  }
+}
+.fs-md-1 {
+  font-size: calc(1.625rem + 4.5vw) !important;
+}
+
+.fs-md-2 {
+  font-size: calc(1.5rem + 3vw) !important;
+}
+
+.fs-md-3 {
+  font-size: 1.75rem !important;
+}
+
+@media (min-width: 768px) {
+  .fs-md-1 { font-size: 2.5rem !important; }  /* same as Bootstrap's fs-1 */
+  .fs-md-2 { font-size: 2rem !important; }    /* same as fs-2 */
+  .fs-md-3 { font-size: 1.75rem !important; } /* same as fs-3 */
 }
