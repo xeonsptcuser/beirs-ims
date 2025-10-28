@@ -1,0 +1,25 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
+
+:root {
+  --strong-blue: #12243f;
+  --light-red: #ff9cba;
+}
+body {
+  font-family: "Roboto Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.bg-primary-gradient {
+  background: linear-gradient(90deg, var(--strong-blue), var(--light-red)  );
+}
+
+.bg-strong-blue {
+  background: var(--strong-blue);
+}
+
+.bg-light-red {
+  background: var(--light-red);
+}
