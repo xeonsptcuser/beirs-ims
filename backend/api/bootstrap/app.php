@@ -1,18 +1,85 @@
 <?php
 
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Foundation\Http\Middleware\TrimStrings;
+use Illuminate\Http\Middleware\HandleCors;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        commands: __DIR__.'/../routes/console.php',
+        api: __DIR__ . '/../routes/api.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // global middlewares
+        $middleware->group('api', [
+            ThrottleRequests::class . ':api',
+            SubstituteBindings::class,
+            EnsureFrontendRequestsAreStateful::class,
+            'auth:sanctum',
+        ]);
+
+        $middleware->use([
+            HandleCors::class,
+            TrimStrings::class,
+            ConvertEmptyStringsToNull::class
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Always return JSON for API errors
+        $exceptions->shouldRenderJsonWhen(fn() => true);
+
+        $exceptions->dontReport([HttpException::class]);
+
+        // Handle validation errors
+        $exceptions->renderable(function (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed.',
+                'errors' => $e->errors(),   // { field: [msg, ...], ... }
+                'status' => 422,
+            ], 422);
+        });
+
+        // Handle model not found
+        $exceptions->renderable(function (ModelNotFoundException $e) {
+            return response()->json([
+                'error_type' => 'MODEL NOT FOUND',
+                'message' => $e->getMessage(),
+            ], 404);
+        });
+
+        // Handle missing routes
+        $exceptions->renderable(function (NotFoundHttpException $e) {
+            return response()->json([
+                'error_type' => 'ENDPOINT NOT FOUND',
+                'message' => $e->getMessage(),
+            ], 404);
+        });
+
+        // Handle unauthenticated requests
+        $exceptions->renderable(function (AuthenticationException $e) {
+            return response()->json([
+                'error_type' => 'AUTHENTICATION FAILED',
+                'message' => $e->getMessage(),
+            ], 401);
+        });
+
+        // Fallback for all others
+        $exceptions->renderable(function (Throwable $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        });
+
     })->create();
