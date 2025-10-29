@@ -35,10 +35,9 @@ const handleLogin = async () => {
       <FormContainer>
         <div class="alert alert-danger" role="alert" v-show="hasError">
           <ul class="bg-white rounded p-2 mb-1 list-group-flush">
-            <li class="list-group-item mb-1" style="font-size: 13px;" v-for="message in errorMessages"
-              :key="message.error"><i class="bi bi-exclamation-circle-fill" style="font-size: 13px;"></i> {{
-                message.error
-              }}
+            <li class="list-group-item mb-1" style="font-size: 13px;" v-for="message in errorMessages"><i
+                class="bi bi-exclamation-circle-fill" style="font-size: 13px;"></i> {{ message.error
+                }}
             </li>
           </ul>
         </div>
