@@ -34,7 +34,7 @@
 
 This is to ensure that code that are merged into the develop branch are bug-free and working as intended.
 
-## commands 
+## Git Commands 
  - git checkout develop - This will be the main branch
  - git pull - This is to ensure that our main branch is up-to-date in our local environment
  - git checkout -b feat/<your_assigned_role (e.g admin, resident, staff)>/<figma_screen_name (e.g register, login, admin-dashboard)>-001
