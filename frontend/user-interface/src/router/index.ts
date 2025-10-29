@@ -1,6 +1,7 @@
 import AppLayout from "@/components/layout/AppLayout.vue";
-import LoginPage from "@/views/LandingPage/components/LoginPage.vue";
+
 import LandingPage from "@/views/LandingPage/LandingPage.vue";
+import LoginPage from "@/views/LandingPage/LoginPage/LoginPage.vue";
 import {
   createRouter,
   createWebHistory,
