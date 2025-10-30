@@ -30,7 +30,7 @@ const model = defineModel<string>()
 <template>
   <slot v-if="$slots.default" />
   <div class="mb-3 form-floating" v-else>
-    <input v-bind="$attrs" :id="id" :type="type" :placeholder="placeholder" v-model="model">
+    <input v-bind="$attrs" :id="id" :type="type" :placeholder="placeholder" v-model="model" class="form-control">
     <label :for="id" class="form-label" v-if="label">{{ label }}</label>
   </div>
 </template>

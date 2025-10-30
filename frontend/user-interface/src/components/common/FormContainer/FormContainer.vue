@@ -5,6 +5,11 @@ defineProps({
   maxWidth: {
     type: String,
     default: '480px'
+  },
+  hasError: {
+    type: Boolean,
+    required: false,
+    default: false
   }
 })
 
@@ -15,7 +20,7 @@ const title = ref('Account Login');
     <div class="card shadow-sm"
       :style="{ width: '100%', maxWidth: typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth }">
       <div class="card-body d-flex flex-column py-5">
-        <h4 class="card-title text-center mb-5">{{ title }}</h4>
+        <h4 class="card-title text-center" :class="{ 'mb-5': !hasError, 'mb-3': hasError }">{{ title }}</h4>
         <slot />
       </div>
     </div>
