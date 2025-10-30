@@ -3,7 +3,7 @@
 
 :root {
   --strong-blue: #12243f;
-  --light-red: #ee3030d9;
+  --light-red: #c50000ad;
 }
 body {
   font-family: "Roboto Mono", monospace;
@@ -14,6 +14,10 @@ body {
 
 .bg-primary-gradient {
   background: linear-gradient(90deg, var(--strong-blue), var(--light-red)  );
+}
+
+.bg-reverse-primary-gradient {
+  background: linear-gradient(90deg,  var(--light-red), var(--strong-blue)  );
 }
 
 .bg-strong-blue {
