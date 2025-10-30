@@ -1,17 +1,17 @@
 const API_CONFIG = {
-  BASE_PATH: "/api",
+  BASE_PATH: '/api',
   // Add modules here.
   // This are just subpaths available in the api [e.g auth, admin, residents, staff]
   MODULES: {
-    AUTHENTICATION: "auth",
+    AUTHENTICATION: 'auth',
   },
-};
+}
 
-const AUTH_BASE = `${API_CONFIG.BASE_PATH}/ ${API_CONFIG.MODULES.AUTHENTICATION}`;
-const COMMON_BASE = `${API_CONFIG.BASE_PATH}`;
+const AUTH_BASE = `${API_CONFIG.BASE_PATH}/ ${API_CONFIG.MODULES.AUTHENTICATION}`
+const COMMON_BASE = `${API_CONFIG.BASE_PATH}` // will be used later on.
 
 export const endpoints = {
   // AUTHENTICATION RELATED
   LOGIN: `${AUTH_BASE}/login`,
   REGISTRATION: `${AUTH_BASE}/register`,
-};
+}

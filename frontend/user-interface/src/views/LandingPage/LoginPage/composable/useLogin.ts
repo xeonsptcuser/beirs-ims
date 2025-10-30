@@ -1,24 +1,24 @@
-import type { LoginCredentials } from '@/Types'
+import type { LoginRequest } from '@/Types'
 import { reactive, ref } from 'vue'
 
 export function useLogin() {
-  const form = reactive<LoginCredentials>({
+  const form = reactive<LoginRequest>({
     username: '',
     password: '',
   })
 
-  const errors = ref<Record<keyof LoginCredentials, boolean>>({
+  const errors = ref<Record<keyof LoginRequest, boolean>>({
     username: false,
     password: false,
   })
 
-  const errorMessages = ref<Record<keyof LoginCredentials, { error: string }>>({
+  const errorMessages = ref<Record<keyof LoginRequest, { error: string }>>({
     username: { error: '' },
     password: { error: '' },
   })
 
   const resetErrors = () => {
-    for (const key of Object.keys(errors.value) as (keyof LoginCredentials)[]) {
+    for (const key of Object.keys(errors.value) as (keyof LoginRequest)[]) {
       errors.value[key] = false
       errorMessages.value[key] = { error: '' }
     }

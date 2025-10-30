@@ -3,21 +3,89 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Users\User;
+use App\Models\Users\UserProfile;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
-    public function login()
+    // POST /api/login
+    public function login(Request $request)
     {
-        return response()->json(['status' => 'success', 'login attempt..']);
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        $user = User::with('profile')->where('email', $credentials['email'])->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'status' => 'success',
+            'user' => $user,
+            'token' => $token,
+        ]);
     }
 
-    public function register()
+    // POST /api/register
+    public function register(Request $request)
     {
-        return response()->json(['status' => 'success', 'register attempt..']);
+        // Add necessary fields here
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'date_of_birth' => 'required|date',
+        ]);
+
+        $profile = UserProfile::create([
+            'name' => $validated['name'],
+            'date_of_birth' => Carbon::parse($validated['date_of_birth']),
+            'street_address' => $request->street_address,
+            'mobile_number' => $request->mobile_number,
+        ]);
+
+        $user = $profile->login()->create([
+            'email' => $validated['email'],
+            'password' => $validated['password'],
+        ]);
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User registered successfully.',
+            'token' => $token,
+        ], 201);
     }
 
-    public function logout()
+    // POST api/auth/logout
+    public function logout(Request $request)
     {
-        return response()->json(['status' => 'success', 'logout attempt..']);
+        $user = $request->user();
+        // Safety check in case token is missing or invalid
+        $token = $user?->currentAccessToken();
+
+        if ($token) {
+            $token->delete();
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No active session found or token already expired.',
+            ], 400);
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Logged out successfully.'
+        ]);
     }
 }
