@@ -7,7 +7,6 @@ import WarningLabel from "@/components/common/WarningLabel/WarningLabel.vue";
 
 const {
   form,
-  errors,
   errorMessages,
   validateForm
 } = useLogin();

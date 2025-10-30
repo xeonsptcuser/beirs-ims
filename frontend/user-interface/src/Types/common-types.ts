@@ -3,7 +3,12 @@ export interface NavItem {
   label: string
 }
 
-export interface LoginCredentials {
+// LOGIN REQUEST INTERFACE
+export interface LoginRequest {
   username: string
   password: string
+}
+
+export interface LoginResponse {
+  message: string
 }
