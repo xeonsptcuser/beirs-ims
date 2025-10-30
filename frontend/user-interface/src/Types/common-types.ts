@@ -10,5 +10,6 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  message: string
+  username: string
+  access_token: string
 }

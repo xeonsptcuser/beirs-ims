@@ -41,11 +41,14 @@ const filteredErrors = computed(() => {
       <FormContainer>
         <WarningLabel :has-error="hasError" :errors="filteredErrors" />
         <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleLogin">
-          <FormInput type="text" label="Username or Email" placeholder="Username or Email Address" class="form-control"
-            id="userName" autofocus v-model="form.username" />
+          <FormInput type="text" label="Email Address" placeholder="beirs@test.com" class="form-control" id="userName"
+            autofocus v-model="form.username" />
           <FormInput type="password" label="Password" placeholder="Password" class="form-control" id="passWord"
             autofocus v-model="form.password" />
           <button type="submit" class="btn btn-primary w-100 mt-2">Sign In</button>
+          <hr>
+          <p class="text-center">Don't have an account yet? <router-link to="/registration">Register Now</router-link>
+          </p>
         </form>
       </FormContainer>
     </div>

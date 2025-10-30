@@ -29,8 +29,8 @@ defineProps({
             <router-link class="nav-link py-2 text-responsive" :to="item.path">{{ item.label }}</router-link>
           </li>
           <li class="list-group-item ms-md-5 mt-3 mt-md-0">
-            <router-link class="nav-link text-responsive" to="/signin">
-              login
+            <router-link class="nav-link text-responsive" to="/login">
+              Login
             </router-link>
           </li>
         </div>

@@ -1,4 +1,3 @@
-import { endpoints } from './../endpoints/endpoints'
 import type { BaseResponse, LoginRequest, LoginResponse } from '@/Types'
 import { ApiService } from '../ApiService'
 
@@ -17,7 +16,7 @@ export class LoginRegisterService {
     return LoginRegisterService.instance
   }
 
-  async postUserLogin(
+  async postRequestLogin(
     payload: LoginRequest,
     endpoint: string,
     params?: object
