@@ -54,17 +54,14 @@ class AuthController extends Controller
             'mobile_number' => $request->mobile_number,
         ]);
 
-        $user = $profile->login()->create([
+        $profile->login()->create([
             'email' => $validated['email'],
             'password' => $validated['password'],
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-
         return response()->json([
             'status' => 'success',
-            'message' => 'User registered successfully.',
-            'token' => $token,
+            'message' => 'User registered successfully.'
         ], 201);
     }
 

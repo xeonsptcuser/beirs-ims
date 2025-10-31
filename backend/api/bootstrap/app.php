@@ -24,22 +24,20 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
         then: function () {
-            // ✅ Define your rate limiter here
             RateLimiter::for('api', function (Request $request) {
                 return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
             });
         }
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->appendToGroup('api', HandleCors::class);
         // global middlewares
         $middleware->group('api', [
             ThrottleRequests::class . ':api',
             SubstituteBindings::class,
             EnsureFrontendRequestsAreStateful::class,
         ]);
-
         $middleware->use([
-            HandleCors::class,
             TrimStrings::class,
             ConvertEmptyStringsToNull::class
         ]);
