@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import FormContainer from "@/components/common/FormContainer/FormContainer.vue";
-import { useLogin } from "./composable/useLogin";
+import { useLoginAccount } from "./composable/useLoginAccount";
 import { computed, ref } from "vue";
 import WarningLabel from "@/components/common/WarningLabel/WarningLabel.vue";
 import FormInput from "@/components/common/FormInput/FormInput.vue";
@@ -9,7 +9,7 @@ const {
   form,
   errorMessages,
   validateForm
-} = useLogin();
+} = useLoginAccount();
 
 // Shows error messages if true
 const hasError = ref(false);
@@ -38,16 +38,18 @@ const filteredErrors = computed(() => {
 <template>
   <div class="my-4">
     <div class="bg-primary p-6 rounded">
-      <FormContainer :has-error="hasError">
+      <FormContainer :has-error="hasError" title="Account Login">
         <WarningLabel :has-error="hasError" :errors="filteredErrors" />
         <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleLogin">
           <FormInput type="text" label="Email Address" placeholder="beirs@test.com" id="userName" autofocus
             v-model="form.username" />
           <FormInput type="password" label="Password" placeholder="Password" id="passWord" autofocus
             v-model="form.password" />
-          <button type="submit" class="btn btn-primary w-100 mt-2">Sign In</button>
+          <button type="submit" class="btn btn-primary w-100 mt-2 py-2">SIGN IN</button>
           <hr>
-          <p class="text-center">Don't have an account yet? <router-link to="/registration">Register Now</router-link>
+          <p class="text-center">Don't have an account yet? <router-link to="/registration"
+              class="btn btn-success">Register
+              Now</router-link>
           </p>
         </form>
       </FormContainer>

@@ -1,7 +1,7 @@
 import type { LoginRequest } from '@/Types'
 import { reactive, ref } from 'vue'
 
-export function useLogin() {
+export function useLoginAccount() {
   const form = reactive<LoginRequest>({
     username: '',
     password: '',
