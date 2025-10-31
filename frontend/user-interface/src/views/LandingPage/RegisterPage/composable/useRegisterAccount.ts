@@ -12,6 +12,8 @@ export function useRegisterAccount() {
     password: '',
     passwordConfirmation: '',
     date_of_birth: '',
+    streetAddress: '',
+    mobileNumber: '',
   })
 
   const errors = ref<Record<keyof RegisterRequest, boolean>>({
@@ -20,6 +22,8 @@ export function useRegisterAccount() {
     password: false,
     passwordConfirmation: false,
     date_of_birth: false,
+    streetAddress: false,
+    mobileNumber: false,
   })
 
   const errorMessages = ref<Record<keyof RegisterRequest, { error: string }>>({
@@ -28,6 +32,8 @@ export function useRegisterAccount() {
     password: { error: '' },
     passwordConfirmation: { error: '' },
     date_of_birth: { error: '' },
+    streetAddress: { error: '' },
+    mobileNumber: { error: '' },
   })
 
   const resetErrors = () => {
@@ -54,6 +60,14 @@ export function useRegisterAccount() {
       errors.value.password = true
       errorMessages.value.password = {
         error: 'Please enter your password.',
+      }
+      isValid = false
+    }
+
+    if (form.password.trim() !== form.passwordConfirmation.trim()) {
+      errors.value.password = true
+      errorMessages.value.password = {
+        error: 'Password and Confirmation Password does not match..',
       }
       isValid = false
     }

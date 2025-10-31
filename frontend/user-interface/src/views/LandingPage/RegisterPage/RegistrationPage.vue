@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import FormContainer from '@/components/common/FormContainer/FormContainer.vue';
 import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { useRegisterAccount } from './composable/useRegisterAccount';
 import FormInput from '@/components/common/FormInput/FormInput.vue';
+import type { RegisterRequestPayload } from '@/Types';
+import { userRegistration } from '@/Utils/loginServices';
+import { useRouter } from 'vue-router';
 
 const {
   form,
@@ -11,22 +14,44 @@ const {
   validateForm
 } = useRegisterAccount();
 
+const router = useRouter();
 const handleRegisterAccount = async () => {
   try {
     const isValid = validateForm();
     if (isValid) {
-      // PERFORM logic to register user here...
-      console.log("FORM: ", form)
+      const requestPayload: RegisterRequestPayload = {
+        name: `${form.name.firstName} ${form.name.middleName} ${form.name.lastName}`,
+        email: form.email,
+        password: form.password,
+        passwordConfirmation: form.passwordConfirmation,
+        date_of_birth: form.date_of_birth,
+        street_address: form.streetAddress,
+        mobile_number: form.mobileNumber
+      }
+
+      const response = await userRegistration(requestPayload);
+
+      if (response.status_code !== 'success') {
+        throw response;
+      }
+
       hasError.value = false;
+
+      // Redirect to login page
+      router.push({ name: 'LoginPage' })
+
     } else {
       hasError.value = true;
     };
   } catch (error) {
-    console.log("ERRORS: ", error)
+    const axiosError = error;
+    console.log("ERROR: ", axiosError);
+    hasError.value = true;
   }
 }
 
 const hasError = ref<boolean>(false);
+
 const filteredErrors = computed(() => {
   return Object.values(errorMessages.value).filter(msg => msg.error && msg.error.trim() !== '');
 });
@@ -36,7 +61,7 @@ const filteredErrors = computed(() => {
   <div class="my-4">
     <div class="bg-primary p-6 rounded">
       <FormContainer :has-error="hasError" title="Account Registration" :max-width="'750px'">
-        <WarningLabel :has-error="hasError" :errors="filteredErrors" />
+        <WarningLabel :has-error="hasError && filteredErrors.length > 0" :errors="filteredErrors" />
         <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleRegisterAccount">
           <div class="row g-2">
             <div class="col-md-4 col-sm-12">
@@ -44,17 +69,17 @@ const filteredErrors = computed(() => {
                 v-model="form.name.firstName" />
             </div>
             <div class="col-md-4 col-sm-12">
-              <FormInput type="text" label="Last Name" placeholder="Last Name" id="last_name"
-                v-model="form.name.lastName" />
-            </div>
-            <div class="col-md-4 col-sm-12">
               <FormInput type="text" label="Middle Name" :optional="true" placeholder="M.I (Optional)" id="middle_name"
                 v-model="form.name.middleName" />
+            </div>
+            <div class="col-md-4 col-sm-12">
+              <FormInput type="text" label="Last Name" placeholder="Last Name" id="last_name"
+                v-model="form.name.lastName" />
             </div>
           </div>
           <div class="row g-2">
             <div class="col-md-6 col-sm-12">
-              <FormInput type="text" label="Email Address" placeholder="beirs@test.com" id="email"
+              <FormInput type="email" label="Email Address" placeholder="beirs@test.com" id="email"
                 v-model="form.email" />
             </div>
             <div class="col-md-6 col-sm-12">

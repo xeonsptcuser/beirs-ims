@@ -19,10 +19,28 @@ export interface RegisterRequest {
   password: string
   passwordConfirmation: string
   date_of_birth: string
+  streetAddress: string
+  mobileNumber: string
 }
 
 interface Fullname {
   firstName: ''
   lastName: ''
   middleName: ''
+}
+
+export interface RegisterRequestPayload {
+  name: string
+  email: string
+  password: string
+  passwordConfirmation: string
+  date_of_birth: string
+  street_address: string
+  mobile_number: string
+}
+
+export interface RegisterResponse {
+  status: string
+  message: string
+  access_token: string
 }
