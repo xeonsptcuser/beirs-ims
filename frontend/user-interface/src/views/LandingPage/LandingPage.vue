@@ -2,7 +2,7 @@
 <template>
   <div class="my-5 vh-100">
     <div class="alert alert-primary" role="alert">
-      LANDING PAGE HERE.... 🎉
+      LANDING PAGE HERE.... 🎉sasa
     </div>
   </div>
 </template>
