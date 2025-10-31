@@ -12,6 +12,6 @@ const COMMON_BASE = `${API_CONFIG.BASE_PATH}` // will be used later on.
 
 export const endpoints = {
   // AUTHENTICATION RELATED
-  LOGIN: `${AUTH_BASE}/login`,
-  REGISTRATION: `${AUTH_BASE}/register`,
+  LOGIN: `${COMMON_BASE}/login`,
+  REGISTRATION: `${COMMON_BASE}/register`,
 }

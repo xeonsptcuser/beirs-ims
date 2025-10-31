@@ -1,4 +1,10 @@
-import type { BaseResponse, LoginRequest, LoginResponse } from '@/Types'
+import type {
+  BaseResponse,
+  LoginRequest,
+  LoginResponse,
+  RegisterRequestPayload,
+  RegisterResponse,
+} from '@/Types'
 import { ApiService } from '../ApiService'
 
 export class LoginRegisterService {
@@ -18,9 +24,15 @@ export class LoginRegisterService {
 
   async postRequestLogin(
     payload: LoginRequest,
-    endpoint: string,
-    params?: object
+    endpoint: string
   ): Promise<BaseResponse<LoginResponse>> {
+    return this.apiService.post(endpoint, payload)
+  }
+
+  async postRequestRegister(
+    payload: RegisterRequestPayload,
+    endpoint: string
+  ): Promise<BaseResponse<RegisterResponse>> {
     return this.apiService.post(endpoint, payload)
   }
 }
