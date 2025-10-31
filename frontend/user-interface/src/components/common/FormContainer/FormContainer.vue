@@ -10,10 +10,15 @@ defineProps({
     type: Boolean,
     required: false,
     default: false
+  },
+  title: {
+    type: String,
+    required: false,
+    default: ''
   }
 })
 
-const title = ref('Account Login');
+
 </script>
 <template>
   <div class="min-vh-75 d-flex align-items-center justify-content-center bg-light">
