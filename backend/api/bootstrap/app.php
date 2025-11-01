@@ -14,7 +14,6 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
-use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -30,14 +29,14 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->appendToGroup('api', HandleCors::class);
+
         // global middlewares
         $middleware->group('api', [
             ThrottleRequests::class . ':api',
             SubstituteBindings::class,
-            EnsureFrontendRequestsAreStateful::class,
         ]);
         $middleware->use([
+            HandleCors::class,
             TrimStrings::class,
             ConvertEmptyStringsToNull::class
         ]);

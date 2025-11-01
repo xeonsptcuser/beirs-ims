@@ -1,7 +1,11 @@
+import { useSharedAuthResponse } from '@/composables/useSharedAuthResponse'
 import type { LoginRequest } from '@/Types'
 import { reactive, ref } from 'vue'
 
 export function useLoginAccount() {
+  const { successResponse, clearSuccessResponse } = useSharedAuthResponse()
+  const isSuccessResponse = successResponse
+
   const form = reactive<LoginRequest>({
     username: '',
     password: '',
@@ -57,7 +61,9 @@ export function useLoginAccount() {
     form,
     errors,
     errorMessages,
+    isSuccessResponse,
     validateForm,
     resetForm,
+    clearSuccessResponse,
   }
 }

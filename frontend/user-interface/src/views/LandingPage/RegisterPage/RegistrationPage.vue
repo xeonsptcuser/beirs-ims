@@ -4,17 +4,22 @@ import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
 import { computed, ref } from 'vue';
 import { useRegisterAccount } from './composable/useRegisterAccount';
 import FormInput from '@/components/common/FormInput/FormInput.vue';
-import type { RegisterRequestPayload } from '@/Types';
+import type { ApiErrorResponse, RegisterRequestPayload, RegisterResponse } from '@/Types';
 import { userRegistration } from '@/Utils/loginServices';
 import { useRouter } from 'vue-router';
+import type { AxiosError } from 'axios';
 
 const {
   form,
   errorMessages,
-  validateForm
+  validateForm,
+  setServerErrors,
+  setSuccessResponse
 } = useRegisterAccount();
 
 const router = useRouter();
+const hasError = ref<boolean>(false);
+
 const handleRegisterAccount = async () => {
   try {
     const isValid = validateForm();
@@ -23,38 +28,50 @@ const handleRegisterAccount = async () => {
         name: `${form.name.firstName} ${form.name.middleName} ${form.name.lastName}`,
         email: form.email,
         password: form.password,
-        passwordConfirmation: form.passwordConfirmation,
+        password_confirmation: form.passwordConfirmation,
         date_of_birth: form.date_of_birth,
         street_address: form.streetAddress,
         mobile_number: form.mobileNumber
-      }
+      };
 
       const response = await userRegistration(requestPayload);
 
-      if (response.status_code !== 'success') {
+      if (response.status !== 'success') {
         throw response;
       }
 
+      setSuccessResponse({
+        status: response.status,
+        message: response.message
+      });
+
       hasError.value = false;
-
-      // Redirect to login page
-      router.push({ name: 'LoginPage' })
-
+      router.push({ name: 'LoginPage' });
     } else {
       hasError.value = true;
-    };
+    }
   } catch (error) {
-    const axiosError = error;
-    console.log("ERROR: ", axiosError);
+    setSuccessResponse(null);
+    const axiosError = error as AxiosError<ApiErrorResponse>;
+    const fallbackResponse = error as RegisterResponse;
+
+    if (axiosError?.isAxiosError) {
+      const responseData = axiosError.response?.data;
+      setServerErrors(responseData?.errors, responseData?.message);
+    } else if (fallbackResponse?.message) {
+      setServerErrors(undefined, fallbackResponse.message);
+    } else {
+      setServerErrors(undefined, 'Failed to register new user.');
+    }
+
     hasError.value = true;
   }
-}
-
-const hasError = ref<boolean>(false);
+};
 
 const filteredErrors = computed(() => {
   return Object.values(errorMessages.value).filter(msg => msg.error && msg.error.trim() !== '');
 });
+
 
 </script>
 <template>
