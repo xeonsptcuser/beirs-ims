@@ -1,28 +1,28 @@
 import { useSharedAuthResponse } from '@/composables/useSharedAuthResponse'
-import type { LoginRequest } from '@/Types'
+import type { LoginRequestPayload } from '@/Types'
 import { reactive, ref } from 'vue'
 
 export function useLoginAccount() {
   const { successResponse, clearSuccessResponse } = useSharedAuthResponse()
   const isSuccessResponse = successResponse
 
-  const form = reactive<LoginRequest>({
-    username: '',
+  const form = reactive<LoginRequestPayload>({
+    email: '',
     password: '',
   })
 
-  const errors = ref<Record<keyof LoginRequest, boolean>>({
-    username: false,
+  const errors = ref<Record<keyof LoginRequestPayload, boolean>>({
+    email: false,
     password: false,
   })
 
-  const errorMessages = ref<Record<keyof LoginRequest, { error: string }>>({
-    username: { error: '' },
+  const errorMessages = ref<Record<keyof LoginRequestPayload, { error: string }>>({
+    email: { error: '' },
     password: { error: '' },
   })
 
   const resetErrors = () => {
-    for (const key of Object.keys(errors.value) as (keyof LoginRequest)[]) {
+    for (const key of Object.keys(errors.value) as (keyof LoginRequestPayload)[]) {
       errors.value[key] = false
       errorMessages.value[key] = { error: '' }
     }
@@ -32,10 +32,10 @@ export function useLoginAccount() {
     resetErrors()
     let isValid = true
 
-    if (!form.username.trim()) {
-      errors.value.username = true
-      errorMessages.value.username = {
-        error: 'Please enter your username or email address...',
+    if (!form.email.trim()) {
+      errors.value.email = true
+      errorMessages.value.email = {
+        error: 'Please enter your email.',
       }
       isValid = false
     }
@@ -43,7 +43,7 @@ export function useLoginAccount() {
     if (!form.password.trim()) {
       errors.value.password = true
       errorMessages.value.password = {
-        error: 'Please enter your password...',
+        error: 'Please enter your password.',
       }
       isValid = false
     }
@@ -52,7 +52,7 @@ export function useLoginAccount() {
   }
 
   const resetForm = () => {
-    form.username = ''
+    form.email = ''
     form.password = ''
     resetErrors()
   }

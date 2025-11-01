@@ -1,17 +1,19 @@
+import { type UserSessionInfo } from './session-types'
+
 export interface NavItem {
   path: string
   label: string
 }
 
-export interface LoginRequest {
-  username: string
+export interface LoginRequestPayload {
+  email: string
   password: string
 }
 
 export interface LoginResponse {
   status: string
-  username: string
-  access_token: string
+  user: UserSessionInfo
+  token: string
 }
 
 export interface RegisterRequest {
