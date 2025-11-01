@@ -1,8 +1,13 @@
 import { endpoints } from '@/services/api/endpoints'
 import { LoginRegisterService } from '@/services/api/http/login-register-service'
-import type { LoginRequest, LoginResponse, RegisterRequestPayload, RegisterResponse } from '@/Types'
+import type {
+  LoginRequestPayload,
+  LoginResponse,
+  RegisterRequestPayload,
+  RegisterResponse,
+} from '@/Types'
 
-export const userLogin = async (data: LoginRequest): Promise<LoginResponse> => {
+export const userLogin = async (data: LoginRequestPayload): Promise<LoginResponse> => {
   const loginRegisterService = LoginRegisterService.getInstance()
   const response = await loginRegisterService.postRequestLogin(data, endpoints.LOGIN)
 

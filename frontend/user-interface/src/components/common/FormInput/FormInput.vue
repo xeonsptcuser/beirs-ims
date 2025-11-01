@@ -22,7 +22,7 @@ const props = defineProps({
   },
   placeholder: {
     type: String,
-    required: true,
+    required: false,
     default: 'Placeholder...'
   },
   optional: {
