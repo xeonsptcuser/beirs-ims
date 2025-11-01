@@ -9,6 +9,7 @@ export const useSessionStore = defineStore('session', {
     id: null as BigInt | null,
     name: '' as string,
     token: '' as string,
+    role: '' as string,
   }),
 
   actions: {
@@ -25,6 +26,7 @@ export const useSessionStore = defineStore('session', {
       this.id = user.id ?? null
       this.name = user.profile?.name ?? ''
       this.token = token ?? ''
+      this.role = user.role
 
       sessionStorage.setItem(
         STORAGE_KEY,
@@ -33,6 +35,7 @@ export const useSessionStore = defineStore('session', {
           id: this.id,
           name: this.name,
           token: this.token,
+          role: this.role,
         })
       )
     },
@@ -44,6 +47,7 @@ export const useSessionStore = defineStore('session', {
         this.id = parsedSession.id
         this.name = parsedSession.name
         this.token = parsedSession.token
+        this.role = parsedSession.role
       }
     },
 
@@ -52,6 +56,7 @@ export const useSessionStore = defineStore('session', {
       this.id = null
       this.name = ''
       this.token = ''
+      this.role = ''
       sessionStorage.removeItem(STORAGE_KEY)
     },
   },

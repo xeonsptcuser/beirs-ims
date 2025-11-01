@@ -1,13 +1,14 @@
 <?php
 
-namespace Database\Factories;
+namespace Database\Factories\Users;
 
+use App\Models\Users\UserProfile;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Users\User>
  */
 class UserFactory extends Factory
 {
@@ -24,12 +25,22 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'user_profile_id' => UserProfile::factory(),
             'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'role' => 'resident',
             'remember_token' => Str::random(10),
         ];
+    }
+
+    public function admin(): static
+    {
+        return $this->state(fn() => ['role' => 'admin']);
+    }
+
+    public function staff(): static
+    {
+        return $this->state(fn() => ['role' => 'staff']);
     }
 
     /**
@@ -37,7 +48,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
         ]);
     }
