@@ -1,5 +1,5 @@
 export interface UserSessionInfo {
-  id: BigInt
+  id: number
   email: string
   role: string
   profile: { name: string }

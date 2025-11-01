@@ -1,4 +1,4 @@
-import AppLayout from '@/components/layout/AppLayout.vue'
+﻿import AppLayout from '@/components/layout/AppLayout.vue'
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { publicRoutes } from './public-routes'
 import { useSessionStore } from '@/Utils/store/useSessionStore'
@@ -32,7 +32,7 @@ router.beforeEach(async (to, _from, next) => {
   if (to.meta.requiresAuth) {
     if (!session.token) return next({ name: 'LoginPage' })
     if (roleParam && roleParam !== session.role) {
-      return next({ name: 'HomePage' })
+      return next({ name: 'LandingPage' })
     }
   }
 

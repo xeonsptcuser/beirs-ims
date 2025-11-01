@@ -2,7 +2,8 @@ import type {
   LoginRequestPayload,
   LoginResponse,
   RegisterRequestPayload,
-  RegisterResponse,
+  CommonResponse,
+  CommonResponse,
 } from '@/Types'
 import { ApiService } from '../ApiService'
 
@@ -28,7 +29,11 @@ export class LoginRegisterService {
   async postRequestRegister(
     payload: RegisterRequestPayload,
     endpoint: string
-  ): Promise<RegisterResponse> {
+  ): Promise<CommonResponse> {
     return this.apiService.post(endpoint, payload)
+  }
+
+  async postRequestLogout(endpoint: string): Promise<CommonResponse> {
+    return this.apiService.post(endpoint)
   }
 }

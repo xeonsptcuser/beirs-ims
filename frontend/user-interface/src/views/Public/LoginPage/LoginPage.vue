@@ -5,7 +5,7 @@ import { computed, ref } from "vue";
 import WarningLabel from "@/components/common/WarningLabel/WarningLabel.vue";
 import FormInput from "@/components/common/FormInput/FormInput.vue";
 import SuccessLabel from "@/components/common/SuccessLabel/SuccessLabel.vue";
-import type { LoginRequestPayload } from "@/Types";
+import type { ApiErrorResponse, LoginRequestPayload } from "@/Types";
 import { userLogin } from "@/Utils/loginServices";
 import { useRouter } from "vue-router";
 import { useSessionStore } from "@/Utils/store/useSessionStore";
@@ -19,11 +19,13 @@ const {
 } = useLoginAccount();
 
 const hasError = ref(false);
+const apiErrorMessage = ref('');
 const router = useRouter();
 const useSession = useSessionStore();
 
 const handleLogin = async () => {
   clearSuccessResponse();
+  apiErrorMessage.value = '';
   try {
     const isValid = validateForm()
     if (isValid) {
@@ -39,6 +41,7 @@ const handleLogin = async () => {
       }
 
       hasError.value = false;
+      apiErrorMessage.value = '';
       useSession.setSession(response);
 
       router.push({
@@ -52,12 +55,26 @@ const handleLogin = async () => {
       hasError.value = true;
     };
   } catch (error) {
-    console.log("ERRORS: ", error)
+    hasError.value = true;
+    const apiError = error as { response?: { data?: ApiErrorResponse } }
+    const messageFromResponse =
+      apiError?.response?.data?.message ||
+      Object.values(apiError?.response?.data?.errors ?? {})
+        .flat()
+        .find(msg => !!msg)
+    const fallbackMessage =
+      error instanceof Error && error.message ? error.message : 'Failed to login. Please try again.'
+
+    apiErrorMessage.value = messageFromResponse ?? fallbackMessage
   }
 }
 
 const filteredErrors = computed(() => {
-  return Object.values(errorMessages.value).filter(msg => msg.error && msg.error.trim() !== '');
+  const fieldErrors = Object.values(errorMessages.value).filter(msg => msg.error && msg.error.trim() !== '')
+  if (apiErrorMessage.value.trim()) {
+    fieldErrors.unshift({ error: apiErrorMessage.value })
+  }
+  return fieldErrors
 });
 
 

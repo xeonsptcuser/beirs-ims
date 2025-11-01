@@ -1,12 +1,13 @@
 import type { LoginResponse } from '@/Types'
 import { defineStore } from 'pinia'
+import { userLogout } from '@/Utils/loginServices'
 
 const STORAGE_KEY = 'session'
 
 export const useSessionStore = defineStore('session', {
   state: () => ({
     status: '' as string,
-    id: null as BigInt | null,
+    id: null as number | null,
     name: '' as string,
     token: '' as string,
     role: '' as string,
@@ -58,6 +59,32 @@ export const useSessionStore = defineStore('session', {
       this.token = ''
       this.role = ''
       sessionStorage.removeItem(STORAGE_KEY)
+    },
+
+    async logout() {
+      try {
+        await userLogout()
+      } catch (error) {
+        console.error('Failed to log out user', error)
+      } finally {
+        this.clearSession()
+      }
+    },
+
+    isRoleResident(): boolean {
+      return this.role === 'resident'
+    },
+
+    isRoleAdmin(): boolean {
+      return this.role === 'admin'
+    },
+
+    isRoleStaff(): boolean {
+      return this.role === 'staff'
+    },
+
+    isLoggedIn(): boolean {
+      return !!this.token
     },
   },
 })
