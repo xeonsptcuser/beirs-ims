@@ -44,7 +44,7 @@ const handleLogin = async () => {
       router.push({
         name: 'Dashboard',
         params: {
-          role: response.user.profile.role
+          role: response.user.role
         }
       });
 
@@ -69,8 +69,10 @@ const filteredErrors = computed(() => {
         <WarningLabel :has-error="hasError" :errors="filteredErrors" />
         <SuccessLabel :is-success="!!isSuccessResponse?.status" :message="isSuccessResponse?.message" />
         <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleLogin">
-          <FormInput type="text" label="Email Address" id="userName" autofocus v-model="form.email" />
-          <FormInput type="password" label="Password" id="passWord" autofocus v-model="form.password" />
+          <FormInput type="text" label="Email Address" placeholder="Email Address" id="userName" autofocus
+            v-model="form.email" />
+          <FormInput type="password" label="Password" placeholder="Password" id="passWord" autofocus
+            v-model="form.password" />
           <button type="submit" class="btn btn-primary w-100 mt-2 py-2">SIGN IN</button>
           <hr>
           <p class="text-center mb-0">Don't have an account yet? <router-link to="/registration"

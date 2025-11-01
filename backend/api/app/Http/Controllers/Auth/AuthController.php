@@ -45,6 +45,7 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'date_of_birth' => 'required|date',
+            'role' => 'in:admin,staff,resident',
         ]);
 
         $profile = UserProfile::create([
@@ -54,9 +55,10 @@ class AuthController extends Controller
             'mobile_number' => $request->mobile_number,
         ]);
 
-        $profile->login()->create([
+        $profile->user()->create([
             'email' => $validated['email'],
             'password' => $validated['password'],
+            'role' => $validated['role'] ?? 'resident',
         ]);
 
         return response()->json([

@@ -28,7 +28,7 @@ class UserProfile extends Model
      *
      * @var list<string>
      */
-    public function login()
+    public function user()
     {
         return $this->hasOne(User::class, 'user_profile_id');
     }

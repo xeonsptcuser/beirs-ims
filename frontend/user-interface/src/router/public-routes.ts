@@ -8,7 +8,7 @@ import type { RouteRecordRaw } from 'vue-router'
 export const publicRoutes: RouteRecordRaw[] = [
   {
     path: '/home',
-    name: 'LandingPage',
+    name: 'HomePage',
     component: HomePage,
     meta: {
       title: 'Home',

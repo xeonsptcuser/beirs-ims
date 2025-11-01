@@ -26,7 +26,7 @@ export const useSessionStore = defineStore('session', {
       this.id = user.id ?? null
       this.name = user.profile?.name ?? ''
       this.token = token ?? ''
-      this.token = data.user.profile.role
+      this.role = user.role
 
       sessionStorage.setItem(
         STORAGE_KEY,

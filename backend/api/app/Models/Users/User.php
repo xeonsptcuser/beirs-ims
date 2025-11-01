@@ -24,6 +24,7 @@ class User extends Authenticatable
         'user_profile_id',
         'email',
         'password',
+        'role'
     ];
 
     /**
@@ -44,8 +45,14 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'role' => 'string',
             'password' => 'hashed',
         ];
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
     }
 
     public function profile()

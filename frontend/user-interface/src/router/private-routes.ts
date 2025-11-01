@@ -10,6 +10,7 @@ export const privateRoutes: RouteRecordRaw[] = [
         path: 'dashboard',
         name: 'Dashboard',
         component: Dashboard,
+        props: (route) => ({ role: route.params.role as string }),
         meta: {
           title: 'Dashboard',
           requiresAuth: true,
