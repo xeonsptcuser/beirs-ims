@@ -9,6 +9,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+  status: string
   username: string
   access_token: string
 }
@@ -33,7 +34,7 @@ export interface RegisterRequestPayload {
   name: string
   email: string
   password: string
-  passwordConfirmation: string
+  password_confirmation: string
   date_of_birth: string
   street_address: string
   mobile_number: string
@@ -42,5 +43,10 @@ export interface RegisterRequestPayload {
 export interface RegisterResponse {
   status: string
   message: string
-  access_token: string
+}
+
+export interface ApiErrorResponse {
+  message?: string
+  status?: number
+  errors?: Record<string, string[]>
 }

@@ -1,7 +1,9 @@
+import { useSharedAuthResponse } from '@/composables/useSharedAuthResponse'
 import type { RegisterRequest } from '@/Types'
 import { reactive, ref } from 'vue'
 
 export function useRegisterAccount() {
+  const { successResponse, setSuccessResponse } = useSharedAuthResponse()
   const form = reactive<RegisterRequest>({
     name: {
       firstName: '',
@@ -91,10 +93,50 @@ export function useRegisterAccount() {
     return isValid
   }
 
+  const setServerErrors = (
+    apiErrors?: Record<string, string[]>,
+    fallbackMessage?: string
+  ) => {
+    resetErrors()
+
+    const fieldMap: Record<string, keyof RegisterRequest> = {
+      name: 'name',
+      email: 'email',
+      password: 'password',
+      password_confirmation: 'passwordConfirmation',
+      date_of_birth: 'date_of_birth',
+      street_address: 'streetAddress',
+      mobile_number: 'mobileNumber',
+    }
+
+    if (!apiErrors || Object.keys(apiErrors).length === 0) {
+      if (fallbackMessage) {
+        errorMessages.value.email = { error: fallbackMessage }
+        errors.value.email = true
+      }
+      return
+    }
+
+    for (const [field, messages] of Object.entries(apiErrors)) {
+      const key = fieldMap[field]
+      if (!key) {
+        continue
+      }
+
+      errors.value[key] = true
+      errorMessages.value[key] = {
+        error: messages?.[0] ?? fallbackMessage ?? 'An unexpected error occurred.',
+      }
+    }
+  }
+
   return {
     form,
     errors,
+    successResponse,
     errorMessages,
     validateForm,
+    setServerErrors,
+    setSuccessResponse,
   }
 }

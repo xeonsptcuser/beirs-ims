@@ -1,13 +1,12 @@
-import type { BaseResponse } from '@/Types/base-response'
 import type { AxiosInstance } from 'axios'
 import api from './axios'
 
 interface IApiService {
-  get<T>(url: string): Promise<BaseResponse<T>>
-  post<T>(url: string, data?: any): Promise<BaseResponse<T>>
-  get<T>(url: string, data?: any): Promise<BaseResponse<T>>
-  get<T>(url: string, data?: any): Promise<BaseResponse<T>>
-  get<T>(url: string): Promise<BaseResponse<T>>
+  get<T>(url: string): Promise<T>
+  post<T>(url: string, data?: any): Promise<T>
+  put<T>(url: string, data?: any): Promise<T>
+  patch<T>(url: string, data?: any): Promise<T>
+  delete<T>(url: string): Promise<T>
 }
 
 export class ApiService implements IApiService {
@@ -24,26 +23,26 @@ export class ApiService implements IApiService {
     return ApiService.instance
   }
 
-  async get<T>(url: string): Promise<BaseResponse<T>> {
-    const response = await this.axiosInstance.get<BaseResponse<T>>(url)
+  async get<T>(url: string): Promise<T> {
+    const response = await this.axiosInstance.get<T>(url)
     return response.data
   }
 
-  async post<T>(url: string, data?: any): Promise<BaseResponse<T>> {
-    const response = await this.axiosInstance.post<BaseResponse<T>>(url, data)
+  async post<T>(url: string, data?: any): Promise<T> {
+    const response = await this.axiosInstance.post<T>(url, data)
     return response.data ? response.data : (response as any).response?.data
   }
 
-  async put<T>(url: string, data?: any): Promise<BaseResponse<T>> {
-    const response = await this.axiosInstance.put<BaseResponse<T>>(url, data)
+  async put<T>(url: string, data?: any): Promise<T> {
+    const response = await this.axiosInstance.put<T>(url, data)
     return response.data ? response.data : (response as any).response?.data
   }
-  async patch<T>(url: string, data?: any): Promise<BaseResponse<T>> {
-    const response = await this.axiosInstance.patch<BaseResponse<T>>(url, data)
+  async patch<T>(url: string, data?: any): Promise<T> {
+    const response = await this.axiosInstance.patch<T>(url, data)
     return response.data
   }
-  async delete<T>(url: string): Promise<BaseResponse<T>> {
-    const response = await this.axiosInstance.delete<BaseResponse<T>>(url)
+  async delete<T>(url: string): Promise<T> {
+    const response = await this.axiosInstance.delete<T>(url)
     return response.data
   }
 }
