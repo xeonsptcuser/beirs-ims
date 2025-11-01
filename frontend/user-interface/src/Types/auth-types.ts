@@ -42,7 +42,7 @@ export interface RegisterRequestPayload {
   mobile_number: string
 }
 
-export interface RegisterResponse {
+export interface CommonResponse {
   status: string
   message: string
 }

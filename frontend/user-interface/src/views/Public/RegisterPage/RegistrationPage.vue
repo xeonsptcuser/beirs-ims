@@ -4,7 +4,7 @@ import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
 import { computed, ref } from 'vue';
 import { useRegisterAccount } from './composable/useRegisterAccount';
 import FormInput from '@/components/common/FormInput/FormInput.vue';
-import type { ApiErrorResponse, RegisterRequestPayload, RegisterResponse } from '@/Types';
+import type { ApiErrorResponse, RegisterRequestPayload, CommonResponse } from '@/Types';
 import { userRegistration } from '@/Utils/loginServices';
 import { useRouter } from 'vue-router';
 import type { AxiosError } from 'axios';
@@ -53,7 +53,7 @@ const handleRegisterAccount = async () => {
   } catch (error) {
     setSuccessResponse(null);
     const axiosError = error as AxiosError<ApiErrorResponse>;
-    const fallbackResponse = error as RegisterResponse;
+    const fallbackResponse = error as CommonResponse;
 
     if (axiosError?.isAxiosError) {
       const responseData = axiosError.response?.data;

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { NavItem } from '@/Types';
+import { useSessionStore } from '@/Utils/store/useSessionStore';
+import { useRouter } from 'vue-router';
 
 
 defineProps({
@@ -13,6 +15,19 @@ defineProps({
     default: ''
   }
 })
+
+const useSession = useSessionStore();
+const router = useRouter();
+
+const handleLogout = async () => {
+  try {
+    await useSession.logout();
+    await router.push({ name: 'LoginPage' });
+  } catch (error) {
+    console.error('Failed to logout user', error);
+  }
+}
+
 </script>
 <template>
 
@@ -23,7 +38,7 @@ defineProps({
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
-      <ul class="list-group-flush ms-auto">
+      <ul class="list-group-flush ms-auto" v-if="!useSession.isLoggedIn()">
         <div class="d-md-flex gap-md-3 align-items-center pt-2">
           <li v-for="item in navLinks" :key="item.path" class="list-group-item">
             <router-link class="nav-link py-2 text-responsive" :to="item.path">{{ item.label }}</router-link>
@@ -32,6 +47,15 @@ defineProps({
             <router-link class="nav-link text-responsive" to="/login">
               Login
             </router-link>
+          </li>
+        </div>
+      </ul>
+      <ul class="list-group-flush ms-auto" v-else>
+        <div class="d-md-flex gap-md-3 align-items-center pt-2">
+          <li class="list-group-item ms-md-5 mt-3 mt-md-0">
+            <a class="nav-link text-responsive" href="#" @click.prevent="handleLogout">
+              Logout
+            </a>
           </li>
         </div>
       </ul>
