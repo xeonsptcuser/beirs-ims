@@ -40,7 +40,13 @@ const handleLogin = async () => {
 
       hasError.value = false;
       useSession.setSession(response);
-      router.push({ name: 'Dashboard' });
+
+      router.push({
+        name: 'Dashboard',
+        params: {
+          role: response.user.profile.role
+        }
+      });
 
     } else {
       hasError.value = true;

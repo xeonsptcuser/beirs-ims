@@ -1,15 +1,15 @@
-import AboutPage from '@/views/LandingPage/AboutPage/AboutPage.vue'
-import LandingPage from '@/views/LandingPage/LandingPage.vue'
-import LoginPage from '@/views/LandingPage/LoginPage/LoginPage.vue'
-import RegistrationPage from '@/views/LandingPage/RegisterPage/RegistrationPage.vue'
-import ServicesPage from '@/views/LandingPage/ServicesPage/ServicesPage.vue'
+import AboutPage from '@/views/Public/AboutPage/AboutPage.vue'
+import HomePage from '@/views/Public/HomePage/HomePage.vue'
+import LoginPage from '@/views/Public/LoginPage/LoginPage.vue'
+import RegistrationPage from '@/views/Public/RegisterPage/RegistrationPage.vue'
+import ServicesPage from '@/views/Public/ServicesPage/ServicesPage.vue'
 import type { RouteRecordRaw } from 'vue-router'
 
 export const publicRoutes: RouteRecordRaw[] = [
   {
     path: '/home',
     name: 'LandingPage',
-    component: LandingPage,
+    component: HomePage,
     meta: {
       title: 'Home',
     },
