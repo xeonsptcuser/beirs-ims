@@ -53,12 +53,69 @@ const handleLogout = async () => {
       <ul class="list-group-flush ms-auto" v-else>
         <div class="d-md-flex gap-md-3 align-items-center pt-2">
           <li class="list-group-item ms-md-5 mt-3 mt-md-0">
-            <a class="nav-link text-responsive" href="#" @click.prevent="handleLogout">
-              Logout
-            </a>
+            <div class="dropdown d-none d-md-inline-block">
+              <a class="text-decoration-none text-md-dark dropdown-toggle" href="#" id="navProfileDesktop"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                {{ useSession.name }} <i class="bi bi-caret-down-fill d-md-none"></i>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navProfileDesktop">
+                <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Profile</a></li>
+                <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Settings</a></li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+                <li>
+                  <a class="dropdown-item text-danger" href="#" @click.prevent="handleLogout">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="d-md-none">
+              <a class="text-md-dark text-decoration-none d-flex align-items-center justify-content-between"
+                data-bs-toggle="collapse" href="#navbarMobileProfile" aria-expanded="false"
+                aria-controls="navbarMobileProfile">
+                {{ useSession.name }} <i class="bi bi-caret-down-fill"></i>
+              </a>
+              <div class="collapse mt-2" id="navbarMobileProfile">
+                <ul class="list-group-flush">
+                  <li class="list-group-item bg-transparent border-0 mb-1">
+                    <i class="bi bi-person"></i> Profile
+                  </li>
+                  <li class="list-group-item bg-transparent border-0 mb-1">
+                    <i class="bi bi-gear"></i> Settings
+                  </li>
+                  <li class="list-group-item ">
+                    <hr class="dropdown-divider bg-light" />
+                  </li>
+                  <li class="list-group-item bg-transparent border-0">
+                    <a class="text-responsive text-decoration-none text-danger" href="#" @click.prevent="handleLogout">
+                      <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </li>
         </div>
       </ul>
     </div>
   </div>
 </template>
+
+<style scoped>
+.text-md-dark {
+  color: #333;
+}
+
+@media (min-width: 768px) {
+  .text-md-dark {
+    color: #fff;
+  }
+
+  .text-md-dark:hover {
+    color: #010101;
+  }
+}
+</style>
