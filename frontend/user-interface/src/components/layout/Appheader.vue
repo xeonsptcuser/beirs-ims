@@ -23,7 +23,7 @@ const navItems = [
     <div class="container d-flex align-items-center justify-between">
       <AppLogo />
       <HamburgerButton />
-      <SlidingNavbar :navLinks="navItems" title="Navigation Menu" />
+      <SlidingNavbar :navLinks="navItems" title="Menu" />
     </div>
   </nav>
 </template>
