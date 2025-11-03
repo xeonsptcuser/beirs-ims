@@ -8,7 +8,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: AppLayout,
-    redirect: { name: 'LandingPage' },
+    redirect: { name: 'HomePage' },
     children: [...publicRoutes, ...privateRoutes],
   },
 ]
@@ -32,7 +32,7 @@ router.beforeEach(async (to, _from, next) => {
   if (to.meta.requiresAuth) {
     if (!session.token) return next({ name: 'LoginPage' })
     if (roleParam && roleParam !== session.role) {
-      return next({ name: 'LandingPage' })
+      return next({ name: 'HomePage' })
     }
   }
 
