@@ -1,34 +1,38 @@
 <script setup lang="ts">
 import AdminDashboardImage from '@/assets/images/adminImageDashboard.png'
 
+defineProps<{ role: string }>();
+
 const ADMIN_PANEL = 'ADMIN PANEL';
 
 const navItems = [
   {
-    path: '/residents',
+    name: 'Residents',
     icon: 'bi-people-fill',
     title: 'View Residents',
     btnType: 'btn-primary'
   },
   {
-    path: '/certifications',
+    name: 'Certifications',
     icon: 'bi-files',
-    title: 'Certification',
+    title: 'Certification Requests',
     btnType: 'btn-warning'
   },
   {
-    path: '/blotter-reports',
+    name: 'BlotterReports',
     icon: 'bi-megaphone-fill',
-    title: 'View Residents',
+    title: 'Blotter Reports',
     btnType: 'btn-success'
   },
   {
-    path: '/heat-maps',
+    name: 'HeatMaps',
     icon: 'bi-broadcast-pin',
     title: 'Heat Map',
     btnType: 'btn-danger'
   },
 ]
+
+// Fetch total records for
 
 </script>
 <template>
@@ -38,8 +42,8 @@ const navItems = [
         <p class="text-center letter-spacing-wide fw-bold h2 mb-4">{{ ADMIN_PANEL }}</p>
         <div class="row justify-content-center gy-3 gx-3">
           <div class="col-12 col-md-6" v-for="navItem in navItems">
-            <router-link :to="navItem.path" class="btn py-4 w-100 d-flex align-items-center justify-content-center"
-              :class="[navItem.btnType]">
+            <router-link :to="{ name: navItem.name, params: { role: role } }"
+              class="btn py-4 w-100 d-flex align-items-center justify-content-center" :class="[navItem.btnType]">
               <i class="bi fs-4 me-2" :class="[`${navItem.icon}`]"></i>
               <span> {{ navItem.title }} </span>
             </router-link>
