@@ -3,7 +3,7 @@
 
 </script>
 <template>
-  <nav class="bg-strong-blue py-4 fixed-bottom">
+  <nav class="bg-strong-blue py-4">
     <div class="container-fluid d-flex justify-content-end py-4">
       <ul class="list-group list-group-flush  text-end">
         <li class="list-group-item bg-transparent border-0 text-white"><span class="fs-md-4">+63 975 123 1234</span> <i
