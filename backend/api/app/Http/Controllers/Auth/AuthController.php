@@ -3,16 +3,19 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Users\User;
+use App\Interfaces\UsersRepositoryInterface;
 use App\Models\Users\UserProfile;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
+
+    public function __construct(private readonly UsersRepositoryInterface $users)
+    {
+    }
+
     // POST /api/login
     public function login(Request $request)
     {
@@ -21,7 +24,7 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        $user = User::with('profile')->where('email', $credentials['email'])->first();
+        $user = $this->users->findByEmail($credentials['email'], $credentials['profile']);
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Incorrect email address or password...'], 401);
@@ -46,20 +49,24 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'date_of_birth' => 'required|date',
             'role' => 'in:admin,staff,resident',
+            'street_address' => 'nullable|string|max:255',
+            'mobile_number' => 'nullable|string|max:20',
         ]);
 
-        $profile = UserProfile::create([
-            'name' => $validated['name'],
-            'date_of_birth' => Carbon::parse($validated['date_of_birth']),
-            'street_address' => $request->street_address,
-            'mobile_number' => $request->mobile_number,
-        ]);
+        $this->users->createWithProfile(
+            [
+                'email' => $validated['email'],
+                'password' => $validated['password'],
+                'role' => $validated['role'] ?? 'resident',
+            ],
+            [
+                'name' => $validated['name'],
+                'date_of_birth' => Carbon::parse($validated['date_of_birth']),
+                'street_address' => $validated['street_address'],
+                'mobile_number' => $validated['mobile_number'],
+            ]
+        );
 
-        $profile->user()->create([
-            'email' => $validated['email'],
-            'password' => $validated['password'],
-            'role' => $validated['role'] ?? 'resident',
-        ]);
 
         return response()->json([
             'status' => 'success',
