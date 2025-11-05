@@ -20,7 +20,8 @@ class UserProfile extends Model
         'name',
         'street_address',
         'mobile_number',
-        'date_of_birth'
+        'date_of_birth',
+        'is_active'
     ];
 
     /**
@@ -39,5 +40,6 @@ class UserProfile extends Model
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_active' => 'boolean'
     ];
 }

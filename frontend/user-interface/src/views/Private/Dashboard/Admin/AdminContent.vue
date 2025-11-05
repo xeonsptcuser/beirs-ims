@@ -38,6 +38,9 @@ const navItems = [
 <template>
   <div class="my-5">
     <div class="row align-items-center py-5">
+      <div class="col-md-5 d-none d-md-block">
+        <img :src="AdminDashboardImage" alt="admin-dashboard-img" class="img-fluid">
+      </div>
       <div class="col-md-7 col-sm-12">
         <p class="text-center letter-spacing-wide fw-bold h2 mb-4">{{ ADMIN_PANEL }}</p>
         <div class="row justify-content-center gy-3 gx-3">
@@ -50,9 +53,6 @@ const navItems = [
           </div>
         </div>
       </div>
-      <div class="col-md-5 d-none d-md-block">
-        <img :src="AdminDashboardImage" alt="admin-dashboard-img" class="img-fluid img-flip">
-      </div>
     </div>
   </div>
 </template>
@@ -60,10 +60,6 @@ const navItems = [
 <style scoped>
 .letter-spacing-wide {
   letter-spacing: 12px;
-}
-
-.img-flip {
-  transform: scaleX(-1);
 }
 
 @media (min-width: 768px) {
