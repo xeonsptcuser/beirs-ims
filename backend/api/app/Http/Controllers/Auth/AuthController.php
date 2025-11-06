@@ -24,7 +24,7 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        $user = $this->users->findByEmail($credentials['email'], $credentials['profile']);
+        $user = $this->users->findByEmail($credentials['email'], ['profile']);
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Incorrect email address or password...'], 401);

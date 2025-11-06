@@ -11,7 +11,7 @@ interface IApiService {
 
 export class ApiService implements IApiService {
   private static instance: ApiService
-  private axiosInstance: AxiosInstance
+  private readonly axiosInstance: AxiosInstance
 
   constructor() {
     this.axiosInstance = api
@@ -23,8 +23,8 @@ export class ApiService implements IApiService {
     return ApiService.instance
   }
 
-  async get<T>(url: string): Promise<T> {
-    const response = await this.axiosInstance.get<T>(url)
+  async get<T>(url: string, params?: Record<string, any>): Promise<T> {
+    const response = await this.axiosInstance.get<T>(url, { params })
     return response.data
   }
 

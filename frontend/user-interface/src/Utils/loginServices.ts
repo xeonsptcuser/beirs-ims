@@ -5,7 +5,6 @@ import type {
   LoginResponse,
   RegisterRequestPayload,
   CommonResponse,
-  CommonResponse,
 } from '@/Types'
 
 export const userLogin = async (data: LoginRequestPayload): Promise<LoginResponse> => {

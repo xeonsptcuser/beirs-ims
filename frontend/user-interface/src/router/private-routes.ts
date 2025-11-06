@@ -3,6 +3,7 @@ import Certifications from '@/views/Private/Certifications/Certifications.vue'
 import Dashboard from '@/views/Private/Dashboard/Dashboard.vue'
 import HeatMaps from '@/views/Private/HeatMaps/HeatMaps.vue'
 import Residents from '@/views/Private/Residents/Residents.vue'
+import UserProfile from '@/views/Private/Residents/UserProfile.vue'
 
 import type { RouteRecordRaw } from 'vue-router'
 
@@ -28,6 +29,16 @@ export const privateRoutes: RouteRecordRaw[] = [
         props: (route) => ({ role: route.params.role as string }),
         meta: {
           title: 'View Residents',
+          requiresAuth: true,
+        },
+      },
+      {
+        path: 'profile/:id',
+        name: 'UserProfile',
+        component: UserProfile,
+        props: (route) => ({ id: route.params.id as string }),
+        meta: {
+          title: 'User Profile',
           requiresAuth: true,
         },
       },
