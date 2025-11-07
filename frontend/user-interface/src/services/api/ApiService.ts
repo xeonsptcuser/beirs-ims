@@ -6,7 +6,7 @@ interface IApiService {
   post<T>(url: string, data?: any): Promise<T>
   put<T>(url: string, data?: any): Promise<T>
   patch<T>(url: string, data?: any): Promise<T>
-  delete<T>(url: string): Promise<T>
+  delete<T>(url: string, data?: any): Promise<T>
 }
 
 export class ApiService implements IApiService {

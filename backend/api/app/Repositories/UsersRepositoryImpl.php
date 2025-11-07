@@ -15,12 +15,6 @@ class UsersRepositoryImpl implements UsersRepositoryInterface
     {
         $query = User::with($relations)
             ->whereIn('role', ['resident', 'staff'])
-            ->whereHas(
-                'profile',
-                function ($q) {
-                    $q->where('is_active', true);
-                }
-            )
             ->orderBy('created_at', 'desc');
 
         return $perPage ? $query->paginate($perPage) : $query->get();
