@@ -27,4 +27,11 @@ export class UserRelatedService {
   ): Promise<ApiResponse<User>> {
     return this.apiService.post<ApiResponse<User>>(url, data)
   }
+
+  async toggleUserAccount(
+    url: string,
+    data: { is_active: boolean }
+  ): Promise<ApiResponse<User>> {
+    return this.apiService.patch<ApiResponse<User>>(url, data)
+  }
 }

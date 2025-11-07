@@ -92,10 +92,18 @@ class UsersController extends Controller
             'street_address' => ['sometimes', 'nullable', 'string', 'max:255'],
             'mobile_number' => ['sometimes', 'nullable', 'string', 'max:20'],
             'date_of_birth' => ['sometimes', 'date'],
+            'is_active' => ['sometimes', 'boolean'],
         ]);
 
-        $userData = collect($validated)->only(['email', 'password', 'role'])->filter()->toArray();
-        $profileData = collect($validated)->only(['name', 'street_address', 'mobile_number', 'date_of_birth'])->filter()->toArray();
+        $userData = collect($validated)
+            ->only(['email', 'password', 'role'])
+            ->filter(fn ($value) => !is_null($value))
+            ->toArray();
+
+        $profileData = collect($validated)
+            ->only(['name', 'street_address', 'mobile_number', 'date_of_birth', 'is_active'])
+            ->filter(fn ($value) => !is_null($value))
+            ->toArray();
 
         $updated = $this->users->updateWithProfile($user, $userData, $profileData);
 

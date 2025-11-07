@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import Pagination from '@/components/common/Pagination/Pagination.vue';
 import type { PaginationLink, User } from '@/Types';
-import { fetchAllUsers } from '@/Utils/userServices';
+import { fetchAllUsers, toggleUserAccountStatus } from '@/Utils/userServices';
 import { onMounted, reactive, ref } from 'vue';
-
 
 defineProps<{ role: string }>();
 
-const residents = ref<User[]>();
+const residents = ref<User[]>([]);
 const loading = ref<boolean>(false);
 
 const pagination = reactive({
@@ -18,7 +17,7 @@ const pagination = reactive({
   links: [] as PaginationLink[],
 });
 
-const fetchResidentUsers = async (page = pagination.current) => {
+const fetchResidentUsers = async (page: number = pagination.current) => {
   loading.value = true
   try {
     const response = await fetchAllUsers({ page, per_page: pagination.perPage });
@@ -40,7 +39,24 @@ const fetchResidentUsers = async (page = pagination.current) => {
   }
 }
 
+const handleToggleUserStatus = async (resident: User) => {
+  const targetStatus = !resident.profile.is_active;
+  const actionLabel = targetStatus ? 'activate' : 'deactivate';
+  const shouldProceed = globalThis.confirm(`Are you sure you want to ${actionLabel} this user?`);
+  if (!shouldProceed) {
+    return;
+  }
 
+  loading.value = true;
+  try {
+    await toggleUserAccountStatus(resident.id, targetStatus);
+    await fetchResidentUsers(pagination.current);
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loading.value = false;
+  }
+}
 
 onMounted(() => {
   fetchResidentUsers();
@@ -71,7 +87,7 @@ onMounted(() => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="resident in residents">
+          <tr v-for="resident in residents" :key="resident.id">
             <td class="align-middle">
               <router-link :to="{
                 name: 'UserProfile',
@@ -94,7 +110,15 @@ onMounted(() => {
               <p class="mb-0 py-1 text-md"><i class="bi bi-pencil-square fs-5 text-warning"></i> Edit</p>
             </td>
             <td class="align-middle">
-              <p class="mb-0 py-1 text-md"><i class="bi bi-slash-circle-fill fs-5 text-danger"></i> Deactivate</p>
+              <a href="#" @click.prevent="handleToggleUserStatus(resident)"
+                class="text-decoration-none text-black">
+                <span v-if="resident.profile.is_active">
+                  <i class="bi bi-slash-circle-fill fs-5 text-danger"></i> Deactivate
+                </span>
+                <span v-else>
+                  <i class="bi bi-check-circle-fill fs-5 text-success"></i> Activate
+                </span>
+              </a>
             </td>
           </tr>
         </tbody>
