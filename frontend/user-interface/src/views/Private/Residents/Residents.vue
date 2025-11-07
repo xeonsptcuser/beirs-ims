@@ -63,9 +63,11 @@ onMounted(() => {
         <thead class="table-secondary">
           <tr>
             <th scope="col">Full Name</th>
-            <th scope="col" class="text-center">Active</th>
+            <th scope="col" class="text-center">Roles</th>
+
             <th scope="col" class="text-center">Sitio</th>
-            <th scope="col" colspan="2">Options</th>
+            <th scope="col" class="text-center">Active</th>
+            <th scope="col" colspan="2" class="text-center">Options</th>
           </tr>
         </thead>
         <tbody>
@@ -78,12 +80,15 @@ onMounted(() => {
                 {{ resident.profile.name ?? '-' }}
               </router-link>
             </td>
-            <td class="align-middle text-center">
-              <p class="mb-0 py-1 text-md "> <i class="bi-record-fill"
-                  :class="[resident.profile.is_active ? 'text-success' : 'text-danger']"></i></p>
+            <td class="align-middle">
+              <p class="mb-0 py-1 text-md ps-2 text-capitalize">{{ resident.role ?? '-' }}</p>
             </td>
             <td class="align-middle">
               <p class="mb-0 py-1 text-md ps-2">{{ resident.profile?.street_address ?? '-' }}</p>
+            </td>
+            <td class="align-middle text-center">
+              <p class="mb-0 py-1 text-md "> <i class="bi-record-fill"
+                  :class="[resident.profile.is_active ? 'text-success' : 'text-danger']"></i></p>
             </td>
             <td class="align-middle">
               <p class="mb-0 py-1 text-md"><i class="bi bi-pencil-square fs-5 text-warning"></i> Edit</p>

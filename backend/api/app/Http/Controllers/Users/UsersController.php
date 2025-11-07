@@ -59,12 +59,12 @@ class UsersController extends Controller
                 'role' => $validated['role']
             ],
             [
-                [
-                    'name' => $validated['name'],
-                    'date_of_birth' => Carbon::parse($validated['date_of_birth']),
-                    'street_address' => $validated['street_address'],
-                    'mobile_number' => $validated['mobile_number'],
-                ]
+
+                'name' => $validated['name'],
+                'date_of_birth' => Carbon::parse($validated['date_of_birth']),
+                'street_address' => $validated['street_address'],
+                'mobile_number' => $validated['mobile_number'],
+
             ]
         );
 

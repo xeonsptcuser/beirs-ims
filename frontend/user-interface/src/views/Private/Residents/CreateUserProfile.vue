@@ -28,6 +28,10 @@ const hasError = ref<boolean>(false);
 const router = useRouter();
 const roleOptions = ['Resident', 'Staff'];
 
+const formatRole = computed(() => {
+  return form.role.toLowerCase();
+})
+
 const handleCreateUserAccount = async () => {
   // HANDLE CREATE HERE
   try {
@@ -40,7 +44,7 @@ const handleCreateUserAccount = async () => {
         email: form.email,
         password: form.password,
         password_confirmation: form.passwordConfirmation,
-        role: form.role,
+        role: formatRole.value,
         date_of_birth: form.date_of_birth,
         street_address: form.streetAddress,
         mobile_number: form.mobileNumber,
