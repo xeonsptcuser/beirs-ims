@@ -1,4 +1,4 @@
-import type { User } from '@/Types/user-related-types'
+import type { CreateAccountRequestPayload, User } from '@/Types/user-related-types'
 import { ApiService } from '../ApiService'
 import type { ApiResponse, PageInfo, PaginatedData } from '@/Types'
 
@@ -18,7 +18,13 @@ export class UserRelatedService {
   }
 
   async getAllUsers(url: string, params?: PageInfo): Promise<ApiResponse<PaginatedData<User[]>>> {
-    console.log(params)
     return this.apiService.get<ApiResponse<PaginatedData<User[]>>>(url, params)
+  }
+
+  async createUserAccount(
+    data: CreateAccountRequestPayload,
+    url: string
+  ): Promise<ApiResponse<User>> {
+    return this.apiService.post<ApiResponse<User>>(url, data)
   }
 }

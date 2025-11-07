@@ -18,4 +18,5 @@ export const endpoints = {
   // AUTHENTICATED ENDPOINTS
   LOGOUT: `${AUTH_BASE}/logout`,
   GET_ALL_USERS: `${AUTH_BASE}/users`,
+  CREATE_USER_ACCOUNT: `${AUTH_BASE}/users`,
 }
