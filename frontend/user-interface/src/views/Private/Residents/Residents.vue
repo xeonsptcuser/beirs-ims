@@ -50,10 +50,12 @@ onMounted(() => {
 <template>
   <div class="my-5">
     <div class="d-flex">
-      <button class="btn btn-primary mb-3 ms-auto">
+      <router-link :to="{
+        name: 'CreateUserProfile'
+      }" class="btn btn-primary mb-3 ms-auto">
         <i class="bi bi-person-plus me-2 mb-0 fs-5"></i>
         <span>Add Resident</span>
-      </button>
+      </router-link>
     </div>
     <div class="p-4 rounded border border-gray-500 ">
       <h3 class="text-center tracking-wider">RESIDENTS LIST</h3>
@@ -83,11 +85,11 @@ onMounted(() => {
             <td class="align-middle">
               <p class="mb-0 py-1 text-md ps-2">{{ resident.profile?.street_address ?? '-' }}</p>
             </td>
-            <td class="text-warning align-middle">
-              <p class="mb-0 py-1 text-md"><i class="bi bi-pencil-square fs-5"></i> Edit</p>
+            <td class="align-middle">
+              <p class="mb-0 py-1 text-md"><i class="bi bi-pencil-square fs-5 text-warning"></i> Edit</p>
             </td>
-            <td class="text-danger align-middle">
-              <p class="mb-0 py-1 text-md"><i class="bi bi-trash3-fill fs-5"></i> Deactivate</p>
+            <td class="align-middle">
+              <p class="mb-0 py-1 text-md"><i class="bi bi-slash-circle-fill fs-5 text-danger"></i> Deactivate</p>
             </td>
           </tr>
         </tbody>

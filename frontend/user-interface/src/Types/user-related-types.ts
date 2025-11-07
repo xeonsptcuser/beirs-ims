@@ -15,3 +15,30 @@ export interface User {
   role: string
   profile: UserProfile
 }
+
+interface FullName {
+  firstName: string
+  lastName: string
+  middleName: string
+}
+export interface CreateUserAccountRequest {
+  name: FullName
+  role: string
+  email: string
+  password: string
+  passwordConfirmation: string
+  date_of_birth: string
+  streetAddress: string
+  mobileNumber: string
+}
+
+export interface CreateAccountRequestPayload {
+  name: string
+  email: string
+  password: string
+  password_confirmation: string
+  role: string
+  date_of_birth: string
+  street_address: string
+  mobile_number: string
+}

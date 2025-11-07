@@ -2,6 +2,7 @@ import BlotterReports from '@/views/Private/BlotterReports/BlotterReports.vue'
 import Certifications from '@/views/Private/Certifications/Certifications.vue'
 import Dashboard from '@/views/Private/Dashboard/Dashboard.vue'
 import HeatMaps from '@/views/Private/HeatMaps/HeatMaps.vue'
+import CreateUserProfile from '@/views/Private/Residents/CreateUserProfile.vue'
 import Residents from '@/views/Private/Residents/Residents.vue'
 import UserProfile from '@/views/Private/Residents/UserProfile.vue'
 
@@ -33,12 +34,22 @@ export const privateRoutes: RouteRecordRaw[] = [
         },
       },
       {
-        path: 'profile/:id',
+        path: 'residents/profile/:id',
         name: 'UserProfile',
         component: UserProfile,
         props: (route) => ({ id: route.params.id as string }),
         meta: {
           title: 'User Profile',
+          requiresAuth: true,
+        },
+      },
+      {
+        path: 'residents/create',
+        name: 'CreateUserProfile',
+        component: CreateUserProfile,
+        props: (route) => ({ role: route.params.role as string }),
+        meta: {
+          title: 'Create User Profile',
           requiresAuth: true,
         },
       },

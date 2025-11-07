@@ -9,9 +9,11 @@ import type { ApiErrorResponse, LoginRequestPayload } from "@/Types";
 import { userLogin } from "@/Utils/loginServices";
 import { useRouter } from "vue-router";
 import { useSessionStore } from "@/Utils/store/useSessionStore";
+import FormButton from "@/components/common/FormButton/FormButton.vue";
 
 const {
   form,
+  errors,
   errorMessages,
   isSuccessResponse,
   validateForm,
@@ -87,10 +89,12 @@ const filteredErrors = computed(() => {
         <SuccessLabel :is-success="!!isSuccessResponse?.status" :message="isSuccessResponse?.message" />
         <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleLogin">
           <FormInput type="text" label="Email Address" placeholder="Email Address" id="userName" autofocus
-            v-model="form.email" />
+            v-model="form.email" :has-error="errors.email" :error-message="errorMessages.email.error" />
           <FormInput type="password" label="Password" placeholder="Password" id="passWord" autofocus
-            v-model="form.password" />
-          <button type="submit" class="btn btn-primary w-100 mt-2 py-2">SIGN IN</button>
+            v-model="form.password" :has-error="errors.password" :error-message="errorMessages.password.error" />
+          <div class="col-md-10 col-sm-12 mx-auto">
+            <FormButton label="Sign In" />
+          </div>
           <hr>
           <p class="text-center mb-0">Don't have an account yet? <router-link to="/registration"
               class="btn btn-success">Register
