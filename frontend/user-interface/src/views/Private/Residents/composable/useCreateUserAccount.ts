@@ -41,6 +41,8 @@ export function useCreateUserAccount() {
     mobileNumber: { error: '' },
   })
 
+  const roleOptions = ['Resident', 'Staff']
+
   const resetErrors = () => {
     for (const key of Object.keys(errors.value) as (keyof CreateUserAccountRequest)[]) {
       errors.value[key] = false
@@ -159,6 +161,7 @@ export function useCreateUserAccount() {
     errors,
     errorMessages,
     successResponse,
+    roleOptions,
     validateForm,
     setServerErrors,
     setSuccessResponse,

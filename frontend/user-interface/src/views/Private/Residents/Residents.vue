@@ -83,7 +83,7 @@ onMounted(() => {
 
             <th scope="col" class="text-center">Sitio</th>
             <th scope="col" class="text-center">Active</th>
-            <th scope="col" colspan="2" class="text-center">Options</th>
+            <th scope="col" colspan="2" class="text-center">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -107,11 +107,7 @@ onMounted(() => {
                   :class="[resident.profile.is_active ? 'text-success' : 'text-danger']"></i></p>
             </td>
             <td class="align-middle">
-              <p class="mb-0 py-1 text-md"><i class="bi bi-pencil-square fs-5 text-warning"></i> Edit</p>
-            </td>
-            <td class="align-middle">
-              <a href="#" @click.prevent="handleToggleUserStatus(resident)"
-                class="text-decoration-none text-black">
+              <a href="#" @click.prevent="handleToggleUserStatus(resident)" class="text-decoration-none text-black">
                 <span v-if="resident.profile.is_active">
                   <i class="bi bi-slash-circle-fill fs-5 text-danger"></i> Deactivate
                 </span>

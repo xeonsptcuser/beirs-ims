@@ -1,8 +1,16 @@
 <script setup lang="ts">
-defineProps<{
+withDefaults(defineProps<{
   label: string
-}>()
+  type?: 'submit' | 'button' | 'reset'
+  btnDisplay?: 'primary' | 'warning' | 'success' | 'danger' | 'secondary'
+  isOutlined?: boolean
+}>(), {
+  type: 'submit',
+  btnDisplay: 'primary',
+  isOutlined: false
+})
 </script>
 <template>
-  <button type="submit" class="btn btn-primary w-100 mt-2 py-2"> {{ label }}</button>
+  <button :type="type" class="btn w-100 mt-2 py-2"
+    :class="[isOutlined ? `btn-outline-${btnDisplay}` : `btn-${btnDisplay}`]"> {{ label }}</button>
 </template>

@@ -42,3 +42,14 @@ export interface CreateAccountRequestPayload {
   street_address: string
   mobile_number: string
 }
+
+export interface UserProfileEditStatus {
+  name: boolean
+  email: boolean
+  password: boolean
+  passwordConfirmation: boolean
+  role: boolean
+  dateOfBirth: boolean
+  streetAddress: boolean
+  mobileNumber: boolean
+}
