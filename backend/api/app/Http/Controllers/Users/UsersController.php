@@ -28,10 +28,9 @@ class UsersController extends Controller
     }
 
     // GET /api/auth/users/{id}
-    public function show(Request $request)
+    public function show(int $userId)
     {
-        $id = $request->integer('user_id');
-        $user = $this->users->findById($id, ['profile']);
+        $user = $this->users->findById($userId, ['profile']);
 
         return response()->json([
             'status' => 'success',
@@ -97,12 +96,12 @@ class UsersController extends Controller
 
         $userData = collect($validated)
             ->only(['email', 'password', 'role'])
-            ->filter(fn ($value) => !is_null($value))
+            ->filter(fn($value) => !is_null($value))
             ->toArray();
 
         $profileData = collect($validated)
             ->only(['name', 'street_address', 'mobile_number', 'date_of_birth', 'is_active'])
-            ->filter(fn ($value) => !is_null($value))
+            ->filter(fn($value) => !is_null($value))
             ->toArray();
 
         $updated = $this->users->updateWithProfile($user, $userData, $profileData);

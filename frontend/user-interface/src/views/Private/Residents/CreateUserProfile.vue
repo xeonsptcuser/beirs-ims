@@ -19,6 +19,7 @@ const {
   form,
   errorMessages,
   errors,
+  roleOptions,
   validateForm,
   setSuccessResponse,
   setServerErrors
@@ -26,7 +27,6 @@ const {
 
 const hasError = ref<boolean>(false);
 const router = useRouter();
-const roleOptions = ['Resident', 'Staff'];
 
 const formatRole = computed(() => {
   return form.role.toLowerCase();
