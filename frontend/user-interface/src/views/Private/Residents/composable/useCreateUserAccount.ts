@@ -41,7 +41,7 @@ export function useCreateUserAccount() {
     mobileNumber: { error: '' },
   })
 
-  const roleOptions = ['Resident', 'Staff']
+  const roleOptions = ['resident', 'staff']
 
   const resetErrors = () => {
     for (const key of Object.keys(errors.value) as (keyof CreateUserAccountRequest)[]) {

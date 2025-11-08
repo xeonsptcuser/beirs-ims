@@ -16,12 +16,6 @@ export function useEditUserAccount() {
     mobileNumber: true,
   })
 
-  const resetEditStatus = () => {
-    for (const key of Object.keys(isEditableUser.value) as (keyof UserProfileEditStatus)[]) {
-      isEditableUser.value[key] = true
-    }
-  }
-
   const setIsEditableUser = () => {
     isEditableUser.value.name = !isEditableUser.value.name
     isEditableUser.value.role = !isEditableUser.value.role

@@ -28,10 +28,11 @@ export class UserRelatedService {
     return this.apiService.post<ApiResponse<User>>(url, data)
   }
 
-  async toggleUserAccount(
-    url: string,
-    data: { is_active: boolean }
-  ): Promise<ApiResponse<User>> {
+  async toggleUserAccount(url: string, data: { is_active: boolean }): Promise<ApiResponse<User>> {
     return this.apiService.patch<ApiResponse<User>>(url, data)
+  }
+
+  async getSingleUserAccount(url: string): Promise<ApiResponse<User>> {
+    return this.apiService.get(url)
   }
 }

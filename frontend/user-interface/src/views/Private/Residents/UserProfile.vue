@@ -4,6 +4,14 @@ import FormInput from '@/components/common/FormInput/FormInput.vue';
 import { useEditUserAccount } from './composable/useEditUserAccount';
 import DropdownInput from '@/components/common/DropdownInput/DropdownInput.vue';
 import FormButton from '@/components/common/FormButton/FormButton.vue';
+import { fetchSingleUserProfile } from '@/Utils/userServices';
+import { onMounted, ref } from 'vue';
+import type { AxiosError } from 'axios';
+import type { ApiErrorResponse } from '@/Types';
+
+const props = defineProps<{
+  id: string
+}>()
 
 const {
   form,
@@ -15,16 +23,47 @@ const {
   setIsEditableUser
 } = useEditUserAccount()
 
+const loading = ref<boolean>(false);
 const handleUpdateUserAccount = async () => {
   // handle update here
+  console.log(form);
 }
 
+const fetchUserProfile = async () => {
+  loading.value = true
+  try {
+    const response = await fetchSingleUserProfile(props.id)
+    const responseData = response.data
+
+    const [firstAndLast = '', middle = ''] = (responseData.profile?.name ?? '').split(',')
+    const [firstName = '', lastName = ''] = firstAndLast.trim().split(/\s+/, 2)
+
+    form.name.firstName = firstName.trim()
+    form.name.lastName = lastName.trim()
+    form.name.middleName = middle.trim()
+
+    form.email = responseData.email.trim()
+    form.role = (responseData.role).trim()
+    form.streetAddress = responseData.profile.street_address.trim()
+    form.mobileNumber = responseData.profile.mobile_number.trim()
+    form.date_of_birth = responseData.profile.date_of_birth.trim()
+
+    console.log("RESPONSE: ", responseData)
+
+  } catch (error) {
+    const axiosError = error as AxiosError<ApiErrorResponse>;
+    console.log(axiosError)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchUserProfile()
+})
 </script>
 <template>
   <div class="my-5 ">
-    <div class="alert alert-success" role="alert">
-      USER PROFILE PAGE HERE.... 🎉sasa
-    </div>
     <FormContainer title="User Profile" :max-width="'750px'">
       <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleUpdateUserAccount">
         <div class="row g-2">
@@ -42,7 +81,7 @@ const handleUpdateUserAccount = async () => {
               :is-disabled="isEditableUser.name" />
           </div>
         </div>
-        <div class="row g-2">
+        <div class="row g-2 mb-3 mb-md-0">
           <div class="col-md-6 col-sm-12">
             <FormInput type="email" label="Email Address" placeholder="beirs@test.com" id="email" v-model="form.email"
               :has-error="errors.email" :error-message="errorMessages.email.error"
@@ -86,7 +125,7 @@ const handleUpdateUserAccount = async () => {
 
         <div class="col-md-8 col-sm-12 mx-auto d-flex justify-items-center gap-2 align-items-center">
           <FormButton label="Submit" />
-          <FormButton type="button" label="Edit Profile" btn-display="secondary" :is-outlined="true"
+          <FormButton type="button" label="Edit" btn-display="secondary" :is-outlined="true"
             @Click.prevent="setIsEditableUser" />
         </div>
 

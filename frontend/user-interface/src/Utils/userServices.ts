@@ -36,3 +36,13 @@ export const toggleUserAccountStatus = async (userId: number, isActive: boolean)
 
   return response
 }
+
+export const fetchSingleUserProfile = async (userId: string) => {
+  const response = await userRelatedService.getSingleUserAccount(endpoints.GET_SINGLE_USER(userId))
+
+  if (!response.status || response.status !== 'success') {
+    throw new Error(`Failed to retrieve user with id ${userId}`)
+  }
+
+  return response
+}
