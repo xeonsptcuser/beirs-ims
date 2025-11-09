@@ -106,8 +106,7 @@ const handleUpdateUserAccount = async () => {
     setSuccessResponse(null)
     const axiosError = error as AxiosError<ApiErrorResponse>;
     const fallbackResponse = error as CommonResponse;
-    console.log("AXIOS ERROR: ", axiosError)
-    console.log("FALLBACK ERROR: ", fallbackResponse)
+
     setServerErrors(axiosError.response?.data?.errors, axiosError.response?.data?.message ?? fallbackResponse.message)
   } finally {
     loading.value = false
