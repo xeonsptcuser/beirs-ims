@@ -1,6 +1,6 @@
 import { endpoints } from '@/services/api/endpoints'
 import { UserRelatedService } from '@/services/api/http/user-related-service'
-import type { CreateAccountRequestPayload, PageInfo } from '@/Types'
+import type { CreateAccountRequestPayload, PageInfo, UpdateAccountRequestPayload } from '@/Types'
 
 const userRelatedService = UserRelatedService.getInstance()
 
@@ -42,6 +42,19 @@ export const fetchSingleUserProfile = async (userId: string) => {
 
   if (!response.status || response.status !== 'success') {
     throw new Error(`Failed to retrieve user with id ${userId}`)
+  }
+
+  return response
+}
+
+export const updateUserAccount = async (userId: string, data: UpdateAccountRequestPayload) => {
+  const response = await userRelatedService.updateSingleUserAccount(
+    endpoints.UPDATE_SINGLE_USER(userId),
+    data
+  )
+
+  if (!response.status || response.status !== 'success') {
+    throw new Error(`Failed to update user with id ${userId}`)
   }
 
   return response

@@ -59,7 +59,11 @@ const handleLogout = async () => {
                 {{ useSession.name }} <i class="bi bi-caret-down-fill d-md-none"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navProfileDesktop">
-                <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Profile</a></li>
+                <li>
+                  <router-link :to="{ name: 'UserProfile', params: { role: useSession.role, id: useSession.id } }"
+                    class="dropdown-item"><i class="bi bi-person"></i> Profile
+                  </router-link>
+                </li>
                 <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Settings</a></li>
                 <li>
                   <hr class="dropdown-divider" />
@@ -81,7 +85,9 @@ const handleLogout = async () => {
               <div class="collapse mt-2" id="navbarMobileProfile">
                 <ul class="list-group-flush">
                   <li class="list-group-item bg-transparent border-0 mb-1">
-                    <i class="bi bi-person"></i> Profile
+                    <router-link :to="{ name: 'UserProfile', params: { role: useSession.role, id: useSession.id } }"
+                      class="dropdown-item"><i class="bi bi-person"></i> Profile
+                    </router-link>
                   </li>
                   <li class="list-group-item bg-transparent border-0 mb-1">
                     <i class="bi bi-gear"></i> Settings

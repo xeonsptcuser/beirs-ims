@@ -52,6 +52,16 @@ export const useSessionStore = defineStore('session', {
       }
     },
 
+    updateUserName(name: string) {
+      this.name = name
+      const savedSession = sessionStorage.getItem(STORAGE_KEY)
+      if (savedSession) {
+        const parsedSession = JSON.parse(savedSession)
+        parsedSession.name = name
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(parsedSession))
+      }
+    },
+
     clearSession() {
       this.status = ''
       this.id = null

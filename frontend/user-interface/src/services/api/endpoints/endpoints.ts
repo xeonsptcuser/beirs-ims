@@ -21,4 +21,5 @@ export const endpoints = {
   CREATE_USER_ACCOUNT: `${AUTH_BASE}/users`,
   TOGGLE_USER_ACCOUNT: (id: number | string) => `${AUTH_BASE}/users/${id}`,
   GET_SINGLE_USER: (id: number | string) => `${AUTH_BASE}/users/${id}`,
+  UPDATE_SINGLE_USER: (id: number | string) => `${AUTH_BASE}/users/${id}`,
 }
