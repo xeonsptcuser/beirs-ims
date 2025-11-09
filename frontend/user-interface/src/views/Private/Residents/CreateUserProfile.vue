@@ -40,7 +40,7 @@ const handleCreateUserAccount = async () => {
     if (isValid) {
 
       const requestPayload: CreateAccountRequestPayload = {
-        name: `${form.name.firstName} ${form.name.lastName}, ${form.name.middleName}`,
+        name: `${form.name.firstName} ${form.name.middleName} ${form.name.lastName}`,
         email: form.email,
         password: form.password,
         password_confirmation: form.passwordConfirmation,

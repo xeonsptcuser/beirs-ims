@@ -4,14 +4,19 @@ import FormInput from '@/components/common/FormInput/FormInput.vue';
 import { useEditUserAccount } from './composable/useEditUserAccount';
 import DropdownInput from '@/components/common/DropdownInput/DropdownInput.vue';
 import FormButton from '@/components/common/FormButton/FormButton.vue';
-import { fetchSingleUserProfile } from '@/Utils/userServices';
+import { fetchSingleUserProfile, updateUserAccount } from '@/Utils/userServices';
 import { onMounted, ref } from 'vue';
 import type { AxiosError } from 'axios';
-import type { ApiErrorResponse } from '@/Types';
+import type { ApiErrorResponse, CommonResponse, UpdateAccountRequestPayload, User } from '@/Types';
+import { useSessionStore } from '@/Utils/store/useSessionStore';
 
 const props = defineProps<{
   id: string
 }>()
+
+const responseData = ref<User>();
+const hasError = ref<boolean>(false);
+const useSession = useSessionStore();
 
 const {
   form,
@@ -19,40 +24,118 @@ const {
   errorMessages,
   isEditableUser,
   roleOptions,
+  isEditableSubmit,
+  successResponse,
+  setServerErrors,
   validateForm,
+  setSuccessResponse,
   setIsEditableUser
 } = useEditUserAccount()
 
 const loading = ref<boolean>(false);
+
+const setNameFieldsFromProfile = (fullName?: string) => {
+  const parts = (fullName ?? '').trim().split(/\s+/).filter(Boolean)
+  const first = parts.shift() ?? ''
+  const last = parts.length > 0 ? parts.pop() ?? '' : ''
+  const middle = parts.join(' ')
+
+  form.name.firstName = first
+  form.name.middleName = middle
+  form.name.lastName = last
+}
+
 const handleUpdateUserAccount = async () => {
   // handle update here
   console.log(form);
+  loading.value = true
+  try {
+    hasError.value = false
+    setSuccessResponse(null)
+    const isValid = validateForm();
+
+    const nameSegments = [form.name.firstName, form.name.middleName, form.name.lastName]
+      .map((segment) => segment.trim())
+      .filter(Boolean)
+
+    if (isValid) {
+      hasError.value = false
+      const requestPayload: UpdateAccountRequestPayload = {
+        name: nameSegments.join(' '),
+        email: form.email,
+        role: form.role,
+        street_address: form.streetAddress,
+        mobile_number: form.mobileNumber,
+        date_of_birth: form.date_of_birth,
+      }
+
+      const trimmedPassword = form.password.trim()
+      const trimmedPasswordConfirmation = form.passwordConfirmation.trim()
+
+      if (trimmedPassword.length || trimmedPasswordConfirmation.length) {
+        requestPayload.password = trimmedPassword
+        requestPayload.password_confirmation = trimmedPasswordConfirmation
+      }
+
+      const response = await updateUserAccount(props.id, requestPayload)
+      responseData.value = response.data
+
+      setNameFieldsFromProfile(responseData.value.profile?.name ?? '')
+      form.email = responseData.value.email
+      form.date_of_birth = responseData.value.profile.date_of_birth
+      form.role = responseData.value.role
+      form.streetAddress = responseData.value.profile.street_address
+      form.mobileNumber = responseData.value.profile.mobile_number
+
+      setSuccessResponse({
+        status: response.status ?? 'success',
+        message: response.message ?? 'User updated successfully.',
+      })
+
+      setIsEditableUser()
+      setTimeout(() => {
+        setSuccessResponse(null);
+      }, 3000);
+
+    } else {
+      hasError.value = true
+    }
+
+  } catch (error) {
+    hasError.value = true
+    setSuccessResponse(null)
+    const axiosError = error as AxiosError<ApiErrorResponse>;
+    const fallbackResponse = error as CommonResponse;
+    console.log("AXIOS ERROR: ", axiosError)
+    console.log("FALLBACK ERROR: ", fallbackResponse)
+    setServerErrors(axiosError.response?.data?.errors, axiosError.response?.data?.message ?? fallbackResponse.message)
+  } finally {
+    loading.value = false
+  }
 }
 
 const fetchUserProfile = async () => {
   loading.value = true
   try {
     const response = await fetchSingleUserProfile(props.id)
-    const responseData = response.data
+    responseData.value = response.data
 
-    const [firstAndLast = '', middle = ''] = (responseData.profile?.name ?? '').split(',')
-    const [firstName = '', lastName = ''] = firstAndLast.trim().split(/\s+/, 2)
+    setNameFieldsFromProfile(responseData.value.profile?.name ?? '')
 
-    form.name.firstName = firstName.trim()
-    form.name.lastName = lastName.trim()
-    form.name.middleName = middle.trim()
+    form.email = responseData.value.email.trim()
+    form.role = (responseData.value.role).trim()
+    form.streetAddress = responseData.value.profile.street_address.trim()
+    form.mobileNumber = responseData.value.profile.mobile_number.trim()
+    form.date_of_birth = responseData.value.profile.date_of_birth.trim()
 
-    form.email = responseData.email.trim()
-    form.role = (responseData.role).trim()
-    form.streetAddress = responseData.profile.street_address.trim()
-    form.mobileNumber = responseData.profile.mobile_number.trim()
-    form.date_of_birth = responseData.profile.date_of_birth.trim()
-
-    console.log("RESPONSE: ", responseData)
-
+    useSession.updateUserName(responseData.value.profile.name)
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
-    console.log(axiosError)
+    const fallbackResponse = error as CommonResponse;
+
+    const apiErrorResponse = axiosError.response?.data?.errors
+
+    setServerErrors(apiErrorResponse, fallbackResponse.message);
   } finally {
     loading.value = false
   }
@@ -64,6 +147,12 @@ onMounted(() => {
 </script>
 <template>
   <div class="my-5 ">
+    <div v-if="successResponse" class="alert alert-success" role="alert">
+      {{ successResponse.message }}
+    </div>
+    <div v-else-if="hasError" class="alert alert-danger" role="alert">
+      Something went wrong while saving changes.
+    </div>
     <FormContainer title="User Profile" :max-width="'750px'">
       <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleUpdateUserAccount">
         <div class="row g-2">
@@ -73,12 +162,12 @@ onMounted(() => {
               :is-disabled="isEditableUser.name" />
           </div>
           <div class="col-md-4 col-sm-12">
-            <FormInput type="text" label="Last Name" placeholder="Last Name" id="last_name" v-model="form.name.lastName"
-              :has-error="errors.name" :error-message="errorMessages.name.error" :is-disabled="isEditableUser.name" />
-          </div>
-          <div class="col-md-4 col-sm-12">
             <FormInput type="text" label="Middle Name" :optional="true" id="middle_name" v-model="form.name.middleName"
               :is-disabled="isEditableUser.name" />
+          </div>
+          <div class="col-md-4 col-sm-12">
+            <FormInput type="text" label="Last Name" placeholder="Last Name" id="last_name" v-model="form.name.lastName"
+              :has-error="errors.name" :error-message="errorMessages.name.error" :is-disabled="isEditableUser.name" />
           </div>
         </div>
         <div class="row g-2 mb-3 mb-md-0">
@@ -124,7 +213,8 @@ onMounted(() => {
         </div>
 
         <div class="col-md-8 col-sm-12 mx-auto d-flex justify-items-center gap-2 align-items-center">
-          <FormButton label="Submit" />
+          <FormButton label="Submit" :is-disabled="isEditableSubmit"
+            :btn-display="isEditableSubmit ? 'secondary' : 'primary'" />
           <FormButton type="button" label="Edit" btn-display="secondary" :is-outlined="true"
             @Click.prevent="setIsEditableUser" />
         </div>

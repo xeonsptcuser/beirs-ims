@@ -3,7 +3,18 @@ import { useCreateUserAccount } from './useCreateUserAccount'
 import { ref } from 'vue'
 
 export function useEditUserAccount() {
-  const { form, errors, errorMessages, roleOptions, validateForm } = useCreateUserAccount()
+  const {
+    form,
+    errors,
+    errorMessages,
+    roleOptions,
+    validateForm,
+    setServerErrors,
+    successResponse,
+    setSuccessResponse,
+  } = useCreateUserAccount({
+    requirePassword: false,
+  })
 
   const isEditableUser = ref<Record<keyof UserProfileEditStatus, boolean>>({
     name: true,
@@ -16,15 +27,14 @@ export function useEditUserAccount() {
     mobileNumber: true,
   })
 
+  const isEditableSubmit = ref<boolean>(true)
+
   const setIsEditableUser = () => {
-    isEditableUser.value.name = !isEditableUser.value.name
-    isEditableUser.value.role = !isEditableUser.value.role
-    isEditableUser.value.email = !isEditableUser.value.email
-    isEditableUser.value.password = !isEditableUser.value.password
-    isEditableUser.value.passwordConfirmation = !isEditableUser.value.passwordConfirmation
-    isEditableUser.value.dateOfBirth = !isEditableUser.value.dateOfBirth
-    isEditableUser.value.streetAddress = !isEditableUser.value.streetAddress
-    isEditableUser.value.mobileNumber = !isEditableUser.value.mobileNumber
+    for (const key of Object.keys(isEditableUser.value) as (keyof UserProfileEditStatus)[]) {
+      if (key === 'role') continue
+      isEditableUser.value[key] = !isEditableUser.value[key]
+    }
+    isEditableSubmit.value = !isEditableSubmit.value
   }
 
   return {
@@ -33,7 +43,11 @@ export function useEditUserAccount() {
     errorMessages,
     isEditableUser,
     roleOptions,
+    isEditableSubmit,
+    successResponse,
     validateForm,
+    setServerErrors,
+    setSuccessResponse,
     setIsEditableUser,
   }
 }

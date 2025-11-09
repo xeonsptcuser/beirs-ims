@@ -2,7 +2,8 @@ import { useSharedAuthResponse } from '@/composables/useSharedAuthResponse'
 import type { CreateUserAccountRequest } from '@/Types'
 import { reactive, ref } from 'vue'
 
-export function useCreateUserAccount() {
+export function useCreateUserAccount(options?: { requirePassword: boolean }) {
+  const requiredPassword = options?.requirePassword ?? true
   const { successResponse, setSuccessResponse } = useSharedAuthResponse()
   const form = reactive<CreateUserAccountRequest>({
     name: {
@@ -63,20 +64,33 @@ export function useCreateUserAccount() {
       isValid = false
     }
 
-    if (!form.password.trim()) {
-      errors.value.password = true
-      errorMessages.value.password = {
-        error: 'Please enter your password.',
-      }
-      isValid = false
-    }
+    const passwordVal = form.password.trim()
+    const passwordConfirmationVal = form.passwordConfirmation.trim()
+    const shouldValidatePassword =
+      requiredPassword || passwordVal.length > 0 || passwordConfirmationVal.length > 0
 
-    if (form.password.trim() !== form.passwordConfirmation.trim()) {
-      errors.value.passwordConfirmation = true
-      errorMessages.value.passwordConfirmation = {
-        error: 'Password confirmation does not match with password...',
+    if (shouldValidatePassword) {
+      if (!passwordVal.length) {
+        errors.value.password = true
+        errorMessages.value.password = {
+          error: 'Please enter your password.',
+        }
+        isValid = false
+      } else if (passwordVal.length < 8) {
+        errors.value.password = true
+        errorMessages.value.password = {
+          error: 'Password must be atleast 8 characters.',
+        }
+        isValid = false
       }
-      isValid = false
+
+      if (form.password.trim() !== form.passwordConfirmation.trim()) {
+        errors.value.passwordConfirmation = true
+        errorMessages.value.passwordConfirmation = {
+          error: 'Password confirmation does not match with password...',
+        }
+        isValid = false
+      }
     }
 
     if (!form.email.trim()) {

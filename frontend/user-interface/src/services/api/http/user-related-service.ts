@@ -1,4 +1,8 @@
-import type { CreateAccountRequestPayload, User } from '@/Types/user-related-types'
+import type {
+  CreateAccountRequestPayload,
+  UpdateAccountRequestPayload,
+  User,
+} from '@/Types/user-related-types'
 import { ApiService } from '../ApiService'
 import type { ApiResponse, PageInfo, PaginatedData } from '@/Types'
 
@@ -34,5 +38,12 @@ export class UserRelatedService {
 
   async getSingleUserAccount(url: string): Promise<ApiResponse<User>> {
     return this.apiService.get(url)
+  }
+
+  async updateSingleUserAccount(
+    url: string,
+    data: UpdateAccountRequestPayload
+  ): Promise<ApiResponse<User>> {
+    return this.apiService.patch(url, data)
   }
 }

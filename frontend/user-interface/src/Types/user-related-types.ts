@@ -43,6 +43,27 @@ export interface CreateAccountRequestPayload {
   mobile_number: string
 }
 
+export interface UpdateAccountRequest {
+  name?: FullName
+  role?: string
+  email?: string
+  password?: string
+  passwordConfirmation?: string
+  date_of_birth?: string
+  streetAddress?: string
+  mobileNumber?: string
+}
+export interface UpdateAccountRequestPayload {
+  name: string
+  email: string
+  password?: string
+  password_confirmation?: string
+  role: string
+  date_of_birth: string
+  street_address: string
+  mobile_number: string
+}
+
 export interface UserProfileEditStatus {
   name: boolean
   email: boolean

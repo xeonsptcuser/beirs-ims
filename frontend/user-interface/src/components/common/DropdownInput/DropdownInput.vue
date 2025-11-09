@@ -15,7 +15,8 @@ const model = defineModel<string>()
 <template>
   <slot v-if="$slots.default" />
   <div class="form-floating">
-    <select class="form-select" :class="{ 'is-invalid': hasError }" v-model="model" :disabled="isDisabled">
+    <select class="form-select text-capitalize" :class="{ 'is-invalid': hasError }" v-model="model"
+      :disabled="isDisabled">
       <option value="" selected>...</option>
       <option :value="option" v-for="option in options" :key="option" class="text-capitalize">{{ option }}
       </option>
