@@ -7,13 +7,13 @@ const navItems = [
   {
     name: 'CreateBlotterReport',
     icon: 'bi-file-earmark-text',
-    title: 'File Blotter Report',
+    title: 'File Incident Report',
     btnType: 'btn-success'
   },
   {
-    name: 'CreateBlotterReport',
+    name: 'CreateCertification',
     icon: 'bi-file-earmark',
-    title: 'Request Certification',
+    title: 'Request Certifications',
     btnType: 'btn-warning'
   },
 ]

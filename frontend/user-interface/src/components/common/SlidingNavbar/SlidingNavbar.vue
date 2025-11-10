@@ -94,7 +94,7 @@ const handleLogout = async () => {
           </li>
           <li class="list-group-item ps-2 me-3">
             <a href="#" class="text-light position-relative">
-              <span class="position-absolute top-0 right-0 start-100 translate-middle badge rounded-pill bg-danger">
+              <span class="position-absolute top-0 right-0 start-100 translate-middle badge rounded-pill bg-primary">
                 99+
                 <span class="visually-hidden">unread messages</span>
               </span>
