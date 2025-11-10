@@ -5,10 +5,11 @@ import { useEditUserAccount } from './composable/useEditUserAccount';
 import DropdownInput from '@/components/common/DropdownInput/DropdownInput.vue';
 import FormButton from '@/components/common/FormButton/FormButton.vue';
 import { fetchSingleUserProfile, updateUserAccount } from '@/Utils/userServices';
-import { onMounted, ref } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import type { AxiosError } from 'axios';
 import type { ApiErrorResponse, CommonResponse, UpdateAccountRequestPayload, User } from '@/Types';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
+import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 
 const props = defineProps<{
   id: string
@@ -22,17 +23,17 @@ const {
   form,
   errors,
   errorMessages,
-  isEditableUser,
+  isNotEditableUser,
   roleOptions,
   isEditableSubmit,
   successResponse,
   setServerErrors,
   validateForm,
   setSuccessResponse,
-  setIsEditableUser
+  setisNotEditableUser
 } = useEditUserAccount()
 
-const loading = ref<boolean>(false);
+const navigation = useGlobalLoadingStore();
 
 const setNameFieldsFromProfile = (fullName?: string) => {
   const parts = (fullName ?? '').trim().split(/\s+/).filter(Boolean)
@@ -46,9 +47,8 @@ const setNameFieldsFromProfile = (fullName?: string) => {
 }
 
 const handleUpdateUserAccount = async () => {
-  // handle update here
-  console.log(form);
-  loading.value = true
+  navigation.startNavigation();
+
   try {
     hasError.value = false
     setSuccessResponse(null)
@@ -92,10 +92,12 @@ const handleUpdateUserAccount = async () => {
         message: response.message ?? 'User updated successfully.',
       })
 
-      setIsEditableUser()
-      setTimeout(() => {
-        setSuccessResponse(null);
-      }, 3000);
+      setisNotEditableUser()
+      if (useSession.id === response.data.id) {
+        useSession.updateUserName(response.data.profile.name)
+      }
+
+      globalThis.location.reload();
 
     } else {
       hasError.value = true
@@ -109,12 +111,13 @@ const handleUpdateUserAccount = async () => {
 
     setServerErrors(axiosError.response?.data?.errors, axiosError.response?.data?.message ?? fallbackResponse.message)
   } finally {
-    loading.value = false
+    navigation.endNavigation();
   }
 }
 
 const fetchUserProfile = async () => {
-  loading.value = true
+  navigation.startNavigation()
+
   try {
     const response = await fetchSingleUserProfile(props.id)
     responseData.value = response.data
@@ -127,7 +130,6 @@ const fetchUserProfile = async () => {
     form.mobileNumber = responseData.value.profile.mobile_number.trim()
     form.date_of_birth = responseData.value.profile.date_of_birth.trim()
 
-    useSession.updateUserName(responseData.value.profile.name)
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
     const fallbackResponse = error as CommonResponse;
@@ -136,12 +138,20 @@ const fetchUserProfile = async () => {
 
     setServerErrors(apiErrorResponse, fallbackResponse.message);
   } finally {
-    loading.value = false
+    navigation.endNavigation();
   }
 }
 
-onMounted(() => {
+const userAge = computed(() => {
+  return Math.floor((Date.now() - new Date(form.date_of_birth).getTime()) / (1000 * 60 * 60 * 24 * 365.25)).toString();
+});
+
+watchEffect(() => {
   fetchUserProfile()
+  setTimeout(() => {
+    setSuccessResponse(null);
+
+  }, 3000);
 })
 </script>
 <template>
@@ -158,64 +168,68 @@ onMounted(() => {
           <div class="col-md-4 col-sm-12">
             <FormInput type="text" label="First Name" placeholder="First Name" id="first_name"
               v-model="form.name.firstName" :error-message="errorMessages.name.error"
-              :is-disabled="isEditableUser.name" />
+              :is-disabled="isNotEditableUser.name" />
           </div>
           <div class="col-md-4 col-sm-12">
             <FormInput type="text" label="Middle Name" :optional="true" id="middle_name" v-model="form.name.middleName"
-              :is-disabled="isEditableUser.name" />
+              :is-disabled="isNotEditableUser.name" />
           </div>
           <div class="col-md-4 col-sm-12">
             <FormInput type="text" label="Last Name" placeholder="Last Name" id="last_name" v-model="form.name.lastName"
-              :has-error="errors.name" :error-message="errorMessages.name.error" :is-disabled="isEditableUser.name" />
+              :has-error="errors.name" :error-message="errorMessages.name.error"
+              :is-disabled="isNotEditableUser.name" />
           </div>
         </div>
         <div class="row g-2 mb-3 mb-md-0">
           <div class="col-md-6 col-sm-12">
             <FormInput type="email" label="Email Address" placeholder="beirs@test.com" id="email" v-model="form.email"
               :has-error="errors.email" :error-message="errorMessages.email.error"
-              :is-disabled="isEditableUser.email" />
+              :is-disabled="isNotEditableUser.email" />
           </div>
           <div class="col-md-3 col-sm-12">
-            <FormInput type="date" label="Date Of Birth" id="birthday" v-model="form.date_of_birth"
-              :has-error="errors.date_of_birth" :error-message="errorMessages.date_of_birth.error"
-              :is-disabled="isEditableUser.dateOfBirth" />
+            <FormInput v-if="!isNotEditableUser.dateOfBirth" type="date" label="Date Of Birth" id="birthday"
+              v-model="form.date_of_birth" :has-error="errors.date_of_birth"
+              :error-message="errorMessages.date_of_birth.error" />
+            <FormInput type="text" label="Age" id="user-age" v-model="userAge"
+              :is-disabled="isNotEditableUser.dateOfBirth" v-else />
           </div>
           <div class="col-md-3 col-sm-12">
             <DropdownInput :options="roleOptions" label="Roles" id="select-roles" v-model="form.role"
-              :error-message="errorMessages.role.error" :has-error="errors.role" :is-disabled="isEditableUser.role" />
+              :error-message="errorMessages.role.error" :has-error="errors.role"
+              :is-disabled="isNotEditableUser.role" />
           </div>
         </div>
         <div class="row g-2">
           <div class="col-md-6 col-sm-12">
             <FormInput type="text" label="Mobile Number" id="phoneNumber" v-model="form.mobileNumber"
               :has-error="errors.mobileNumber" :error-message="errorMessages.mobileNumber.error"
-              :is-disabled="isEditableUser.mobileNumber" />
+              :is-disabled="isNotEditableUser.mobileNumber" />
           </div>
           <div class="col-md-6 col-sm-12">
             <FormInput type="text" label="Street Address" id="streetAddress" v-model="form.streetAddress"
               :has-error="errors.streetAddress" :error-message="errorMessages.streetAddress.error"
-              :is-disabled="isEditableUser.streetAddress" />
+              :is-disabled="isNotEditableUser.streetAddress" />
           </div>
         </div>
         <div class="row g-2">
           <div class="col-md-6 col-sm-12">
             <FormInput type="password" label="Password" placeholder="Password" id="password" v-model="form.password"
               :has-error="errors.password" :error-message="errorMessages.password.error"
-              :is-disabled="isEditableUser.password" />
+              :is-disabled="isNotEditableUser.password" />
           </div>
           <div class="col-md-6 col-sm-12">
             <FormInput type="password" label="Confirm Password" placeholder="Password Confirmation" id="passwordConfirm"
               v-model="form.passwordConfirmation" :has-error="errors.passwordConfirmation"
               :error-message="errorMessages.passwordConfirmation.error"
-              :is-disabled="isEditableUser.passwordConfirmation" />
+              :is-disabled="isNotEditableUser.passwordConfirmation" />
           </div>
         </div>
 
         <div class="col-md-8 col-sm-12 mx-auto d-flex justify-items-center gap-2 align-items-center">
           <FormButton label="Submit" :is-disabled="isEditableSubmit"
             :btn-display="isEditableSubmit ? 'secondary' : 'primary'" />
-          <FormButton type="button" label="Edit" btn-display="secondary" :is-outlined="true"
-            @Click.prevent="setIsEditableUser" />
+          <FormButton type="button" label="Edit" btn-display="danger" :is-outlined="true"
+            @Click.prevent="setisNotEditableUser" />
         </div>
 
       </form>

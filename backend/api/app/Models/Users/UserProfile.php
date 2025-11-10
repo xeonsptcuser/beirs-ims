@@ -21,6 +21,7 @@ class UserProfile extends Model
         'street_address',
         'mobile_number',
         'date_of_birth',
+        'gender',
         'is_active'
     ];
 

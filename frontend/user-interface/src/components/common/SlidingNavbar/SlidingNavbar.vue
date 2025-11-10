@@ -2,7 +2,7 @@
 import type { NavItem } from '@/Types';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 import { useRouter } from 'vue-router';
-
+import UserImg from '@/assets/images/user.svg';
 
 defineProps({
   navLinks: {
@@ -51,14 +51,24 @@ const handleLogout = async () => {
         </div>
       </ul>
       <ul class="list-group-flush ms-auto" v-else>
-        <div class="d-md-flex gap-md-3 align-items-center pt-2">
-          <li class="list-group-item ms-md-5 mt-3 mt-md-0">
-            <div class="dropdown d-none d-md-inline-block">
+        <div class="d-md-flex align-items-center pt-2 d-none">
+          <li class="list-group-item py-2">
+            <router-link :to="{ name: 'Dashboard', params: { role: useSession.role } }"
+              class="text-light text-decoration-none">
+              Dashboard
+            </router-link>
+          </li>
+          <li class="list-group-item ms-md-4 mt-3 mt-md-0">
+            <div class="dropdown ">
               <a class="text-decoration-none text-md-dark dropdown-toggle" href="#" id="navProfileDesktop"
                 data-bs-toggle="dropdown" aria-expanded="false">
-                {{ useSession.name }} <i class="bi bi-caret-down-fill d-md-none"></i>
+                <img :src="UserImg" alt="user-logo" :height="30"
+                  class="rounded-circle border border-white-1 bg-white p-1 me-1">
               </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navProfileDesktop">
+                <li class="pb-2 text-center">
+                  <span class="text-sm">{{ useSession.name }}</span>
+                </li>
                 <li>
                   <router-link :to="{ name: 'UserProfile', params: { role: useSession.role, id: useSession.id } }"
                     class="dropdown-item"><i class="bi bi-person"></i> Profile
@@ -75,37 +85,55 @@ const handleLogout = async () => {
                 </li>
               </ul>
             </div>
-
-            <div class="d-md-none">
-              <a class="text-md-dark text-decoration-none d-flex align-items-center justify-content-between"
-                data-bs-toggle="collapse" href="#navbarMobileProfile" aria-expanded="false"
-                aria-controls="navbarMobileProfile">
-                {{ useSession.name }} <i class="bi bi-caret-down-fill"></i>
-              </a>
-              <div class="collapse mt-2" id="navbarMobileProfile">
-                <ul class="list-group-flush">
-                  <li class="list-group-item bg-transparent border-0 mb-1">
-                    <router-link :to="{ name: 'UserProfile', params: { role: useSession.role, id: useSession.id } }"
-                      class="dropdown-item"><i class="bi bi-person"></i> Profile
-                    </router-link>
-                  </li>
-                  <li class="list-group-item bg-transparent border-0 mb-1">
-                    <i class="bi bi-gear"></i> Settings
-                  </li>
-                  <li class="list-group-item ">
-                    <hr class="dropdown-divider bg-light" />
-                  </li>
-                  <li class="list-group-item bg-transparent border-0">
-                    <a class="text-responsive text-decoration-none text-danger" href="#" @click.prevent="handleLogout">
-                      <i class="bi bi-box-arrow-right"></i> Logout
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
           </li>
         </div>
       </ul>
+      <div class="d-md-none bg-light pe-3">
+        <ul class="list-group-flush">
+          <li class="list-group-item py-2">
+            <router-link :to="{ name: 'Dashboard', params: { role: useSession.role } }" class="text-dark">
+              Dashboard
+            </router-link>
+          </li>
+          <li class="list-group-item py-2">
+            <router-link :to="{ name: 'Dashboard', params: { role: useSession.role } }" class="text-dark">
+              Dashboard
+            </router-link>
+          </li>
+          <li class="list-group-item py-2">
+            <router-link :to="{ name: 'Dashboard', params: { role: useSession.role } }" class="text-dark">
+              Dashboard
+            </router-link>
+          </li>
+          <li class="list-group-item py-2">
+            <a class="text-md-dark text-decoration-none d-flex align-items-center justify-content-between"
+              data-bs-toggle="collapse" href="#navbarMobileProfile" aria-expanded="false"
+              aria-controls="navbarMobileProfile">
+              {{ useSession.name }} <i class="bi bi-caret-down-fill"></i>
+            </a>
+            <div class="collapse mt-2 bg-white py-2" id="navbarMobileProfile">
+              <ul class="list-group-flush ps-4">
+                <li class="list-group-item bg-transparent border-0 mb-1">
+                  <router-link :to="{ name: 'UserProfile', params: { role: useSession.role, id: useSession.id } }"
+                    class="dropdown-item"><i class="bi bi-person"></i> Profile
+                  </router-link>
+                </li>
+                <li class="list-group-item bg-transparent border-0 mb-1">
+                  <a href="#" class="text-dark text-decoration-none"><i class="bi bi-gear"></i> Settings</a>
+                </li>
+                <li class="list-group-item ">
+                  <hr class="dropdown-divider bg-light" />
+                </li>
+                <li class="list-group-item bg-transparent border-0">
+                  <a class="text-responsive text-decoration-none text-danger" href="#" @click.prevent="handleLogout">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -113,6 +141,10 @@ const handleLogout = async () => {
 <style scoped>
 .text-md-dark {
   color: #333;
+}
+
+.text-sm {
+  font-size: 12px;
 }
 
 @media (min-width: 768px) {

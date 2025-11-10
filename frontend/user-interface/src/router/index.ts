@@ -3,6 +3,7 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { publicRoutes } from './public-routes'
 import { useSessionStore } from '@/Utils/store/useSessionStore'
 import { privateRoutes } from './private-routes'
+import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -28,6 +29,9 @@ const router = createRouter({
 router.beforeEach(async (to, _from, next) => {
   const session = useSessionStore()
   const roleParam = to.params.role as string | undefined
+  const navigation = useGlobalLoadingStore()
+
+  navigation.startNavigation()
 
   if (to.meta.requiresAuth) {
     if (!session.token) return next({ name: 'LoginPage' })
@@ -41,6 +45,16 @@ router.beforeEach(async (to, _from, next) => {
     document.title = `BEIRS-IMS - ${title}`
   }
   next()
+})
+
+router.afterEach(() => {
+  const navigation = useGlobalLoadingStore()
+  navigation.endNavigation()
+})
+
+router.onError(() => {
+  const navigation = useGlobalLoadingStore()
+  navigation.endNavigation()
 })
 
 export default router
