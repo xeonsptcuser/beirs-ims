@@ -9,6 +9,7 @@ import { userRegistration } from '@/Utils/loginServices';
 import { useRouter } from 'vue-router';
 import type { AxiosError } from 'axios';
 import FormButton from '@/components/common/FormButton/FormButton.vue';
+import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 
 const {
   form,
@@ -21,8 +22,10 @@ const {
 
 const router = useRouter();
 const hasError = ref<boolean>(false);
+const navigation = useGlobalLoadingStore();
 
 const handleRegisterAccount = async () => {
+  navigation.startNavigation();
   try {
     const isValid = validateForm();
     if (isValid) {
@@ -67,6 +70,8 @@ const handleRegisterAccount = async () => {
     }
 
     hasError.value = true;
+  } finally {
+    navigation.endNavigation();
   }
 };
 

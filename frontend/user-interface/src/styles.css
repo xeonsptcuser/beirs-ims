@@ -32,11 +32,10 @@ body {
   color: #333333;
 }
 
-@media (min-width: 768px) {
-  .text-responsive {
-    color: #ffffff;
-  }
+.text-md {
+  font-size: 12px;
 }
+
 .fs-md-1 {
   font-size: calc(1.625rem + 4.5vw) !important;
 }
@@ -50,7 +49,15 @@ body {
 }
 
 @media (min-width: 768px) {
+  .text-responsive {
+    color: #ffffff;
+  }
+  .text-md {
+    font-size: 16px;
+  }
+
   .fs-md-1 { font-size: 2.5rem !important; }  /* same as Bootstrap's fs-1 */
   .fs-md-2 { font-size: 2rem !important; }    /* same as fs-2 */
   .fs-md-3 { font-size: 1.75rem !important; } /* same as fs-3 */
 }
+

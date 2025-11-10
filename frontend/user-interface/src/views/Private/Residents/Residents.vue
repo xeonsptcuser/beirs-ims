@@ -131,16 +131,3 @@ onMounted(() => {
 
   </div>
 </template>
-
-
-<style scoped>
-.text-md {
-  font-size: 12px;
-}
-
-@media (min-width: 768px) {
-  .text-md {
-    font-size: 16px;
-  }
-}
-</style>

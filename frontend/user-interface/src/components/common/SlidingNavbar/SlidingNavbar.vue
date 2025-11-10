@@ -3,6 +3,7 @@ import type { NavItem } from '@/Types';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 import { useRouter } from 'vue-router';
 import UserImg from '@/assets/images/user.svg';
+import { computed } from 'vue';
 
 defineProps({
   navLinks: {
@@ -22,25 +23,35 @@ const router = useRouter();
 const navItems = [
   {
     name: 'Dashboard',
-    label: 'Dashboard'
+    label: 'Dashboard',
+    roles: ['staff', 'resident', 'admin']
   },
   {
     name: 'Residents',
-    label: 'Residents'
+    label: 'Residents',
+    roles: ['staff', 'admin']
   },
   {
     name: 'BlotterReports',
-    label: 'Reports'
+    label: 'Reports',
+    roles: ['resident', 'staff', 'admin']
   },
   {
     name: 'Certifications',
-    label: 'Certifications'
+    label: 'Certifications',
+    roles: ['resident', 'staff', 'admin']
   },
   {
     name: 'HeatMaps',
-    label: 'Heat-Map'
+    label: 'Heat-Map',
+    roles: ['staff', 'admin']
   },
 ]
+
+const filteredRoles = computed(() => {
+  const role = useSession.role ?? 'resident'
+  return navItems.filter(item => !item.roles?.length || item.roles.includes(role))
+})
 
 const handleLogout = async () => {
   try {
@@ -75,14 +86,20 @@ const handleLogout = async () => {
       </ul>
       <ul class="list-group-flush ms-auto" v-else>
         <div class="d-md-flex align-items-center pt-2 d-none">
-          <li class="list-group-item px-2" v-for="navItem in navItems">
+          <li class="list-group-item px-2" v-for="navItem in filteredRoles">
             <router-link :to="{ name: `${navItem.name}`, params: { role: useSession.role } }"
               class="text-light text-decoration-none">
               {{ navItem.label }}
             </router-link>
           </li>
-          <li class="list-group-item ps-2">
-            <span class="text-light"> <i class="bi bi-bell-fill"></i></span>
+          <li class="list-group-item ps-2 me-3">
+            <a href="#" class="text-light position-relative">
+              <span class="position-absolute top-0 right-0 start-100 translate-middle badge rounded-pill bg-primary">
+                99+
+                <span class="visually-hidden">unread messages</span>
+              </span>
+
+              <i class="bi bi-bell-fill fs-5"></i></a>
           </li>
           <li class="list-group-item ms-md-3 mt-3 mt-md-0">
             <div class="dropdown ">
@@ -93,7 +110,7 @@ const handleLogout = async () => {
               </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navProfileDesktop">
                 <li class="pb-2 text-center">
-                  <span class="text-sm">{{ useSession.name }}</span>
+                  <span class="text-md text-nowrap px-3">{{ useSession.name }}</span>
                 </li>
                 <li>
                   <router-link :to="{ name: 'UserProfile', params: { role: useSession.role, id: useSession.id } }"
@@ -114,9 +131,9 @@ const handleLogout = async () => {
           </li>
         </div>
       </ul>
-      <div class="d-md-none bg-light pe-3 py-2">
+      <div class="d-md-none bg-light pe-3 py-2" v-if="useSession.isLoggedIn()">
         <ul class="list-group-flush">
-          <li class="list-group-item py-2" v-for="navItem in navItems">
+          <li class="list-group-item py-2" v-for="navItem in filteredRoles">
             <router-link :to="{ name: `${navItem.name}`, params: { role: useSession.role } }"
               class="text-dark text-decoration-none">
               {{ navItem.label }}
