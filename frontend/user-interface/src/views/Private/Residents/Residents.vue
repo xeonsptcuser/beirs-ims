@@ -81,9 +81,8 @@ onMounted(() => {
         <thead class="table-secondary">
           <tr>
             <th scope="col">Full Name</th>
-            <th scope="col" class="text-center">Roles</th>
-
-            <th scope="col" class="text-center">Sitio</th>
+            <th scope="col" class="text-center d-none d-lg-table-cell">Roles</th>
+            <th scope="col" class="text-center d-none d-md-table-cell">Street Address</th>
             <th scope="col" class="text-center">Active</th>
             <th scope="col" colspan="2" class="text-center">Action</th>
           </tr>
@@ -98,10 +97,10 @@ onMounted(() => {
                 {{ resident.profile.name ?? '-' }}
               </router-link>
             </td>
-            <td class="align-middle">
+            <td class="align-middle d-none d-lg-table-cell">
               <p class="mb-0 py-1 text-md ps-2 text-capitalize">{{ resident.role ?? '-' }}</p>
             </td>
-            <td class="align-middle">
+            <td class="align-middle d-none d-md-table-cell">
               <p class="mb-0 py-1 text-md ps-2">{{ resident.profile?.street_address ?? '-' }}</p>
             </td>
             <td class="align-middle text-center">
@@ -109,12 +108,13 @@ onMounted(() => {
                   :class="[resident.profile.is_active ? 'text-success' : 'text-danger']"></i></p>
             </td>
             <td class="align-middle">
-              <a href="#" @click.prevent="handleToggleUserStatus(resident)" class="text-decoration-none text-black">
+              <a href="#" @click.prevent="handleToggleUserStatus(resident)"
+                class="text-decoration-none text-black text-nowrap text-md">
                 <span v-if="resident.profile.is_active">
-                  <i class="bi bi-slash-circle-fill fs-5 text-danger"></i> Deactivate
+                  <i class="bi bi-slash-circle-fill fs-6 text-danger"></i> Deactivate
                 </span>
                 <span v-else>
-                  <i class="bi bi-check-circle-fill fs-5 text-success"></i> Activate
+                  <i class="bi bi-check-circle-fill fs-6 text-success"></i> Activate
                 </span>
               </a>
             </td>
@@ -132,8 +132,15 @@ onMounted(() => {
   </div>
 </template>
 
+
 <style scoped>
 .text-md {
-  font-size: 15px;
+  font-size: 12px;
+}
+
+@media (min-width: 768px) {
+  .text-md {
+    font-size: 16px;
+  }
 }
 </style>
