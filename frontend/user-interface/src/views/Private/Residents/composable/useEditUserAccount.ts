@@ -16,7 +16,7 @@ export function useEditUserAccount() {
     requirePassword: false,
   })
 
-  const isEditableUser = ref<Record<keyof UserProfileEditStatus, boolean>>({
+  const isNotEditableUser = ref<Record<keyof UserProfileEditStatus, boolean>>({
     name: true,
     role: true,
     email: true,
@@ -29,10 +29,10 @@ export function useEditUserAccount() {
 
   const isEditableSubmit = ref<boolean>(true)
 
-  const setIsEditableUser = () => {
-    for (const key of Object.keys(isEditableUser.value) as (keyof UserProfileEditStatus)[]) {
+  const setisNotEditableUser = () => {
+    for (const key of Object.keys(isNotEditableUser.value) as (keyof UserProfileEditStatus)[]) {
       if (key === 'role') continue
-      isEditableUser.value[key] = !isEditableUser.value[key]
+      isNotEditableUser.value[key] = !isNotEditableUser.value[key]
     }
     isEditableSubmit.value = !isEditableSubmit.value
   }
@@ -41,13 +41,13 @@ export function useEditUserAccount() {
     form,
     errors,
     errorMessages,
-    isEditableUser,
+    isNotEditableUser,
     roleOptions,
     isEditableSubmit,
     successResponse,
     validateForm,
     setServerErrors,
     setSuccessResponse,
-    setIsEditableUser,
+    setisNotEditableUser,
   }
 }

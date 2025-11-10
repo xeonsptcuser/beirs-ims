@@ -42,7 +42,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean }) {
     mobileNumber: { error: '' },
   })
 
-  const roleOptions = ['resident', 'staff']
+  const roleOptions = ['resident', 'staff', 'admin']
 
   const resetErrors = () => {
     for (const key of Object.keys(errors.value) as (keyof CreateUserAccountRequest)[]) {
@@ -104,7 +104,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean }) {
     if (!form.role.trim()) {
       errors.value.role = true
       errorMessages.value.role = {
-        error: 'Please select account role',
+        error: 'Please select account role.',
       }
       isValid = false
     }

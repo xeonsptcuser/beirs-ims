@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import Pagination from '@/components/common/Pagination/Pagination.vue';
 import type { PaginationLink, User } from '@/Types';
+import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import { fetchAllUsers, toggleUserAccountStatus } from '@/Utils/userServices';
 import { onMounted, reactive, ref } from 'vue';
 
 defineProps<{ role: string }>();
 
 const residents = ref<User[]>([]);
-const loading = ref<boolean>(false);
+const navigation = useGlobalLoadingStore();
 
 const pagination = reactive({
   current: 1,
@@ -18,7 +19,7 @@ const pagination = reactive({
 });
 
 const fetchResidentUsers = async (page: number = pagination.current) => {
-  loading.value = true
+  navigation.startNavigation();
   try {
     const response = await fetchAllUsers({ page, per_page: pagination.perPage });
 
@@ -35,7 +36,7 @@ const fetchResidentUsers = async (page: number = pagination.current) => {
   } catch (error) {
     console.log(error)
   } finally {
-    loading.value = false
+    navigation.endNavigation()
   }
 }
 
@@ -43,18 +44,19 @@ const handleToggleUserStatus = async (resident: User) => {
   const targetStatus = !resident.profile.is_active;
   const actionLabel = targetStatus ? 'activate' : 'deactivate';
   const shouldProceed = globalThis.confirm(`Are you sure you want to ${actionLabel} this user?`);
+
   if (!shouldProceed) {
     return;
   }
 
-  loading.value = true;
+  navigation.startNavigation()
   try {
     await toggleUserAccountStatus(resident.id, targetStatus);
     await fetchResidentUsers(pagination.current);
   } catch (error) {
     console.log(error);
   } finally {
-    loading.value = false;
+    navigation.endNavigation()
   }
 }
 
@@ -75,7 +77,7 @@ onMounted(() => {
     </div>
     <div class="p-4 rounded border border-gray-500 ">
       <h3 class="text-center tracking-wider">RESIDENTS LIST</h3>
-      <table class="table" v-if="!loading">
+      <table class="table" v-if="!navigation.isNavigating">
         <thead class="table-secondary">
           <tr>
             <th scope="col">Full Name</th>
@@ -123,8 +125,8 @@ onMounted(() => {
       <div v-else class="text-center">
         <p class="fs-3 tracking-widest">Loading...</p>
       </div>
-      <Pagination v-if="!loading" class="d-flex justify-content-center" :links="pagination.links" :disabled="loading"
-        :current-page="pagination.current" @change="fetchResidentUsers" />
+      <Pagination v-if="!navigation.isNavigating" class="d-flex justify-content-center" :links="pagination.links"
+        :disabled="navigation.isNavigating" :current-page="pagination.current" @change="fetchResidentUsers" />
     </div>
 
   </div>
