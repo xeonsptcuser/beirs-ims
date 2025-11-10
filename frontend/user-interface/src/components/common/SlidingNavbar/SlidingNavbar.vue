@@ -19,6 +19,29 @@ defineProps({
 const useSession = useSessionStore();
 const router = useRouter();
 
+const navItems = [
+  {
+    name: 'Dashboard',
+    label: 'Dashboard'
+  },
+  {
+    name: 'Residents',
+    label: 'Residents'
+  },
+  {
+    name: 'BlotterReports',
+    label: 'Reports'
+  },
+  {
+    name: 'Certifications',
+    label: 'Certifications'
+  },
+  {
+    name: 'HeatMaps',
+    label: 'Heat-Map'
+  },
+]
+
 const handleLogout = async () => {
   try {
     await useSession.logout();
@@ -52,13 +75,16 @@ const handleLogout = async () => {
       </ul>
       <ul class="list-group-flush ms-auto" v-else>
         <div class="d-md-flex align-items-center pt-2 d-none">
-          <li class="list-group-item py-2">
-            <router-link :to="{ name: 'Dashboard', params: { role: useSession.role } }"
+          <li class="list-group-item px-2" v-for="navItem in navItems">
+            <router-link :to="{ name: `${navItem.name}`, params: { role: useSession.role } }"
               class="text-light text-decoration-none">
-              Dashboard
+              {{ navItem.label }}
             </router-link>
           </li>
-          <li class="list-group-item ms-md-4 mt-3 mt-md-0">
+          <li class="list-group-item ps-2">
+            <span class="text-light"> <i class="bi bi-bell-fill"></i></span>
+          </li>
+          <li class="list-group-item ms-md-3 mt-3 mt-md-0">
             <div class="dropdown ">
               <a class="text-decoration-none text-md-dark dropdown-toggle" href="#" id="navProfileDesktop"
                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -74,7 +100,7 @@ const handleLogout = async () => {
                     class="dropdown-item"><i class="bi bi-person"></i> Profile
                   </router-link>
                 </li>
-                <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Settings</a></li>
+                <li><a class="dropdown-item disabled" href="#"><i class="bi bi-gear"></i> Settings</a></li>
                 <li>
                   <hr class="dropdown-divider" />
                 </li>
@@ -88,21 +114,12 @@ const handleLogout = async () => {
           </li>
         </div>
       </ul>
-      <div class="d-md-none bg-light pe-3">
+      <div class="d-md-none bg-light pe-3 py-2">
         <ul class="list-group-flush">
-          <li class="list-group-item py-2">
-            <router-link :to="{ name: 'Dashboard', params: { role: useSession.role } }" class="text-dark">
-              Dashboard
-            </router-link>
-          </li>
-          <li class="list-group-item py-2">
-            <router-link :to="{ name: 'Dashboard', params: { role: useSession.role } }" class="text-dark">
-              Dashboard
-            </router-link>
-          </li>
-          <li class="list-group-item py-2">
-            <router-link :to="{ name: 'Dashboard', params: { role: useSession.role } }" class="text-dark">
-              Dashboard
+          <li class="list-group-item py-2" v-for="navItem in navItems">
+            <router-link :to="{ name: `${navItem.name}`, params: { role: useSession.role } }"
+              class="text-dark text-decoration-none">
+              {{ navItem.label }}
             </router-link>
           </li>
           <li class="list-group-item py-2">
@@ -119,7 +136,8 @@ const handleLogout = async () => {
                   </router-link>
                 </li>
                 <li class="list-group-item bg-transparent border-0 mb-1">
-                  <a href="#" class="text-dark text-decoration-none"><i class="bi bi-gear"></i> Settings</a>
+                  <a href="#" class="text-secondary text-decoration-none disabled"><i class="bi bi-gear"></i>
+                    Settings</a>
                 </li>
                 <li class="list-group-item ">
                   <hr class="dropdown-divider bg-light" />
