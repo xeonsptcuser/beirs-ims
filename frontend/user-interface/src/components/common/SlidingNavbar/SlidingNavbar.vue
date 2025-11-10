@@ -2,7 +2,6 @@
 import type { NavItem } from '@/Types';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 import { useRouter } from 'vue-router';
-import UserImg from '@/assets/images/user.svg';
 import { computed } from 'vue';
 
 defineProps({
@@ -105,8 +104,7 @@ const handleLogout = async () => {
             <div class="dropdown ">
               <a class="text-decoration-none text-md-dark dropdown-toggle" href="#" id="navProfileDesktop"
                 data-bs-toggle="dropdown" aria-expanded="false">
-                <img :src="UserImg" alt="user-logo" :height="30"
-                  class="rounded-circle border border-white-1 bg-white p-1 me-1">
+                <i class="bi bi-person-circle fs-1"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navProfileDesktop">
                 <li class="pb-2 text-center">
