@@ -1,4 +1,5 @@
 import BlotterReports from '@/views/Private/BlotterReports/BlotterReports.vue'
+import CreateBlotterReport from '@/views/Private/BlotterReports/components/CreateBlotterReport.vue'
 import Certifications from '@/views/Private/Certifications/Certifications.vue'
 import Dashboard from '@/views/Private/Dashboard/Dashboard.vue'
 import HeatMaps from '@/views/Private/HeatMaps/HeatMaps.vue'
@@ -70,6 +71,16 @@ export const privateRoutes: RouteRecordRaw[] = [
         props: (route) => ({ role: route.params.role as string }),
         meta: {
           title: 'Blotter Reports',
+          requiresAuth: true,
+        },
+      },
+      {
+        path: 'blotter-reports/file-report',
+        name: 'CreateBlotterReport',
+        component: CreateBlotterReport,
+        props: (route) => ({ role: route.params.role as string }),
+        meta: {
+          title: 'File Blotter Report',
           requiresAuth: true,
         },
       },

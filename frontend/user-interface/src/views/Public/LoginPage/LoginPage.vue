@@ -10,6 +10,7 @@ import { userLogin } from "@/Utils/loginServices";
 import { useRouter } from "vue-router";
 import { useSessionStore } from "@/Utils/store/useSessionStore";
 import FormButton from "@/components/common/FormButton/FormButton.vue";
+import { useGlobalLoadingStore } from "@/Utils/store/useGlobalLoadingStore";
 
 const {
   form,
@@ -24,10 +25,12 @@ const hasError = ref(false);
 const apiErrorMessage = ref('');
 const router = useRouter();
 const useSession = useSessionStore();
+const navigation = useGlobalLoadingStore();
 
 const handleLogin = async () => {
   clearSuccessResponse();
   apiErrorMessage.value = '';
+  navigation.startNavigation();
   try {
     const isValid = validateForm()
     if (isValid) {
@@ -68,6 +71,8 @@ const handleLogin = async () => {
       error instanceof Error && error.message ? error.message : 'Failed to login. Please try again.'
 
     apiErrorMessage.value = messageFromResponse ?? fallbackMessage
+  } finally {
+    navigation.endNavigation()
   }
 }
 

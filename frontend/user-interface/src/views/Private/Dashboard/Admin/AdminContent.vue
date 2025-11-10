@@ -32,8 +32,6 @@ const navItems = [
   },
 ]
 
-// Fetch total records for
-
 </script>
 <template>
   <div class="my-5">
@@ -56,16 +54,3 @@ const navItems = [
     </div>
   </div>
 </template>
-
-<style scoped>
-.letter-spacing-wide {
-  letter-spacing: 12px;
-}
-
-@media (min-width: 768px) {
-  .letter-spacing-wide {
-    letter-spacing: 21px;
-
-  }
-}
-</style>
