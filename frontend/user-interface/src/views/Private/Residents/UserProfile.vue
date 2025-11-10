@@ -34,6 +34,7 @@ const {
 } = useEditUserAccount()
 
 const navigation = useGlobalLoadingStore();
+const isPasswordChangeable = ref<boolean>(false);
 
 const setNameFieldsFromProfile = (fullName?: string) => {
   const parts = (fullName ?? '').trim().split(/\s+/).filter(Boolean)
@@ -142,6 +143,12 @@ const fetchUserProfile = async () => {
   }
 }
 
+const handleShowPasswordChange = () => {
+  isPasswordChangeable.value = !isPasswordChangeable.value;
+  setisNotEditableUser();
+
+}
+
 const userAge = computed(() => {
   return Math.floor((Date.now() - new Date(form.date_of_birth).getTime()) / (1000 * 60 * 60 * 24 * 365.25)).toString();
 });
@@ -211,7 +218,7 @@ watchEffect(() => {
               :is-disabled="isNotEditableUser.streetAddress" />
           </div>
         </div>
-        <div class="row g-2">
+        <div class="row g-2" v-show="isPasswordChangeable">
           <div class="col-md-6 col-sm-12">
             <FormInput type="password" label="Password" placeholder="Password" id="password" v-model="form.password"
               :has-error="errors.password" :error-message="errorMessages.password.error"
@@ -224,14 +231,17 @@ watchEffect(() => {
               :is-disabled="isNotEditableUser.passwordConfirmation" />
           </div>
         </div>
-
+        <div class="ms-md-auto text-center">
+          <a href="#" class="text-dark fs-6" @click="handleShowPasswordChange"><i
+              class="bi bi-shield-lock-fill  me-1"></i>Change
+            Password </a>
+        </div>
         <div class="col-md-8 col-sm-12 mx-auto d-flex justify-items-center gap-2 align-items-center">
           <FormButton label="Submit" :is-disabled="isEditableSubmit"
             :btn-display="isEditableSubmit ? 'secondary' : 'primary'" />
           <FormButton type="button" label="Edit" btn-display="danger" :is-outlined="true"
             @Click.prevent="setisNotEditableUser" />
         </div>
-
       </form>
     </FormContainer>
   </div>

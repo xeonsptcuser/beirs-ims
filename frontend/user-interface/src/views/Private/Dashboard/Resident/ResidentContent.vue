@@ -21,7 +21,7 @@ const navItems = [
 </script>
 <template>
   <!-- FALLBACK DISPLAY  -->
-  <div class="my-5">
+  <div class="my-5 py-5">
     <div class="row align-items-center py-5">
       <div class="col-md-6 d-none d-md-block">
         <h1 class="font-bold">WELCOME TO BARANGAY ALANG-ALANG ELECTRONIC BLOTTER SYSTEM</h1>
