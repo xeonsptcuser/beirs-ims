@@ -146,7 +146,6 @@ const fetchUserProfile = async () => {
 const handleShowPasswordChange = () => {
   isPasswordChangeable.value = !isPasswordChangeable.value;
   setisNotEditableUser();
-
 }
 
 const userAge = computed(() => {

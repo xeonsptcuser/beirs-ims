@@ -2,7 +2,6 @@
 import type { NavItem } from '@/Types';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 import { useRouter } from 'vue-router';
-import UserImg from '@/assets/images/user.svg';
 import { computed } from 'vue';
 
 defineProps({
