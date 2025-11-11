@@ -20,7 +20,7 @@ watchEffect(() => {
 </script>
 <template>
   <AdminContent v-if="isRoleAdmin" :role />
-  <ResidentContent v-if="isRoleResident" :role :user-id="useSession.id?.toString()" />
+  <ResidentContent v-else-if="isRoleResident" :role :user-id="useSession.id?.toString()" />
   <!-- Add content for staff here -->
   <!-- Add content for resident here -->
 
