@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import BeirsLogo from '@/assets/images/beirs-logo.png'
+import BeirsLogo from '@/assets/images/alang2-seal.png'
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 
 const useSession = useSessionStore();
