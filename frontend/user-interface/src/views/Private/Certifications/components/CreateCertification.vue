@@ -4,15 +4,21 @@ import FormContainer from '@/components/common/FormContainer/FormContainer.vue';
 import FormInput from '@/components/common/FormInput/FormInput.vue';
 import { useCreateCertificate } from '../composables/useCreateCertificate';
 import FormButton from '@/components/common/FormButton/FormButton.vue';
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, watchEffect } from 'vue';
 import FormCheckboxInput from '@/components/common/FormCheckboxInput/FormCheckboxInput.vue';
 import FormTextAreaInput from '@/components/common/FormTextAreaInput/FormTextAreaInput.vue';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import type { AxiosError } from 'axios';
 import type { ApiErrorResponse, CommonResponse } from '@/Types';
+import { fetchSingleUserProfile } from '@/Utils/userServices';
+import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
+import type { CreateCertificateRequestPayload } from '@/Types/certificate-related-types';
+import router from '@/router';
+import { submitCertificationRequest } from '@/Utils/certificateServices';
 
-defineProps<{
-  role: string
+const props = defineProps<{
+  role: string,
+  id: string
 }>();
 
 const {
@@ -26,8 +32,10 @@ const {
 
 const requestorName = ref<string>('')
 const requestorAddress = ref<string>('')
-const hasError = ref<boolean>(false)
+const requestorBirthDate = ref<string>('')
 
+
+const hasError = ref<boolean>(false)
 const navigation = useGlobalLoadingStore();
 
 const handleCreateCertificateRequest = async () => {
@@ -37,11 +45,28 @@ const handleCreateCertificateRequest = async () => {
 
     if (isValid) {
       // HNDLE FORM REQUEST HERE
-      console.log("FORM", form)
+      const requestPayload: CreateCertificateRequestPayload = {
+        cert_request_type: form.certificateRequestType,
+        start_residency_date: form.startResidencyDate,
+        end_residency_date: form.endResidencyDate,
+        certificate_request_reason: form.certificateRequestReason,
+      }
+
+      const response = await submitCertificationRequest(requestPayload, props.id);
+
+      if (response.status !== 'success') {
+        throw response;
+      }
+
+      // Update to redirect to new success page.
+      router.push({ name: 'Certifications', params: { role: props.role } })
+
+      hasError.value = false
+    } else {
+      hasError.value = true
     }
 
   } catch (error) {
-    console.log(error);
     const axiosError = error as AxiosError<ApiErrorResponse>;
     const fallbackResponse = error as CommonResponse;
 
@@ -61,6 +86,32 @@ const handleCreateCertificateRequest = async () => {
   }
 }
 
+const fetchUserProfile = async () => {
+  navigation.startNavigation()
+
+  try {
+    hasError.value = false
+
+    const response = await fetchSingleUserProfile(props.id)
+    const responseData = response.data;
+
+    requestorName.value = responseData.profile.name
+    requestorAddress.value = responseData.profile.street_address
+    requestorBirthDate.value = responseData.profile.date_of_birth
+
+  } catch (error) {
+    const axiosError = error as AxiosError<ApiErrorResponse>;
+    const fallbackResponse = error as CommonResponse;
+
+    const apiErrorResponse = axiosError.response?.data?.errors
+
+    setServerErrors(apiErrorResponse, fallbackResponse.message);
+    hasError.value = true
+  } finally {
+    navigation.endNavigation();
+  }
+}
+
 const today = computed(() => {
   const d = new Date()
   const yyyy = d.getFullYear()
@@ -71,6 +122,7 @@ const today = computed(() => {
 
 watch(() => form.isPresent, (isPresent) => {
   if (isPresent) {
+    // set the endResidencyDate field if Present checkbox is checked
     form.endResidencyDate = `${today.value}`
   } else {
     // Optionally clear the field when unchecked
@@ -79,14 +131,35 @@ watch(() => form.isPresent, (isPresent) => {
 })
 
 const requestorAge = computed(() => {
-  return `${Math.floor((Date.now() - new Date('1995-12-30').getTime()) / (1000 * 60 * 60 * 24 * 365.25)).toString()} years old`;
+  return `${Math.floor((Date.now() - new Date(requestorBirthDate.value).getTime()) / (1000 * 60 * 60 * 24 * 365.25)).toString()} years old`;
 });
+
+const filteredErrors = computed(() => {
+  return Object.values(errorMessages.value).filter(msg => msg.error && msg.error.trim() !== '');
+});
+
+watch(() => form.certificateRequestType, (oldVal, newVal) => {
+  if (oldVal !== newVal) {
+    errors.value.certificateRequestType = false;
+  }
+})
+
+watch(() => form.certificateRequestReason, (newVal) => {
+  if (newVal) {
+    errors.value.certificateRequestReason = false;
+  }
+})
+
+watchEffect(() => {
+  fetchUserProfile();
+})
 
 // FETCH USER BY USER_ID
 </script>
 <template>
   <div class="my-5">
     <FormContainer title="Certification Request Form" max-width="750px">
+      <WarningLabel :has-error="hasError && filteredErrors.length > 0" :errors="filteredErrors" />
       <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleCreateCertificateRequest">
         <div class="col-12 ">
           <DropdownInput :options="certificateOptions" label="Certificate Request Type" id="select-certificate-request"
@@ -128,7 +201,6 @@ const requestorAge = computed(() => {
         <div class="col-md-6 col-sm-12 mx-auto">
           <FormButton label="Submit" />
         </div>
-
       </form>
     </FormContainer>
   </div>

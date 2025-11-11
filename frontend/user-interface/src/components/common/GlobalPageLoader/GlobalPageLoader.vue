@@ -4,7 +4,7 @@
     <output class="spinner-border text-danger" style="width: 4rem; height: 4rem;" aria-live="polite">
       <span class="visually-hidden">Loading...</span>
     </output>
-    <p class="text-light mt-3 fs-5">Loading, please wait...</p>
+    <p class="text-secondary mt-3 fs-5">Loading, please wait...</p>
   </div>
 </template>
 

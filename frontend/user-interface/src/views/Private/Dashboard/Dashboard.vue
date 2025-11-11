@@ -2,18 +2,25 @@
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 import AdminContent from './Admin/AdminContent.vue';
 import ResidentContent from './Resident/ResidentContent.vue';
+import { watchEffect } from 'vue';
 
 defineProps<{
   role: string;
-}>()
-const isRoleAdmin = useSessionStore().isRoleAdmin();
-const isRoleResident = useSessionStore().isRoleResident();
 
+}>()
+
+const useSession = useSessionStore();
+const isRoleAdmin = useSession.isRoleAdmin();
+const isRoleResident = useSession.isRoleResident();
+
+watchEffect(() => {
+  useSession.loadFromSession();
+})
 
 </script>
 <template>
   <AdminContent v-if="isRoleAdmin" :role />
-  <ResidentContent v-if="isRoleResident" :role />
+  <ResidentContent v-if="isRoleResident" :role :user-id="useSession.id?.toString()" />
   <!-- Add content for staff here -->
   <!-- Add content for resident here -->
 
