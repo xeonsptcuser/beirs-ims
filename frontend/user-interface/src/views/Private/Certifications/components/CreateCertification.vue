@@ -1,15 +1,135 @@
 <script setup lang="ts">
+import DropdownInput from '@/components/common/DropdownInput/DropdownInput.vue';
 import FormContainer from '@/components/common/FormContainer/FormContainer.vue';
+import FormInput from '@/components/common/FormInput/FormInput.vue';
+import { useCreateCertificate } from '../composables/useCreateCertificate';
+import FormButton from '@/components/common/FormButton/FormButton.vue';
+import { computed, ref, watch } from 'vue';
+import FormCheckboxInput from '@/components/common/FormCheckboxInput/FormCheckboxInput.vue';
+import FormTextAreaInput from '@/components/common/FormTextAreaInput/FormTextAreaInput.vue';
+import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
+import type { AxiosError } from 'axios';
+import type { ApiErrorResponse, CommonResponse } from '@/Types';
 
 defineProps<{
   role: string
 }>();
 
+const {
+  form,
+  errors,
+  errorMessages,
+  certificateOptions,
+  validateCertificateForm,
+  setServerErrors
+} = useCreateCertificate();
+
+const requestorName = ref<string>('')
+const requestorAddress = ref<string>('')
+const hasError = ref<boolean>(false)
+
+const navigation = useGlobalLoadingStore();
+
+const handleCreateCertificateRequest = async () => {
+  navigation.startNavigation();
+  try {
+    const isValid = validateCertificateForm();
+
+    if (isValid) {
+      // HNDLE FORM REQUEST HERE
+      console.log("FORM", form)
+    }
+
+  } catch (error) {
+    console.log(error);
+    const axiosError = error as AxiosError<ApiErrorResponse>;
+    const fallbackResponse = error as CommonResponse;
+
+    if (axiosError?.isAxiosError) {
+      const responseData = axiosError.response?.data;
+      setServerErrors(responseData?.errors, responseData?.message);
+    } else if (fallbackResponse?.message) {
+      setServerErrors(undefined, fallbackResponse.message);
+    } else {
+      setServerErrors(undefined, 'Failed to create a certificate request.');
+    }
+
+    hasError.value = true;
+
+  } finally {
+    navigation.endNavigation();
+  }
+}
+
+const today = computed(() => {
+  const d = new Date()
+  const yyyy = d.getFullYear()
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  return `${yyyy}-${mm}-${dd}`
+})
+
+watch(() => form.isPresent, (isPresent) => {
+  if (isPresent) {
+    form.endResidencyDate = `${today.value}`
+  } else {
+    // Optionally clear the field when unchecked
+    form.endResidencyDate = ''
+  }
+})
+
+const requestorAge = computed(() => {
+  return `${Math.floor((Date.now() - new Date('1995-12-30').getTime()) / (1000 * 60 * 60 * 24 * 365.25)).toString()} years old`;
+});
+
+// FETCH USER BY USER_ID
 </script>
 <template>
   <div class="my-5">
     <FormContainer title="Certification Request Form" max-width="750px">
-      <h3 class="text-center">Insert Form Fields Here...</h3>
+      <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleCreateCertificateRequest">
+        <div class="col-12 ">
+          <DropdownInput :options="certificateOptions" label="Certificate Request Type" id="select-certificate-request"
+            v-model="form.certificateRequestType" :error-message="errorMessages.certificateRequestType.error"
+            :has-error="errors.certificateRequestType" />
+        </div>
+        <div class="col-12">
+          <FormInput type="text" label="Complete Name" id="complete-name" v-model="requestorName" :is-disabled="true" />
+        </div>
+        <div class="col-12">
+          <FormInput type="text" label="Address" id="address" v-model="requestorAddress" :is-disabled="true" />
+        </div>
+        <div class="row gx-2 gy-2"
+          v-if="form.certificateRequestType.trim() && form.certificateRequestType.trim() !== 'clearance'">
+          <div class="col-12 col-md-5 ">
+            <FormInput type="date" label="Start Residency Date" :optional="true" id="start-residency-date"
+              v-model="form.startResidencyDate" :max="today" />
+          </div>
+          <div class="col-12 col-md-7 ">
+            <div class="row align-items-center">
+              <div class="col-12 col-md-8">
+                <FormInput type="date" label="End Residency Date" :optional="true" id="end-residency-date"
+                  v-model="form.endResidencyDate" :is-disabled="form.isPresent" :max="today" />
+              </div>
+              <div class="col-4 ms-auto">
+                <FormCheckboxInput id="check-resident-present" label="Present" v-model="form.isPresent" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12" v-if="form.certificateRequestType.trim() === 'clearance'">
+          <FormInput type="text" label="Age" id="requestor-age" v-model="requestorAge" :is-disabled="true" />
+        </div>
+        <div class="col-12">
+          <FormTextAreaInput label="Purpose of Certificate" id="certificate-request-purpose"
+            v-model="form.certificateRequestReason" :error-message="errorMessages.certificateRequestReason.error"
+            :has-error="errors.certificateRequestReason" :is-resizeable="false" />
+        </div>
+        <div class="col-md-6 col-sm-12 mx-auto">
+          <FormButton label="Submit" />
+        </div>
+
+      </form>
     </FormContainer>
   </div>
 </template>
