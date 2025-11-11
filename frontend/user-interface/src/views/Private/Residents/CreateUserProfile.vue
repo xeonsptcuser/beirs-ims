@@ -10,6 +10,7 @@ import FormButton from '@/components/common/FormButton/FormButton.vue';
 import { userAccountCreation } from '@/Utils/userServices';
 import { useRouter } from 'vue-router';
 import type { AxiosError } from 'axios';
+import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 
 const props = defineProps<{
   role: string
@@ -32,8 +33,10 @@ const formatRole = computed(() => {
   return form.role.toLowerCase();
 })
 
+const navigation = useGlobalLoadingStore();
+
 const handleCreateUserAccount = async () => {
-  // HANDLE CREATE HERE
+  navigation.startNavigation();
   try {
     const isValid = validateForm();
 
@@ -82,7 +85,8 @@ const handleCreateUserAccount = async () => {
     }
 
     hasError.value = true;
-    hasError.value = true
+  } finally {
+    navigation.endNavigation();
   }
 }
 

@@ -156,7 +156,6 @@ watchEffect(() => {
   fetchUserProfile()
   setTimeout(() => {
     setSuccessResponse(null);
-
   }, 3000);
 })
 </script>

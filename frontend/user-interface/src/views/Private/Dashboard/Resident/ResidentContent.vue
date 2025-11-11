@@ -1,6 +1,7 @@
 <script setup lang="ts">
 defineProps<{
-  role: string
+  role: string,
+  userId?: string
 }>()
 
 const navItems = [
@@ -28,7 +29,7 @@ const navItems = [
       </div>
       <div class="col-12 col-md-6">
         <div class="d-flex justify-content-center " v-for="navItem of navItems">
-          <router-link :to="{ name: navItem.name, params: { role: role } }" class="btn py-4 w-100"
+          <router-link :to="{ name: navItem.name, params: { role: role, id: userId } }" class="btn py-4 w-100"
             :class="[navItem.btnType, { 'mb-2': navItems.length > 1 }]">
             <i class="bi fs-4 me-2" :class="[`${navItem.icon}`]"></i>
             <span> {{ navItem.title }} </span>

@@ -66,10 +66,10 @@ export const privateRoutes: RouteRecordRaw[] = [
         },
       },
       {
-        path: 'certifications/create',
+        path: 'certifications/create/:id',
         name: 'CreateCertification',
         component: CreateCertification,
-        props: (route) => ({ role: route.params.role as string }),
+        props: (route) => ({ role: route.params.role as string, id: route.params.id as string }),
         meta: {
           title: 'Request Certifications',
           requiresAuth: true,
@@ -86,10 +86,10 @@ export const privateRoutes: RouteRecordRaw[] = [
         },
       },
       {
-        path: 'blotter-reports/file-report',
+        path: 'blotter-reports/file-report/:id',
         name: 'CreateBlotterReport',
         component: CreateBlotterReport,
-        props: (route) => ({ role: route.params.role as string }),
+        props: (route) => ({ role: route.params.role as string, id: route.params.id as string }),
         meta: {
           title: 'File Blotter Report',
           requiresAuth: true,
