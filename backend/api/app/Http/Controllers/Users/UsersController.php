@@ -42,10 +42,11 @@ class UsersController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'middle_name' => ['nullable', 'string', 'max:100'],
             'email' => ['required', 'email', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'gender' => ['nullable', 'string', 'max:255'],
             'role' => ['required', Rule::in(['admin', 'staff', 'resident'])],
             'date_of_birth' => ['required', 'date'],
             'street_address' => ['nullable', 'string', 'max:255'],
@@ -60,8 +61,9 @@ class UsersController extends Controller
             ],
             [
 
-                'name' => $validated['name'],
-                'gender' => $validated['gender'],
+                'first_name' => $validated['first_name'],
+                'last_name' => $validated['last_name'],
+                'middle_name' => $validated['middle_name'],
                 'date_of_birth' => Carbon::parse($validated['date_of_birth']),
                 'street_address' => $validated['street_address'],
                 'mobile_number' => $validated['mobile_number'],
@@ -89,9 +91,10 @@ class UsersController extends Controller
             'email' => ['sometimes', 'email', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'role' => ['sometimes', Rule::in(['admin', 'staff', 'resident'])],
-            'name' => ['sometimes', 'string', 'max:255'],
+            'first_name' => ['sometimes', 'string', 'max:255'],
+            'last_name' => ['sometimes', 'string', 'max:255'],
+            'middle_name' => ['sometimes', 'string', 'max:100'],
             'street_address' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'gender' => ['sometimes', 'nullable', 'string', 'max:255'],
             'mobile_number' => ['sometimes', 'nullable', 'string', 'max:20'],
             'date_of_birth' => ['sometimes', 'date'],
             'is_active' => ['sometimes', 'boolean'],
@@ -103,7 +106,7 @@ class UsersController extends Controller
             ->toArray();
 
         $profileData = collect($validated)
-            ->only(['name', 'street_address', 'mobile_number', 'date_of_birth', 'is_active', 'gender'])
+            ->only(['first_name', 'last_name', 'middle_name', 'street_address', 'mobile_number', 'date_of_birth', 'is_active'])
             ->filter(fn($value) => !is_null($value))
             ->toArray();
 

@@ -4,13 +4,23 @@ import { publicRoutes } from './public-routes'
 import { useSessionStore } from '@/Utils/store/useSessionStore'
 import { privateRoutes } from './private-routes'
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore'
+import ErrorPage from '@/views/Public/ErrorPage/ErrorPage.vue'
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: AppLayout,
     redirect: { name: 'HomePage' },
-    children: [...publicRoutes, ...privateRoutes],
+    children: [
+      ...publicRoutes,
+      ...privateRoutes,
+      {
+        path: '/:pathMatch(.*)*',
+        name: 'PageNotFound',
+        component: ErrorPage,
+        meta: { title: 'Page Not Found' },
+      },
+    ],
   },
 ]
 

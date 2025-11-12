@@ -47,9 +47,10 @@ const handleCreateCertificateRequest = async () => {
       // HNDLE FORM REQUEST HERE
       const requestPayload: CreateCertificateRequestPayload = {
         cert_request_type: form.certificateRequestType,
-        start_residency_date: form.startResidencyDate,
-        end_residency_date: form.endResidencyDate,
-        certificate_request_reason: form.certificateRequestReason,
+        start_residency_date: form.certificateRequestType === 'clearance' ? null : form.startResidencyDate,
+        requestor_age: form.certificateRequestType === 'clearance' ? requestorAge.value : null,
+        end_residency_date: form.certificateRequestType === 'clearance' ? null : form.endResidencyDate,
+        cert_request_reason: form.certificateRequestReason,
       }
 
       const response = await submitCertificationRequest(requestPayload, props.id);
@@ -95,7 +96,7 @@ const fetchUserProfile = async () => {
     const response = await fetchSingleUserProfile(props.id)
     const responseData = response.data;
 
-    requestorName.value = responseData.profile.name
+    requestorName.value = `${responseData.profile.first_name ?? ''} ${responseData.profile.middle_name ?? ''} ${responseData.profile.last_name ?? ''} `
     requestorAddress.value = responseData.profile.street_address
     requestorBirthDate.value = responseData.profile.date_of_birth
 
@@ -131,6 +132,10 @@ watch(() => form.isPresent, (isPresent) => {
 })
 
 const requestorAge = computed(() => {
+  return `${Math.floor((Date.now() - new Date(requestorBirthDate.value).getTime()) / (1000 * 60 * 60 * 24 * 365.25)).toString()}`;
+})
+
+const requestorAgeStr = computed(() => {
   return `${Math.floor((Date.now() - new Date(requestorBirthDate.value).getTime()) / (1000 * 60 * 60 * 24 * 365.25)).toString()} years old`;
 });
 
@@ -191,7 +196,7 @@ watchEffect(() => {
           </div>
         </div>
         <div class="col-12" v-if="form.certificateRequestType.trim() === 'clearance'">
-          <FormInput type="text" label="Age" id="requestor-age" v-model="requestorAge" :is-disabled="true" />
+          <FormInput type="text" label="Age" id="requestor-age" v-model="requestorAgeStr" :is-disabled="true" />
         </div>
         <div class="col-12">
           <FormTextAreaInput label="Purpose of Certificate" id="certificate-request-purpose"

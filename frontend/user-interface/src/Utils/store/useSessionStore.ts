@@ -22,12 +22,13 @@ export const useSessionStore = defineStore('session', {
         console.error('Login response missing user info')
         return
       }
+      console.log('USER_ID', user.id)
 
       this.status = data.status
       this.id = user.id ?? null
-      this.name = user.profile?.name ?? ''
+      this.name = `${user.profile?.first_name ?? ''} ${user.profile?.middle_name ?? ''} ${user.profile?.last_name ?? ''} `
       this.token = token ?? ''
-      this.role = user.role
+      this.role = user.role ?? ''
 
       sessionStorage.setItem(
         STORAGE_KEY,
@@ -52,7 +53,8 @@ export const useSessionStore = defineStore('session', {
       }
     },
 
-    updateUserName(name: string) {
+    updateUserName(firstName: string, middleName: string, lastName: string) {
+      const name = `${firstName ?? ''} ${middleName ?? ''} ${lastName ?? ''} `
       this.name = name
 
       const savedSession = sessionStorage.getItem(STORAGE_KEY)

@@ -40,6 +40,14 @@ const fetchResidentUsers = async (page: number = pagination.current) => {
   }
 }
 
+const formatName = (firstName: string, middleName: string, lastName: string) => {
+  if (!firstName && !lastName) {
+    return ''
+  }
+  return `${firstName ?? ''} ${middleName ?? ''} ${lastName ?? ''}`
+
+};
+
 const handleToggleUserStatus = async (resident: User) => {
   const targetStatus = !resident.profile.is_active;
   const actionLabel = targetStatus ? 'activate' : 'deactivate';
@@ -75,16 +83,16 @@ onMounted(() => {
         <span>Add Resident</span>
       </router-link>
     </div>
-    <div class="p-4 rounded border border-gray-500 ">
-      <h3 class="text-center tracking-wider">RESIDENTS LIST</h3>
+    <div class="p-4 rounded border border-gray-500 bg-white">
+      <h3 class="text-center tracking-wider mb-3">RESIDENTS LIST</h3>
       <table class="table" v-if="!navigation.isNavigating">
         <thead class="table-secondary">
           <tr>
-            <th scope="col">Full Name</th>
-            <th scope="col" class="text-center d-none d-lg-table-cell">Roles</th>
-            <th scope="col" class="text-center d-none d-md-table-cell">Street Address</th>
-            <th scope="col" class="text-center">Active</th>
-            <th scope="col" colspan="2" class="text-center">Action</th>
+            <th scope="col" class="py-3 border-end border-white">Full Name</th>
+            <th scope="col" class="text-center d-none d-lg-table-cell py-3 border-end border-white">Roles</th>
+            <th scope="col" class="text-center d-none d-md-table-cell py-3 border-end border-white">Street Address</th>
+            <th scope="col" class="text-center py-3 border-end border-white">Active</th>
+            <th scope="col" colspan="2" class="text-center py-3 border-end border-white">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -94,7 +102,8 @@ onMounted(() => {
                 name: 'UserProfile',
                 params: { id: resident.id }
               }" class="mb-0 py-1 text-md text-capitalize text-decoration-none">
-                {{ resident.profile.name ?? '-' }}
+                {{ formatName(resident.profile.first_name, resident.profile.middle_name, resident.profile.last_name,)
+                  ?? '-' }}
               </router-link>
             </td>
             <td class="align-middle d-none d-lg-table-cell">

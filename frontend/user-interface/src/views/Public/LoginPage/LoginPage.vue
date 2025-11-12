@@ -45,8 +45,10 @@ const handleLogin = async () => {
         throw response;
       }
 
+
       hasError.value = false;
       apiErrorMessage.value = '';
+
       useSession.setSession(response);
 
       router.push({
@@ -88,7 +90,7 @@ const filteredErrors = computed(() => {
 </script>
 <template>
   <div class="my-4">
-    <div class="bg-primary p-6 rounded">
+    <div class="p-6 rounded">
       <FormContainer :has-error="hasError" title="Account Login">
         <WarningLabel :has-error="hasError" :errors="filteredErrors" />
         <SuccessLabel :is-success="!!isSuccessResponse?.status" :message="isSuccessResponse?.message" />

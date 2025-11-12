@@ -3,13 +3,16 @@
 
 :root {
   --strong-blue: #12243f;
-  --light-red: #c50000ad;
+  --light-red: #fd4a4a;
 }
 body {
-  font-family: "Roboto Mono", monospace;
+  font-family: 'Roboto Mono', monospace;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
+  min-height: 100vh;
+  background: url('/src/assets/images/main-bg.png') center/cover fixed no-repeat;
+  background-color: #ffffff; /* fallback color */
 }
 
 .bg-primary-gradient {

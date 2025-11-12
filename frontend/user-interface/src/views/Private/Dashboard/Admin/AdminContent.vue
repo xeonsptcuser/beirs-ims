@@ -37,7 +37,7 @@ const navItems = [
   <div class="my-5">
     <div class="row align-items-center py-5">
       <div class="col-md-5 d-none d-md-block">
-        <img :src="AdminDashboardImage" alt="admin-dashboard-img" class="img-fluid">
+        <img :src="AdminDashboardImage" alt="admin-dashboard-img" class="img-fluid rounded">
       </div>
       <div class="col-md-7 col-sm-12">
         <p class="text-center letter-spacing-wide fw-bold h2 mb-4">{{ ADMIN_PANEL }}</p>

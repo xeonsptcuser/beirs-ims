@@ -2,6 +2,7 @@
 
 namespace App\Models\Users;
 
+use App\Models\Certificates\CertificateRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
@@ -17,11 +18,12 @@ class UserProfile extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
+        'middle_name',
         'street_address',
         'mobile_number',
         'date_of_birth',
-        'gender',
         'is_active'
     ];
 
@@ -33,6 +35,11 @@ class UserProfile extends Model
     public function user()
     {
         return $this->hasOne(User::class, 'user_profile_id');
+    }
+
+    public function certificateRequests()
+    {
+        return $this->hasMany(CertificateRequest::class, 'user_profile_id');
     }
     /**
      * The attributes that should be cast to native types.

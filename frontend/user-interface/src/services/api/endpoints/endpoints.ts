@@ -29,7 +29,7 @@ export const endpoints = {
 
   // CERTIFICATE RELATED
   GET_ALL_CERTIFICATE: `${CERT_API_ROUTES}`,
-  CREATE_CERTIFICATE: (id: number | string) => `${CERT_API_ROUTES}/${id}`,
+  CREATE_CERTIFICATE: (id: number | string) => `${CERT_API_ROUTES}/${id}/create`,
   GET_CERTIFICATE: (id: number | string) => `${CERT_API_ROUTES}/${id}`,
   UPDATE_CERTIFICATE: (id: number | string) => `${CERT_API_ROUTES}/${id}`,
 }

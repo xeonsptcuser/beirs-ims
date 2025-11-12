@@ -10,9 +10,10 @@ export interface CreateCertificateFormRequest {
 
 export interface CreateCertificateRequestPayload {
   cert_request_type: string
-  start_residency_date?: string
-  end_residency_date?: string
-  certificate_request_reason: string
+  start_residency_date?: string | null
+  requestor_age?: string | null
+  end_residency_date?: string | null
+  cert_request_reason: string
 }
 
 export interface CertificateRequestsResponse {

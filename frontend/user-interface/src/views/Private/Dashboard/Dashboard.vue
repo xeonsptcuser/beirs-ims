@@ -2,7 +2,6 @@
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 import AdminContent from './Admin/AdminContent.vue';
 import ResidentContent from './Resident/ResidentContent.vue';
-import { watchEffect } from 'vue';
 
 defineProps<{
   role: string;
@@ -13,16 +12,12 @@ const useSession = useSessionStore();
 const isRoleAdmin = useSession.isRoleAdmin();
 const isRoleResident = useSession.isRoleResident();
 
-watchEffect(() => {
-  useSession.loadFromSession();
-})
 
 </script>
 <template>
-  <AdminContent v-if="isRoleAdmin" :role />
-  <ResidentContent v-else-if="isRoleResident" :role :user-id="useSession.id?.toString()" />
+  <AdminContent v-if="isRoleAdmin && useSession.isLoggedIn()" :role />
+  <ResidentContent v-else-if="isRoleResident && useSession.isLoggedIn()" :role :user-id="useSession.id?.toString()" />
   <!-- Add content for staff here -->
-  <!-- Add content for resident here -->
 
   <!-- FALLBACK DISPLAY  -->
   <div class="my-5 py-5" v-else>

@@ -36,17 +36,6 @@ const {
 const navigation = useGlobalLoadingStore();
 const isPasswordChangeable = ref<boolean>(false);
 
-const setNameFieldsFromProfile = (fullName?: string) => {
-  const parts = (fullName ?? '').trim().split(/\s+/).filter(Boolean)
-  const first = parts.shift() ?? ''
-  const last = parts.length > 0 ? parts.pop() ?? '' : ''
-  const middle = parts.join(' ')
-
-  form.name.firstName = first
-  form.name.middleName = middle
-  form.name.lastName = last
-}
-
 const handleUpdateUserAccount = async () => {
   navigation.startNavigation();
 
@@ -81,7 +70,9 @@ const handleUpdateUserAccount = async () => {
       const response = await updateUserAccount(props.id, requestPayload)
       responseData.value = response.data
 
-      setNameFieldsFromProfile(responseData.value.profile?.name ?? '')
+      form.name.firstName = responseData.value.profile.first_name
+      form.name.middleName = responseData.value.profile.middle_name
+      form.name.lastName = responseData.value.profile.last_name
       form.email = responseData.value.email
       form.date_of_birth = responseData.value.profile.date_of_birth
       form.role = responseData.value.role
@@ -95,7 +86,8 @@ const handleUpdateUserAccount = async () => {
 
       setisNotEditableUser()
       if (useSession.id === response.data.id) {
-        useSession.updateUserName(response.data.profile.name)
+        const profile = response.data.profile
+        useSession.updateUserName(profile.first_name, profile.middle_name, profile.last_name)
       }
 
       globalThis.location.reload();
@@ -123,7 +115,9 @@ const fetchUserProfile = async () => {
     const response = await fetchSingleUserProfile(props.id)
     responseData.value = response.data
 
-    setNameFieldsFromProfile(responseData.value.profile?.name ?? '')
+    form.name.firstName = responseData.value.profile.first_name
+    form.name.middleName = responseData.value.profile.middle_name
+    form.name.lastName = responseData.value.profile.last_name
 
     form.email = responseData.value.email.trim()
     form.role = (responseData.value.role).trim()

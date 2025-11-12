@@ -1,6 +1,8 @@
 export interface UserProfile {
   id: number
-  name: string
+  first_name: string
+  middle_name: string
+  last_name: string
   street_address: string
   mobile_number: string
   date_of_birth: string
@@ -33,7 +35,9 @@ export interface CreateUserAccountRequest {
 }
 
 export interface CreateAccountRequestPayload {
-  name: string
+  first_name: string
+  last_name: string
+  middle_name: string
   email: string
   password: string
   password_confirmation: string
