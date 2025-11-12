@@ -32,18 +32,15 @@ const fetchCertificateRequests = async () => {
 </script>
 <template>
   <div class="my-5 ">
-    <div class="alert alert-warning" role="alert">
-      CERTIFICATION VIEW PAGE HERE.... 🎉sasa Logged in as "{{ role }}"
-    </div>
-    <div class="p-4 rounded border border-gray-500 ">
-      <h3 class="text-center tracking-wider">CERTIFICATE REQUESTS</h3>
+    <div class="p-4 rounded border border-gray-500 bg-white">
+      <h3 class="text-center tracking-wider mb-3">CERTIFICATE REQUESTS</h3>
       <table class="table" v-show="!navigation.isNavigating">
         <thead class="table-secondary">
           <tr>
-            <th scope="col">Type</th>
-            <th scope="col" class="text-left">Date Submitted</th>
-            <th scope="col" class="text-left">Status</th>
-            <th scope="col" colspan="2" class="text-center">Action</th>
+            <th scope="col" class="py-3 border-end border-white">Type</th>
+            <th scope="col" class="d-none d-lg-table-cell py-3 border-end border-white">Date Submitted</th>
+            <th scope="col" class="py-3 border-end border-white">Status</th>
+            <th scope="col" colspan="2" class="text-center py-3 border-end border-white">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -51,7 +48,7 @@ const fetchCertificateRequests = async () => {
             <td class="align-middle">
               <p class="mb-0 py-1 text-md ps-2 text-capitalize">{{ certificate.type ?? '-' }}</p>
             </td>
-            <td class="align-middle">
+            <td class="align-middle d-none d-lg-table-cell">
               <p class="mb-0 py-1 text-md ps-2 ">{{ certificate.dateSubmitted ?? '-' }}</p>
             </td>
             <td class="align-middle">

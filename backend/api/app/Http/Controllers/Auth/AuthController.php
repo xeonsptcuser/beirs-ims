@@ -44,7 +44,9 @@ class AuthController extends Controller
     {
         // Add necessary fields here
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'middle_name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'date_of_birth' => 'required|date',
@@ -60,7 +62,9 @@ class AuthController extends Controller
                 'role' => $validated['role'] ?? 'resident',
             ],
             [
-                'name' => $validated['name'],
+                'first_name' => $validated['first_name'],
+                'last_name' => $validated['last_name'],
+                'middle_name' => $validated['middle_name'],
                 'date_of_birth' => Carbon::parse($validated['date_of_birth']),
                 'street_address' => $validated['street_address'],
                 'mobile_number' => $validated['mobile_number'],

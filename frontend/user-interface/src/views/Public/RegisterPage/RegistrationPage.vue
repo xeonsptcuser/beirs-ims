@@ -30,7 +30,9 @@ const handleRegisterAccount = async () => {
     const isValid = validateForm();
     if (isValid) {
       const requestPayload: RegisterRequestPayload = {
-        name: `${form.name.firstName} ${form.name.middleName} ${form.name.lastName}`,
+        first_name: form.name.firstName,
+        last_name: form.name.lastName,
+        middle_name: form.name.middleName,
         email: form.email,
         password: form.password,
         password_confirmation: form.passwordConfirmation,
@@ -83,7 +85,7 @@ const filteredErrors = computed(() => {
 </script>
 <template>
   <div class="my-4">
-    <div class="bg-primary p-6 rounded">
+    <div class="p-6 rounded">
       <FormContainer :has-error="hasError" title="Account Registration" :max-width="'750px'">
         <WarningLabel :has-error="hasError && filteredErrors.length > 0" :errors="filteredErrors" />
         <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleRegisterAccount">

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { NavItem } from '@/Types';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
+import { computed, ref } from 'vue';
+
+import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import { useRouter } from 'vue-router';
-import { computed } from 'vue';
 
 defineProps({
   navLinks: {
@@ -17,6 +19,7 @@ defineProps({
 })
 
 const useSession = useSessionStore();
+const navigation = useGlobalLoadingStore();
 const router = useRouter();
 
 const navItems = [
@@ -53,18 +56,21 @@ const filteredRoles = computed(() => {
 })
 
 const handleLogout = async () => {
+  navigation.startNavigation();
   try {
     await useSession.logout();
-    await router.push({ name: 'LoginPage' });
   } catch (error) {
     console.error('Failed to logout user', error);
+  } finally {
+    router.replace({ name: 'HomePage' });
+    navigation.endNavigation();
   }
 }
 
 </script>
 <template>
 
-  <div class="offcanvas offcanvas-start" data-bs-scroll="true" id="offcanvasScrolling" data-bs-backdrop="false"
+  <div class="offcanvas offcanvas-start" data-bs-scroll="true" id="offcanvasScrolling" data-bs-backdrop="true"
     tabindex="-1" aria-labelledby="offcanvasScrollingLabel">
     <div class="offcanvas-header bg-primary-gradient">
       <h5 class="offcanvas-title text-center text-white" id="offcanvasScrollingLabel">{{ title }}</h5>
@@ -137,7 +143,7 @@ const handleLogout = async () => {
               {{ navItem.label }}
             </router-link>
           </li>
-          <li class="list-group-item py-2">
+          <li li class=" list-group-item py-2">
             <a class="text-md-dark text-decoration-none d-flex align-items-center justify-content-between"
               data-bs-toggle="collapse" href="#navbarMobileProfile" aria-expanded="false"
               aria-controls="navbarMobileProfile">
