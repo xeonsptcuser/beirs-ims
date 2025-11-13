@@ -10,6 +10,7 @@ import type { AxiosError } from 'axios';
 import type { ApiErrorResponse, CommonResponse, UpdateAccountRequestPayload, User } from '@/Types';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
+import { formatName } from '@/Utils/helpers/formatters';
 
 const props = defineProps<{
   id: string
@@ -45,14 +46,12 @@ const handleUpdateUserAccount = async () => {
     setSuccessResponse(null)
     const isValid = validateForm();
 
-    const nameSegments = [form.name.firstName, form.name.middleName, form.name.lastName]
-      .map((segment) => segment.trim())
-      .filter(Boolean)
-
     if (isValid) {
       hasError.value = false
       const requestPayload: UpdateAccountRequestPayload = {
-        name: nameSegments.join(' '),
+        first_name: form.name.firstName,
+        middle_name: form.name.middleName,
+        last_name: form.name.lastName,
         email: form.email,
         role: form.role,
         street_address: form.streetAddress,
@@ -88,7 +87,7 @@ const handleUpdateUserAccount = async () => {
       setisNotEditableUser()
       if (useSession.id === response.data.id) {
         const profile = response.data.profile
-        useSession.updateUserName(profile.first_name, profile.middle_name, profile.last_name)
+        useSession.updateUserName(formatName(profile.first_name, profile.middle_name, profile.last_name))
       }
 
       globalThis.location.reload();

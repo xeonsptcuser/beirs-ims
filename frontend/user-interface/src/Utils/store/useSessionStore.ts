@@ -53,9 +53,8 @@ export const useSessionStore = defineStore('session', {
       }
     },
 
-    updateUserName(firstName: string, middleName: string, lastName: string) {
-      const name = `${firstName ?? ''} ${middleName ?? ''} ${lastName ?? ''} `
-      this.name = name
+    updateUserName(fullName: string) {
+      this.name = fullName
 
       const savedSession = sessionStorage.getItem(STORAGE_KEY)
       if (!savedSession) {

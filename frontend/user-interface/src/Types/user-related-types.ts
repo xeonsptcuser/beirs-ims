@@ -58,7 +58,9 @@ export interface UpdateAccountRequest {
   mobileNumber?: string
 }
 export interface UpdateAccountRequestPayload {
-  name: string
+  first_name: string
+  last_name: string
+  middle_name: string
   email: string
   password?: string
   password_confirmation?: string

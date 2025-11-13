@@ -5,3 +5,7 @@ export const formatDateToHuman = (dateIso: string) => {
     new Date(dateIso)
   )
 }
+
+export const formatName = (firstName: string, middleName: string, lastName: string) => {
+  return `${firstName} ${middleName} ${lastName} `
+}

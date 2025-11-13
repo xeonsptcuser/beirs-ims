@@ -3,8 +3,9 @@ import Pagination from '@/components/common/Pagination/Pagination.vue';
 import type { PaginationLink } from '@/Types';
 import type { CertificateRequestsResponse } from '@/Types/certificate-related-types';
 import { fetchAllCertificates } from '@/Utils/certificateServices';
-import { formatDateToHuman } from '@/Utils/helpers/dateFormatter';
+import { formatDateToHuman, formatName } from '@/Utils/helpers/formatters';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
+import { useSessionStore } from '@/Utils/store/useSessionStore';
 import { reactive, ref, watchEffect } from 'vue';
 
 
@@ -12,6 +13,7 @@ defineProps<{ role: string }>();
 
 const navigation = useGlobalLoadingStore();
 const certificationRequestItems = ref<CertificateRequestsResponse[]>([])
+const useSession = useSessionStore();
 
 const pagination = reactive({
   current: 1,
@@ -23,8 +25,13 @@ const pagination = reactive({
 
 const fetchCertificateRequests = async (page: number = pagination.current) => {
   navigation.startNavigation();
+  let response = null;
   try {
-    const response = await fetchAllCertificates({ page, per_page: pagination.perPage })
+    if (useSession.isRoleResident()) {
+      response = await fetchAllCertificates({ page, per_page: pagination.perPage, user_id: useSession.id })
+    } else {
+      response = await fetchAllCertificates({ page, per_page: pagination.perPage })
+    }
 
     if (response.status !== 'success') {
       throw response;
@@ -56,6 +63,7 @@ watchEffect(() => {
       <table class="table" v-show="!navigation.isNavigating">
         <thead class="table-secondary">
           <tr>
+            <th scope="col" class="py-3 border-end border-white" v-show="useSession.isRoleAdmin()">Name</th>
             <th scope="col" class="py-3 border-end border-white">Type</th>
             <th scope="col" class="d-none d-lg-table-cell py-3 border-end border-white">Date Submitted</th>
             <th scope="col" class="py-3 border-end border-white">Status</th>
@@ -64,6 +72,10 @@ watchEffect(() => {
         </thead>
         <tbody>
           <tr v-for="(certificate, i) in certificationRequestItems" :key="i">
+            <td class="align-middle" v-show="useSession.isRoleAdmin()">
+              <p class="mb-0 py-1 text-md ps-2 text-capitalize">{{ formatName(certificate.profile.first_name,
+                certificate.profile.middle_name, certificate.profile.last_name) ?? '-' }}</p>
+            </td>
             <td class="align-middle">
               <p class="mb-0 py-1 text-md ps-2 text-capitalize">{{ certificate.cert_request_type ?? '-' }}</p>
             </td>
