@@ -1,21 +1,17 @@
 <script setup lang="ts">
 import Pagination from '@/components/common/Pagination/Pagination.vue';
 import type { PaginationLink } from '@/Types';
+import type { CertificateRequestsResponse } from '@/Types/certificate-related-types';
+import { fetchAllCertificates } from '@/Utils/certificateServices';
+import { formatDateToHuman } from '@/Utils/helpers/dateFormatter';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
-import { reactive } from 'vue';
+import { reactive, ref, watchEffect } from 'vue';
 
 
 defineProps<{ role: string }>();
 
 const navigation = useGlobalLoadingStore();
-const certificationRequestItems = [
-  {
-    type: 'indigency',
-    dateSubmitted: '2025-11-13',
-    status: 'pending',
-
-  }
-]
+const certificationRequestItems = ref<CertificateRequestsResponse[]>([])
 
 const pagination = reactive({
   current: 1,
@@ -25,9 +21,32 @@ const pagination = reactive({
   links: [] as PaginationLink[],
 });
 
-const fetchCertificateRequests = async () => {
-  console.log('PAGINATION TRIGGERED')
+const fetchCertificateRequests = async (page: number = pagination.current) => {
+  navigation.startNavigation();
+  try {
+    const response = await fetchAllCertificates({ page, per_page: pagination.perPage })
+
+    if (response.status !== 'success') {
+      throw response;
+    }
+
+    const paginator = response.data;
+    certificationRequestItems.value = paginator.data ?? [];
+    pagination.current = paginator.current_page ?? 1;
+    pagination.last = paginator.last_page ?? 1;
+    pagination.total = paginator.total ?? 0;
+    pagination.links = paginator.links ?? [];
+
+  } catch (error) {
+    console.log(error)
+  } finally {
+    navigation.endNavigation()
+  }
 }
+
+watchEffect(() => {
+  fetchCertificateRequests()
+})
 
 </script>
 <template>
@@ -46,16 +65,19 @@ const fetchCertificateRequests = async () => {
         <tbody>
           <tr v-for="(certificate, i) in certificationRequestItems" :key="i">
             <td class="align-middle">
-              <p class="mb-0 py-1 text-md ps-2 text-capitalize">{{ certificate.type ?? '-' }}</p>
+              <p class="mb-0 py-1 text-md ps-2 text-capitalize">{{ certificate.cert_request_type ?? '-' }}</p>
             </td>
             <td class="align-middle d-none d-lg-table-cell">
-              <p class="mb-0 py-1 text-md ps-2 ">{{ certificate.dateSubmitted ?? '-' }}</p>
+              <p class="mb-0 py-1 text-md ps-2 ">{{ formatDateToHuman(certificate.created_at) ?? '-' }}</p>
             </td>
             <td class="align-middle">
               <p class="mb-0 py-1 text-md ps-2 text-capitalize">{{ certificate.status ?? '-' }}</p>
             </td>
             <td class="align-middle text-center">
-              <button type="button" class="btn btn-primary"> view</button>
+              <router-link :to="{ name: 'ViewCertificateRequest', params: { role, id: certificate.id } }"
+                class="btn btn-primary">
+                View
+              </router-link>
             </td>
           </tr>
         </tbody>

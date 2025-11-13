@@ -14,13 +14,13 @@ class CertificateRequest extends Model
     public const STATUS_PENDING = 'pending';
     public const STATUS_APPROVED = 'approved';
     public const STATUS_REJECTED = 'rejected';
+    public const STATUS_CANCELLED = 'cancelled';
 
     protected $fillable = [
         'user_profile_id',
         'cert_request_type',
         'start_residency_date',
         'end_residency_date',
-        'requestor_age',
         'cert_request_reason',
         'status'
     ];

@@ -2,6 +2,7 @@ import BlotterReports from '@/views/Private/BlotterReports/BlotterReports.vue'
 import CreateBlotterReport from '@/views/Private/BlotterReports/components/CreateBlotterReport.vue'
 import Certifications from '@/views/Private/Certifications/Certifications.vue'
 import CreateCertification from '@/views/Private/Certifications/components/CreateCertification.vue'
+import ViewCertificateRequest from '@/views/Private/Certifications/components/ViewCertificateRequest.vue'
 import Dashboard from '@/views/Private/Dashboard/Dashboard.vue'
 import HeatMaps from '@/views/Private/HeatMaps/HeatMaps.vue'
 import CreateUserProfile from '@/views/Private/Residents/CreateUserProfile.vue'
@@ -72,6 +73,16 @@ export const privateRoutes: RouteRecordRaw[] = [
         props: (route) => ({ role: route.params.role as string, id: route.params.id as string }),
         meta: {
           title: 'Request Certifications',
+          requiresAuth: true,
+        },
+      },
+      {
+        path: 'certifications/:id',
+        name: 'ViewCertificateRequest',
+        component: ViewCertificateRequest,
+        props: (route) => ({ role: route.params.role as string, id: route.params.id as string }),
+        meta: {
+          title: 'View Certification Request',
           requiresAuth: true,
         },
       },

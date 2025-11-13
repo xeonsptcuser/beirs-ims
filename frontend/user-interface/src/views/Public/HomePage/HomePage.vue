@@ -27,7 +27,7 @@ const features = [
 </script>
 
 <template>
-  <div class="container my-5 ">
+  <div class="container-fluid mt-5 ">
     <div class="row align-items-start g-4">
       <!-- LEFT COLUMN: Illustration & Title -->
       <div class="col-md-6 col-12 text-center text-lg-start">

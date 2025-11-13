@@ -14,11 +14,10 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('user_profile_id'); // foreign key to users
             $table->string('cert_request_type');
-            $table->string('requestor_age')->nullable();
             $table->date('start_residency_date')->nullable();
             $table->date('end_residency_date')->nullable();
             $table->string('cert_request_reason');
-            $table->enum('status', ['pending', 'approved', 'rejected']);
+            $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled']);
             $table->timestamps();
         });
     }

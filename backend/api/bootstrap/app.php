@@ -23,11 +23,13 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__ . '/../routes/api.php',
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
-        then: function () {
-            RateLimiter::for('api', function (Request $request) {
+        then: fn(Application $app) =>
+        RateLimiter::for(
+            'api',
+            function (Request $request) {
                 return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
-            });
-        }
+            }
+        )
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
