@@ -19,8 +19,8 @@ const model = defineModel<string>()
 <template>
   <div class="mb-3">
     <label :for="id" class="form-label">{{ label }}</label>
-    <textarea class="form-control " :class="[{ 'resize-none': !isResizeable }, { 'is-invalid': hasError }]" :id
-      :rows="maxRows" :placeholder v-model="model"></textarea>
+    <textarea class="form-control border-base" :class="[{ 'resize-none': !isResizeable }, { 'is-invalid': hasError }]"
+      :id :rows="maxRows" :placeholder v-model="model"></textarea>
     <div class="invalid-feedback" v-show="hasError">
       {{ errorMessage }}
     </div>
@@ -30,5 +30,9 @@ const model = defineModel<string>()
 <style scoped>
 .resize-none {
   resize: none;
+}
+
+.border-base {
+  border: 1px solid grey;
 }
 </style>
