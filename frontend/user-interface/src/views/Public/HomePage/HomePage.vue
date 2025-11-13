@@ -27,15 +27,15 @@ const features = [
 </script>
 
 <template>
-  <div class="container-fluid mt-5 ">
+  <div class="container-fluid my-5 bg-white py-3 ps-3 pe-5 rounded shadow-lg">
     <div class="row align-items-start g-4">
       <!-- LEFT COLUMN: Illustration & Title -->
-      <div class="col-md-6 col-12 text-center text-lg-start">
+      <div class="col-md-6 col-12 mt-auto">
         <img :src="femaleStaff" alt="landing-img" class="img-fluid">
       </div>
 
       <!-- RIGHT COLUMN: Feature Cards -->
-      <div class="col-md-6 col-12">
+      <div class="col-md-6 col-12 ">
         <div class="mb-3 text-center">
           <h1 class="fw-bold mt-3">BLOTTER SYSTEM</h1>
           <h5 class="text-muted text-uppercase">Key Features</h5>
