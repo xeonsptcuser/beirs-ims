@@ -6,7 +6,7 @@ export function useCreateCertificate() {
     certificateRequestType: '',
     startResidencyDate: '',
     endResidencyDate: '',
-    isPresent: false,
+    isCurrent: false,
     certificateRequestReason: '',
   })
 
@@ -16,7 +16,7 @@ export function useCreateCertificate() {
     certificateRequestType: false,
     certificateRequestReason: false,
     startResidencyDate: false,
-    isPresent: false,
+    isCurrent: false,
     endResidencyDate: false,
   })
 
@@ -25,7 +25,7 @@ export function useCreateCertificate() {
     certificateRequestReason: { error: '' },
     startResidencyDate: { error: '' },
     endResidencyDate: { error: '' },
-    isPresent: { error: '' },
+    isCurrent: { error: '' },
   })
 
   const resetErrors = () => {

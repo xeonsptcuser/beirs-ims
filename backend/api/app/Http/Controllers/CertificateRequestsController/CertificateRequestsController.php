@@ -46,14 +46,16 @@ class CertificateRequestsController extends Controller
             'cert_request_type' => ['required', 'string', 'max:255'],
             'start_residency_date' => ['nullable', 'date'],
             'end_residency_date' => ['nullable', 'date'],
-            'cert_request_reason' => ['required', 'string']
+            'cert_request_reason' => ['required', 'string'],
+            'is_current' => ['required', 'boolean']
         ]);
 
         $certificate = $this->certificate->createCertificateRequest([
             'cert_request_type' => $validated['cert_request_type'],
             'start_residency_date' => $validated['start_residency_date'],
             'end_residency_date' => $validated['end_residency_date'],
-            'cert_request_reason' => $validated['cert_request_reason']
+            'cert_request_reason' => $validated['cert_request_reason'],
+            'is_current' => $validated['is_current'],
 
         ], $profileId);
 
