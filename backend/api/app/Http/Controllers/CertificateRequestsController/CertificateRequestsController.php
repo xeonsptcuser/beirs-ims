@@ -4,6 +4,7 @@ namespace App\Http\Controllers\CertificateRequestsController;
 
 use App\Http\Controllers\Controller;
 use App\Interfaces\CertificateRepositoryInterface;
+use App\Models\Certificates\CertificateRequest;
 use Illuminate\Http\Request;
 
 class CertificateRequestsController extends Controller
@@ -40,7 +41,6 @@ class CertificateRequestsController extends Controller
         $validated = $request->validate([
             'cert_request_type' => ['required', 'string', 'max:255'],
             'start_residency_date' => ['nullable', 'date'],
-            'requestor_age' => ['nullable', 'string'],
             'end_residency_date' => ['nullable', 'date'],
             'cert_request_reason' => ['required', 'string']
         ]);
@@ -48,7 +48,6 @@ class CertificateRequestsController extends Controller
         $certificate = $this->certificate->createCertificateRequest([
             'cert_request_type' => $validated['cert_request_type'],
             'start_residency_date' => $validated['start_residency_date'],
-            'requestor_age' => $validated['requestor_age'],
             'end_residency_date' => $validated['end_residency_date'],
             'cert_request_reason' => $validated['cert_request_reason']
 
@@ -60,5 +59,26 @@ class CertificateRequestsController extends Controller
                 'data' => $certificate
             ]
         );
+    }
+
+    public function update(Request $request, int $id)
+    {
+        $certificateRequest = CertificateRequest::findOrFail($id, ['profile']);
+
+        $validated = $request->validate([
+            'status' => ['required', 'string', 'max:255'],
+            'cert_request_reason' => ['required', 'string']
+        ]);
+
+        $certificateData = collect($validated)
+            ->only(['status', 'cert_request_reason'])
+            ->filter(fn($value) => !is_null($value))
+            ->toArray();
+
+        $certificate = $this->certificate->updateCertificateRequest($certificateRequest, $certificateData);
+        return response()->json([
+            'status' => 'success',
+            'data' => $certificate
+        ]);
     }
 }

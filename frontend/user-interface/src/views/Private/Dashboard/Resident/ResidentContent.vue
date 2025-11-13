@@ -22,13 +22,15 @@ const navItems = [
 </script>
 <template>
   <!-- FALLBACK DISPLAY  -->
-  <div class="my-5 py-5">
-    <div class="row align-items-center py-5">
-      <div class="col-md-6 d-none d-md-block">
-        <h1 class="font-bold">WELCOME TO BARANGAY ALANG-ALANG ELECTRONIC BLOTTER SYSTEM</h1>
+  <div class="scrn-h-75 align-content-center">
+    <div class=" align-items-center py-5">
+      <div class="mb-4">
+        <h1 class="font-bold letter-spacing-wide lh-base font-size-3">WELCOME TO BARANGAY ALANG-ALANG ELECTRONIC
+          BLOTTER
+          SYSTEM</h1>
       </div>
-      <div class="col-12 col-md-6">
-        <div class="d-flex justify-content-center " v-for="navItem of navItems">
+      <div class="row">
+        <div class="col-12 col-md-6" v-for="navItem of navItems">
           <router-link :to="{ name: navItem.name, params: { role: role, id: userId } }" class="btn py-4 w-100"
             :class="[navItem.btnType, { 'mb-2': navItems.length > 1 }]">
             <i class="bi fs-4 me-2" :class="[`${navItem.icon}`]"></i>
@@ -39,3 +41,23 @@ const navItems = [
     </div>
   </div>
 </template>
+
+<style scoped>
+.scrn-h-75 {
+  min-height: 75vh;
+}
+
+.letter-spacing-wide {
+  letter-spacing: 0.15em;
+}
+
+.font-size-3 {
+  font-size: 24px;
+}
+
+@media (min-width: 768px) {
+  .font-size-3 {
+    font-size: 42px;
+  }
+}
+</style>

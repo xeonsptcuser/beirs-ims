@@ -35,6 +35,7 @@ const {
 
 const navigation = useGlobalLoadingStore();
 const isPasswordChangeable = ref<boolean>(false);
+const localErrorMsg = ref<string>('')
 
 const handleUpdateUserAccount = async () => {
   navigation.startNavigation();
@@ -113,6 +114,11 @@ const fetchUserProfile = async () => {
 
   try {
     const response = await fetchSingleUserProfile(props.id)
+
+    if (response.status !== 'success') {
+      throw response;
+    }
+
     responseData.value = response.data
 
     form.name.firstName = responseData.value.profile.first_name
@@ -126,12 +132,15 @@ const fetchUserProfile = async () => {
     form.date_of_birth = responseData.value.profile.date_of_birth.trim()
 
   } catch (error) {
+    hasError.value = true
+
     const axiosError = error as AxiosError<ApiErrorResponse>;
     const fallbackResponse = error as CommonResponse;
-
     const apiErrorResponse = axiosError.response?.data?.errors
 
     setServerErrors(apiErrorResponse, fallbackResponse.message);
+    localErrorMsg.value = fallbackResponse.message
+
   } finally {
     navigation.endNavigation();
   }
@@ -139,7 +148,9 @@ const fetchUserProfile = async () => {
 
 const handleShowPasswordChange = () => {
   isPasswordChangeable.value = !isPasswordChangeable.value;
-  setisNotEditableUser();
+  isNotEditableUser.value.password = !isNotEditableUser.value.password
+  isNotEditableUser.value.passwordConfirmation = !isNotEditableUser.value.passwordConfirmation
+  isEditableSubmit.value = !isEditableSubmit.value
 }
 
 const userAge = computed(() => {
@@ -159,7 +170,7 @@ watchEffect(() => {
       {{ successResponse.message }}
     </div>
     <div v-else-if="hasError" class="alert alert-danger" role="alert">
-      Something went wrong while saving changes.
+      {{ localErrorMsg ?? '' }}
     </div>
     <FormContainer title="User Profile" :max-width="'750px'">
       <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleUpdateUserAccount">

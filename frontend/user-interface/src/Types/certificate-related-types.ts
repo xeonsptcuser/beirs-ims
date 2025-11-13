@@ -11,16 +11,17 @@ export interface CreateCertificateFormRequest {
 export interface CreateCertificateRequestPayload {
   cert_request_type: string
   start_residency_date?: string | null
-  requestor_age?: string | null
   end_residency_date?: string | null
   cert_request_reason: string
 }
 
 export interface CertificateRequestsResponse {
-  certificateId: number
-  userProfile: UserProfile
-  certificateRequestType: string
-  startResidencyDate?: string
-  endResidencyDate?: string
-  certificateRequestReason: string
+  id: number
+  profile: UserProfile
+  cert_request_type: string
+  start_residency_date?: string
+  end_residency_date?: string
+  cert_request_reason: string
+  created_at: string
+  status: string
 }

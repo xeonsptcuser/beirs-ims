@@ -47,9 +47,8 @@ const handleCreateCertificateRequest = async () => {
       // HNDLE FORM REQUEST HERE
       const requestPayload: CreateCertificateRequestPayload = {
         cert_request_type: form.certificateRequestType,
-        start_residency_date: form.certificateRequestType === 'clearance' ? null : form.startResidencyDate,
-        requestor_age: form.certificateRequestType === 'clearance' ? requestorAge.value : null,
-        end_residency_date: form.certificateRequestType === 'clearance' ? null : form.endResidencyDate,
+        start_residency_date: form.startResidencyDate,
+        end_residency_date: form.endResidencyDate,
         cert_request_reason: form.certificateRequestReason,
       }
 
@@ -131,14 +130,6 @@ watch(() => form.isPresent, (isPresent) => {
   }
 })
 
-const requestorAge = computed(() => {
-  return `${Math.floor((Date.now() - new Date(requestorBirthDate.value).getTime()) / (1000 * 60 * 60 * 24 * 365.25)).toString()}`;
-})
-
-const requestorAgeStr = computed(() => {
-  return `${Math.floor((Date.now() - new Date(requestorBirthDate.value).getTime()) / (1000 * 60 * 60 * 24 * 365.25)).toString()} years old`;
-});
-
 const filteredErrors = computed(() => {
   return Object.values(errorMessages.value).filter(msg => msg.error && msg.error.trim() !== '');
 });
@@ -177,8 +168,7 @@ watchEffect(() => {
         <div class="col-12">
           <FormInput type="text" label="Address" id="address" v-model="requestorAddress" :is-disabled="true" />
         </div>
-        <div class="row gx-2 gy-2"
-          v-if="form.certificateRequestType.trim() && form.certificateRequestType.trim() !== 'clearance'">
+        <div class="row gx-2 gy-2">
           <div class="col-12 col-md-5 ">
             <FormInput type="date" label="Start Residency Date" :optional="true" id="start-residency-date"
               v-model="form.startResidencyDate" :max="today" />
@@ -194,9 +184,6 @@ watchEffect(() => {
               </div>
             </div>
           </div>
-        </div>
-        <div class="col-12" v-if="form.certificateRequestType.trim() === 'clearance'">
-          <FormInput type="text" label="Age" id="requestor-age" v-model="requestorAgeStr" :is-disabled="true" />
         </div>
         <div class="col-12">
           <FormTextAreaInput label="Purpose of Certificate" id="certificate-request-purpose"

@@ -42,11 +42,12 @@ class CertificateRepositoryImpl implements CertificateRepositoryInterface
             if (
                 !in_array($status, [
                     CertificateRequest::STATUS_APPROVED,
-                    CertificateRequest::STATUS_REJECTED
+                    CertificateRequest::STATUS_REJECTED,
+                    CertificateRequest::STATUS_CANCELLED,
                 ], true)
             ) {
                 throw ValidationException::withMessages([
-                    'status' => "Status must only be approved or rejected.",
+                    'status' => "Status must only be approved, rejected or cancelled.",
                 ]);
             }
 
