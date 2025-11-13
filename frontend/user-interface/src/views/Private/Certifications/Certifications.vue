@@ -60,8 +60,9 @@ watchEffect(() => {
   <div class="my-5 ">
     <div class="p-4 rounded border border-gray-500 bg-white">
       <div class="row mb-0 mb-md-4">
-        <h3 class="text-center tracking-wider mb-3 mb-md-0 mt-md-2 col-10 col-md-9">CERTIFICATE REQUEST LIST</h3>
-        <div class="col-2 col-md-3">
+        <h3 class="text-center tracking-wider mb-3 mb-md-0 mt-md-2"
+          :class="{ 'col-10 col-md-9': useSession.isRoleResident() }">CERTIFICATE REQUEST LIST</h3>
+        <div class="col-2 col-md-3" v-if="useSession.isRoleResident()">
           <router-link v-if="useSession.isLoggedIn()" :to="{
             name: 'CreateCertification',
             params: { role, id: useSession.id }
