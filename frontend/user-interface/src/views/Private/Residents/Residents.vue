@@ -91,7 +91,7 @@ onMounted(() => {
             <th scope="col" class="py-3 border-end border-white">Full Name</th>
             <th scope="col" class="text-center d-none d-lg-table-cell py-3 border-end border-white">Roles</th>
             <th scope="col" class="text-center d-none d-md-table-cell py-3 border-end border-white">Street Address</th>
-            <th scope="col" class="text-center py-3 border-end border-white">Active</th>
+            <th scope="col" class="text-center py-3 border-end border-white">Status</th>
             <th scope="col" colspan="2" class="text-center py-3 border-end border-white">Action</th>
           </tr>
         </thead>
