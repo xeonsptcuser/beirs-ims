@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { NavItem } from '@/Types';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import { useRouter } from 'vue-router';
@@ -59,10 +59,10 @@ const handleLogout = async () => {
   navigation.startNavigation();
   try {
     await useSession.logout();
+    router.replace({ name: 'HomePage' });
   } catch (error) {
     console.error('Failed to logout user', error);
   } finally {
-    router.replace({ name: 'HomePage' });
     navigation.endNavigation();
   }
 }
