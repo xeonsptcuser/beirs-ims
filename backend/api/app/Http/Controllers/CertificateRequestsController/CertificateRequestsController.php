@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Interfaces\CertificateRepositoryInterface;
 use App\Models\Certificates\CertificateRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CertificateRequestsController extends Controller
 {
@@ -17,7 +18,10 @@ class CertificateRequestsController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->integer('per_page');
-        $certificates = $this->certificate->all(['profile'], $perPage);
+        $userId = $request->integer('user_id');
+        $certificates = $this->certificate->all(['profile'], $perPage, $userId);
+
+        Log::info('Fetching certificates', ['userId' => $userId]);
 
         return response()->json([
             'status' => 'success',

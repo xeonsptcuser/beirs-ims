@@ -35,4 +35,5 @@ export interface ApiResponse<T> {
 export interface PageInfo {
   per_page: number
   page: number
+  [key: string]: any
 }

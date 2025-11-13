@@ -13,10 +13,15 @@ use Illuminate\Validation\ValidationException;
 class CertificateRepositoryImpl implements CertificateRepositoryInterface
 {
 
-    public function all(array $relations = [], ?int $perPage = null): Collection|LengthAwarePaginator
+    public function all(array $relations = [], ?int $perPage = null, ?int $userId = null): Collection|LengthAwarePaginator
     {
         $query = CertificateRequest::with($relations)
+
             ->orderBy('created_at', 'desc');
+
+        if (!is_null($userId) && $userId !== 0) {
+            $query->where('user_profile_id', $userId);
+        }
 
         return $perPage ? $query->paginate($perPage) : $query->get();
     }
