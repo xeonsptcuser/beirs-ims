@@ -35,7 +35,7 @@ class CertificateRepositoryImpl implements CertificateRepositoryInterface
             $profile = UserProfile::findOrFail($profileId);
             $certificateData['status'] ??= CertificateRequest::STATUS_PENDING;
             $certificateRequest = $profile->certificateRequests()->create($certificateData);
-            // optional: eager-load the owner so callers get it back populated
+
             return $certificateRequest->load('profile');
         });
     }

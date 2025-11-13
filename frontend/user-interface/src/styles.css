@@ -35,7 +35,7 @@ body {
   color: #333333;
 }
 
-.text-md {
+.text-sm {
   font-size: 12px;
 }
 
@@ -49,6 +49,14 @@ body {
 
 .fs-md-3 {
   font-size: 1.75rem !important;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-md {
+  font-size: 14px;
 }
 
 @media (min-width: 768px) {

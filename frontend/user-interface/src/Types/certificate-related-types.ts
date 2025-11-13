@@ -5,7 +5,7 @@ export interface CreateCertificateFormRequest {
   startResidencyDate?: string
   endResidencyDate?: string
   certificateRequestReason: string
-  isPresent?: boolean
+  isCurrent?: boolean
 }
 
 export interface CreateCertificateRequestPayload {

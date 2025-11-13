@@ -2,7 +2,7 @@
 import DropdownInput from '@/components/common/DropdownInput/DropdownInput.vue';
 import FormContainer from '@/components/common/FormContainer/FormContainer.vue';
 import FormInput from '@/components/common/FormInput/FormInput.vue';
-import { useCreateCertificate } from '../composables/useCreateCertificate';
+import { useCreateCertificate } from '@/views/Private/Certifications/composables/useCreateCertificate';
 import FormButton from '@/components/common/FormButton/FormButton.vue';
 import { computed, ref, watch, watchEffect } from 'vue';
 import FormCheckboxInput from '@/components/common/FormCheckboxInput/FormCheckboxInput.vue';
@@ -48,7 +48,7 @@ const handleCreateCertificateRequest = async () => {
       const requestPayload: CreateCertificateRequestPayload = {
         cert_request_type: form.certificateRequestType,
         start_residency_date: form.startResidencyDate,
-        end_residency_date: form.endResidencyDate,
+        end_residency_date: form.isCurrent ? '' : form.endResidencyDate,
         cert_request_reason: form.certificateRequestReason,
       }
 
@@ -120,8 +120,8 @@ const today = computed(() => {
   return `${yyyy}-${mm}-${dd}`
 })
 
-watch(() => form.isPresent, (isPresent) => {
-  if (isPresent) {
+watch(() => form.isCurrent, (isCurrent) => {
+  if (isCurrent) {
     // set the endResidencyDate field if Present checkbox is checked
     form.endResidencyDate = `${today.value}`
   } else {
@@ -177,10 +177,10 @@ watchEffect(() => {
             <div class="row align-items-center">
               <div class="col-12 col-md-8">
                 <FormInput type="date" label="End Residency Date" :optional="true" id="end-residency-date"
-                  v-model="form.endResidencyDate" :is-disabled="form.isPresent" :max="today" />
+                  v-model="form.endResidencyDate" :is-disabled="form.isCurrent" :max="today" />
               </div>
               <div class="col-4 ms-auto">
-                <FormCheckboxInput id="check-resident-present" label="Present" v-model="form.isPresent" />
+                <FormCheckboxInput id="check-resident-present" label="Present" v-model="form.isCurrent" />
               </div>
             </div>
           </div>
