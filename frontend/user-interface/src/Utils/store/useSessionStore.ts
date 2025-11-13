@@ -22,7 +22,6 @@ export const useSessionStore = defineStore('session', {
         console.error('Login response missing user info')
         return
       }
-      console.log('USER_ID', user.id)
 
       this.status = data.status
       this.id = user.id ?? null
@@ -62,7 +61,7 @@ export const useSessionStore = defineStore('session', {
       }
 
       const parsedSession = JSON.parse(savedSession)
-      parsedSession.name = name
+      parsedSession.name = fullName
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(parsedSession))
     },
 
