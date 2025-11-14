@@ -16,7 +16,7 @@ class CertificateRepositoryImpl implements CertificateRepositoryInterface
     public function all(array $relations = [], ?int $perPage = null, ?int $userId = null): Collection|LengthAwarePaginator
     {
         $query = CertificateRequest::with($relations)
-
+            ->whereNot('status', CertificateRequest::STATUS_CANCELLED)
             ->orderBy('created_at', 'desc');
 
         if (!is_null($userId) && $userId !== 0) {

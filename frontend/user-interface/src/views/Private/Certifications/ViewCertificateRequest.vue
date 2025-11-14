@@ -2,7 +2,7 @@
 import FormButton from '@/components/common/FormButton/FormButton.vue';
 import InfoField from './components/InfoField.vue';
 import InfoFieldTextArea from './components/InfoFieldTextArea.vue';
-import { ref } from 'vue';
+import { onMounted, ref, watchEffect } from 'vue';
 
 const props = defineProps<{
   role: string,
@@ -12,14 +12,20 @@ const props = defineProps<{
 const isCancelled = ref<boolean>(false);
 
 const handleCancelCertRequest = async () => {
-  const userConfirmed = globalThis.confirm('Are you sure you want to cancel this request?');
+  const userConfirmed = globalThis.confirm('Are you sure you want to cancel request?');
   if (!userConfirmed) return;
 
   // HANDLE CANCEL FUNCTIONALITY HERE
   console.log('TRIGGERED CANCEL BUTTON');
 };
 
-//
+const fetchCertificateRequestInfo = async () => {
+  console.log("FETCH CERTIFICATE REQUEST INFORMATION")
+}
+
+onMounted(() => {
+  fetchCertificateRequestInfo();
+})
 
 </script>
 <template>
