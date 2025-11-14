@@ -21,8 +21,6 @@ class CertificateRequestsController extends Controller
         $userId = $request->integer('user_id');
         $certificates = $this->certificate->all(['profile'], $perPage, $userId);
 
-        Log::info('Fetching certificates', ['userId' => $userId]);
-
         return response()->json([
             'status' => 'success',
             'data' => $certificates
@@ -42,12 +40,15 @@ class CertificateRequestsController extends Controller
 
     public function store(Request $request, int $profileId)
     {
+        // update this to notify all staff that a new certificate is requested by resident with id of $profileId
+        // add new field/flag to check if the certificate request is read or unread
+
         $validated = $request->validate([
             'cert_request_type' => ['required', 'string', 'max:255'],
             'start_residency_date' => ['nullable', 'date'],
             'end_residency_date' => ['nullable', 'date'],
             'cert_request_reason' => ['required', 'string'],
-            'is_current' => ['required', 'boolean']
+            'is_current' => ['nullable', 'boolean']
         ]);
 
         $certificate = $this->certificate->createCertificateRequest([
@@ -69,15 +70,19 @@ class CertificateRequestsController extends Controller
 
     public function update(Request $request, int $id)
     {
-        $certificateRequest = CertificateRequest::findOrFail($id, ['profile']);
+        // update this so that when the staff approves or rejects, the resident is notified via sms
+        $certificateRequest = $this->certificate->findById($id, []);
+
+        if (is_null($certificateRequest)) {
+            abort(404);
+        }
 
         $validated = $request->validate([
-            'status' => ['required', 'string', 'max:255'],
-            'cert_request_reason' => ['required', 'string']
+            'status' => ['required', 'string', 'max:255']
         ]);
 
         $certificateData = collect($validated)
-            ->only(['status', 'cert_request_reason'])
+            ->only(['status'])
             ->filter(fn($value) => !is_null($value))
             ->toArray();
 

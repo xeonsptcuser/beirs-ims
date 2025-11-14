@@ -46,7 +46,7 @@ const navItems = [
   {
     name: 'HeatMaps',
     label: 'Heat-Map',
-    roles: ['staff', 'admin']
+    roles: ['admin']
   },
 ]
 

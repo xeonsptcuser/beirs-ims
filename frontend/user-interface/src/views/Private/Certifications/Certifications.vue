@@ -6,6 +6,7 @@ import type { PaginationLink } from '@/Types';
 import type { CertificateRequestsResponse } from '@/Types/certificate-related-types';
 import { fetchAllCertificates } from '@/Utils/certificateServices';
 import { formatDateToHuman, formatName } from '@/Utils/helpers/formatters';
+import { evaluateStatus } from '@/Utils/helpers/common-helpers';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 import { reactive, ref, watchEffect } from 'vue';
@@ -91,7 +92,7 @@ watchEffect(() => {
         </div>
       </div>
 
-      <div class="row mb-2 g-2 align-items-center">
+      <div class="d-md-flex justify-content-between mb-2 g-2 align-items-center ">
         <form @submit.prevent="handleSearchCertificates" class="col-md-3 col-12 mb-3 mb-md-0">
           <FormSearchInput v-model="searchByNameKeyWord" />
         </form>
@@ -136,7 +137,8 @@ watchEffect(() => {
               <p class="mb-0 py-1 text-md ps-2 ">{{ formatDateToHuman(certificate.created_at) ?? '-' }}</p>
             </td>
             <td class="align-middle">
-              <p class="mb-0 py-1 text-md ps-2 text-capitalize">{{ certificate.status ?? '-' }}</p>
+              <p class="mb-0 py-1 text-md ps-2 text-capitalize badge"
+                :class="evaluateStatus(certificate.status ?? '-')">{{ certificate.status ?? '-' }}</p>
             </td>
             <td class="align-middle text-center">
               <router-link :to="{ name: 'ViewCertificateRequest', params: { role, id: certificate.id } }"

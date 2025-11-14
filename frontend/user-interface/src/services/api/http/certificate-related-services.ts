@@ -3,6 +3,7 @@ import { ApiService } from '../ApiService'
 import type {
   CertificateRequestsResponse,
   CreateCertificateRequestPayload,
+  UpdateCertificateRequestPayload,
 } from '@/Types/certificate-related-types'
 
 export class CertificateRelatedService {
@@ -45,7 +46,7 @@ export class CertificateRelatedService {
 
   async updateSingleCertificateRequest(
     url: string,
-    data: string
+    data: UpdateCertificateRequestPayload
   ): Promise<ApiResponse<CertificateRequestsResponse>> {
     return this.apiService.patch(url, data)
   }
