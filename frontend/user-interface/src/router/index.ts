@@ -5,6 +5,7 @@ import { useSessionStore } from '@/Utils/store/useSessionStore'
 import { privateRoutes } from './private-routes'
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore'
 import ErrorPage from '@/views/Public/ErrorPage/ErrorPage.vue'
+import { successErrorRoutes } from './success-error-routes'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -14,6 +15,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       ...publicRoutes,
       ...privateRoutes,
+      ...successErrorRoutes,
       {
         path: '/:pathMatch(.*)*',
         name: 'PageNotFound',

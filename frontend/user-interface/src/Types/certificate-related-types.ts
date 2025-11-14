@@ -13,8 +13,12 @@ export interface CreateCertificateRequestPayload {
   start_residency_date?: string | null
   end_residency_date?: string | null
   cert_request_reason: string
+  is_current?: boolean
 }
 
+export interface UpdateCertificateRequestPayload {
+  status: StatusOptions
+}
 export interface CertificateRequestsResponse {
   id: number
   profile: UserProfile
@@ -22,6 +26,10 @@ export interface CertificateRequestsResponse {
   start_residency_date?: string
   end_residency_date?: string
   cert_request_reason: string
+  is_current?: boolean
   created_at: string
+  updated_at?: string
   status: string
 }
+
+export type StatusOptions = 'approved' | 'rejected' | 'cancelled'

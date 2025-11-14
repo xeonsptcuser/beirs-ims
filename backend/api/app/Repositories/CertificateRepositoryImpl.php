@@ -4,10 +4,12 @@ namespace App\Repositories;
 
 use App\Interfaces\CertificateRepositoryInterface;
 use App\Models\Certificates\CertificateRequest;
+use App\Models\Users\User;
 use App\Models\Users\UserProfile;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class CertificateRepositoryImpl implements CertificateRepositoryInterface
@@ -15,12 +17,23 @@ class CertificateRepositoryImpl implements CertificateRepositoryInterface
 
     public function all(array $relations = [], ?int $perPage = null, ?int $userId = null): Collection|LengthAwarePaginator
     {
-        $query = CertificateRequest::with($relations)
 
+
+        $query = CertificateRequest::with($relations)
             ->orderBy('created_at', 'desc');
 
         if (!is_null($userId) && $userId !== 0) {
-            $query->where('user_profile_id', $userId);
+            $user = User::findOrFail($userId);
+            if ($user && $user->role === 'resident') {
+                // Resident: only their records, including cancelled
+                $query->where('user_profile_id', $userId);
+            } else {
+                // Admin/other: all except cancelled
+                $query->whereNot('status', CertificateRequest::STATUS_CANCELLED);
+            }
+        } else {
+            // No userId: all except cancelled
+            $query->whereNot('status', CertificateRequest::STATUS_CANCELLED);
         }
 
         return $perPage ? $query->paginate($perPage) : $query->get();

@@ -10,7 +10,8 @@ import type { AxiosError } from 'axios';
 import type { ApiErrorResponse, CommonResponse, UpdateAccountRequestPayload, User } from '@/Types';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
-import { formatName } from '@/Utils/helpers/formatters';
+import { computeAge, formatName } from '@/Utils/helpers/formatters';
+import { navigateToTopPage } from '@/Utils/helpers/common-helpers';
 
 const props = defineProps<{
   id: string
@@ -152,8 +153,8 @@ const handleShowPasswordChange = () => {
   isEditableSubmit.value = !isEditableSubmit.value
 }
 
-const userAge = computed(() => {
-  return Math.floor((Date.now() - new Date(form.date_of_birth).getTime()) / (1000 * 60 * 60 * 24 * 365.25)).toString();
+const age = computed(() => {
+  return computeAge(form.date_of_birth)
 });
 
 watchEffect(() => {
@@ -170,6 +171,9 @@ watchEffect(() => {
     </div>
     <div v-else-if="hasError" class="alert alert-danger" role="alert">
       {{ localErrorMsg ?? '' }}
+    </div>
+    <div>
+      <a href="#" @click="navigateToTopPage"><i class="bi bi-arrow-left me-2"></i>PREVIOUS PAGE</a>
     </div>
     <FormContainer title="User Profile" :max-width="'750px'">
       <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleUpdateUserAccount">
@@ -199,8 +203,8 @@ watchEffect(() => {
             <FormInput v-if="!isNotEditableUser.dateOfBirth" type="date" label="Date Of Birth" id="birthday"
               v-model="form.date_of_birth" :has-error="errors.date_of_birth"
               :error-message="errorMessages.date_of_birth.error" />
-            <FormInput type="text" label="Age" id="user-age" v-model="userAge"
-              :is-disabled="isNotEditableUser.dateOfBirth" v-else />
+            <FormInput type="text" label="Age" id="user-age" v-model="age" :is-disabled="isNotEditableUser.dateOfBirth"
+              v-else />
           </div>
           <div class="col-md-3 col-sm-12">
             <DropdownInput :options="roleOptions" label="Roles" id="select-roles" v-model="form.role"

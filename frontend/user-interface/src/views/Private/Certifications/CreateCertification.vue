@@ -50,6 +50,7 @@ const handleCreateCertificateRequest = async () => {
         start_residency_date: form.startResidencyDate,
         end_residency_date: form.isCurrent ? '' : form.endResidencyDate,
         cert_request_reason: form.certificateRequestReason,
+        is_current: form.isCurrent
       }
 
       const response = await submitCertificationRequest(requestPayload, props.id);
@@ -59,7 +60,7 @@ const handleCreateCertificateRequest = async () => {
       }
 
       // Update to redirect to new success page.
-      router.push({ name: 'Certifications', params: { role: props.role } })
+      router.push({ name: 'SuccessCertTransaction', params: { role: props.role } })
 
       hasError.value = false
     } else {

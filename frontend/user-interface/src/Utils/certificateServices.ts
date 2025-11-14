@@ -1,7 +1,10 @@
 import { endpoints } from '@/services/api/endpoints'
 import { CertificateRelatedService } from '@/services/api/http/certificate-related-services'
 import type { PageInfo } from '@/Types'
-import type { CreateCertificateRequestPayload } from '@/Types/certificate-related-types'
+import type {
+  CreateCertificateRequestPayload,
+  UpdateCertificateRequestPayload,
+} from '@/Types/certificate-related-types'
 
 const certificateRelatedServices = CertificateRelatedService.getInstance()
 
@@ -34,7 +37,22 @@ export const submitCertificationRequest = async (
   return response
 }
 
-export const updateCertificateRequest = async (userId: string, data: string) => {
+export const fetchCertificateInfo = async (userId: string) => {
+  const response = await certificateRelatedServices.getSingleCertificateRequest(
+    endpoints.GET_CERTIFICATE(userId)
+  )
+
+  if (!response.status || response.status !== 'success') {
+    throw new Error('Failed to fetch certificate request.')
+  }
+
+  return response
+}
+
+export const updateCertificateRequest = async (
+  userId: string,
+  data: UpdateCertificateRequestPayload
+) => {
   const response = await certificateRelatedServices.updateSingleCertificateRequest(
     endpoints.UPDATE_CERTIFICATE(userId),
     data

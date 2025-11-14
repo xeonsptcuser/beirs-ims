@@ -66,7 +66,7 @@ const handleCreateUserAccount = async () => {
       });
 
       hasError.value = false;
-      router.push({ name: 'Residents', params: { role: props.role } })
+      router.push({ name: 'SuccessResidentCreation', params: { role: props.role } })
 
     } else {
       hasError.value = true
