@@ -8,6 +8,9 @@ export const evaluateStatus = (status: string) => {
     return 'bg-warning text-dark'
   }
   if (status === 'approved') {
+    return 'bg-primary'
+  }
+  if (status === 'released') {
     return 'bg-success'
   }
   return 'bg-secondary'

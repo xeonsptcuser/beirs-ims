@@ -17,7 +17,8 @@ const {
   errors,
   validateForm,
   setServerErrors,
-  setSuccessResponse
+  setSuccessResponse,
+  clearSuccessResponse
 } = useRegisterAccount();
 
 const router = useRouter();
@@ -80,7 +81,6 @@ const handleRegisterAccount = async () => {
 const filteredErrors = computed(() => {
   return Object.values(errorMessages.value).filter(msg => msg.error && msg.error.trim() !== '');
 });
-
 
 </script>
 <template>

@@ -118,9 +118,9 @@ watchEffect(() => {
         <thead class="table-secondary">
           <tr>
             <th scope="col" class="py-3 border-end border-white" v-show="!useSession.isRoleResident()">Name</th>
-            <th scope="col" class="py-3 border-end border-white d-none d-lg-table-cell">Type</th>
-            <th scope="col" class="d-none d-lg-table-cell py-3 border-end border-white">Date Submitted</th>
-            <th scope="col" class="py-3 border-end border-white">Status</th>
+            <th scope="col" class="py-3 border-end border-white">Type</th>
+            <th scope="col" class="d-none d-md-table-cell py-3 border-end border-white">Date Submitted</th>
+            <th scope="col" class="py-3 border-end border-white d-none d-md-table-cell">Status</th>
             <th scope="col" colspan="2" class="text-center py-3 border-end border-white">Action</th>
           </tr>
         </thead>
@@ -130,13 +130,13 @@ watchEffect(() => {
               <p class="mb-0 py-1 text-md ps-2 text-capitalize">{{ formatName(certificate.profile.first_name,
                 certificate.profile.middle_name, certificate.profile.last_name) ?? '-' }}</p>
             </td>
-            <td class="align-middle d-none d-lg-table-cell">
+            <td class="align-middle">
               <p class="mb-0 py-1 text-md ps-2 text-capitalize">{{ certificate.cert_request_type ?? '-' }}</p>
             </td>
-            <td class="align-middle d-none d-lg-table-cell">
+            <td class="align-middle d-none d-md-table-cell">
               <p class="mb-0 py-1 text-md ps-2 ">{{ formatDateToHuman(certificate.created_at) ?? '-' }}</p>
             </td>
-            <td class="align-middle">
+            <td class="align-middle d-none d-md-table-cell">
               <p class="mb-0 py-1 text-md ps-2 text-capitalize badge"
                 :class="evaluateStatus(certificate.status ?? '-')">{{ certificate.status ?? '-' }}</p>
             </td>

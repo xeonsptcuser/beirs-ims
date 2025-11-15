@@ -62,10 +62,11 @@ class CertificateRepositoryImpl implements CertificateRepositoryInterface
                     CertificateRequest::STATUS_APPROVED,
                     CertificateRequest::STATUS_REJECTED,
                     CertificateRequest::STATUS_CANCELLED,
+                    CertificateRequest::STATUS_RELEASED,
                 ], true)
             ) {
                 throw ValidationException::withMessages([
-                    'status' => "Status must only be approved, rejected or cancelled.",
+                    'status' => "Status must only be approved, rejected, cancelled or released",
                 ]);
             }
 
