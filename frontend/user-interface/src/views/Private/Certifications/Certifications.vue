@@ -2,7 +2,7 @@
 import FormCheckboxInput from '@/components/common/FormCheckboxInput/FormCheckboxInput.vue';
 import FormSearchInput from '@/components/common/FormSearchInput/FormSearchInput.vue';
 import Pagination from '@/components/common/Pagination/Pagination.vue';
-import type { PaginationLink } from '@/Types';
+import type { ApiErrorResponse, CommonResponse, PaginationLink } from '@/Types';
 import type { CertificateRequestsResponse } from '@/Types/certificate-related-types';
 import { fetchAllCertificates } from '@/Utils/certificateServices';
 import { formatDateToHuman, formatName } from '@/Utils/helpers/formatters';
@@ -10,6 +10,8 @@ import { evaluateStatus } from '@/Utils/helpers/common-helpers';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 import { reactive, ref, watchEffect } from 'vue';
+import type { AxiosError } from 'axios';
+import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
 
 
 defineProps<{ role: string }>();
@@ -21,6 +23,8 @@ const useSession = useSessionStore();
 // custom typed variable decleration
 const certificationRequestItems = ref<CertificateRequestsResponse[]>([])
 const searchByNameKeyWord = ref<string>('');
+const hasError = ref<boolean>(false);
+const errorMessage = ref<string>('');
 
 const pagination = reactive({
   current: 1,
@@ -52,7 +56,19 @@ const fetchCertificateRequests = async (page: number = pagination.current) => {
     pagination.links = paginator.links ?? [];
 
   } catch (error) {
-    console.log(error)
+    const axiosError = error as AxiosError<ApiErrorResponse>;
+    const fallbackResponse = error as CommonResponse;
+
+    if (axiosError?.isAxiosError) {
+      const responseData = axiosError.response?.data;
+      errorMessage.value = responseData?.message ?? '';
+    } else if (fallbackResponse?.message) {
+      errorMessage.value = fallbackResponse.message ?? '';
+    } else {
+      errorMessage.value = 'Failed to fetch certificate requests.';
+    }
+
+    hasError.value = true;
   } finally {
     navigation.endNavigation()
   }
@@ -78,7 +94,7 @@ watchEffect(() => {
 <template>
   <div class="my-5 ">
     <div class="p-4 rounded border border-gray-500 bg-white">
-
+      <WarningLabel :has-error="hasError" :errors="[{ error: errorMessage }]" />
       <div class="row mb-0 mb-md-4">
         <h3 class="text-center tracking-wider mb-3 mb-md-0 mt-md-2"
           :class="{ 'col-10 col-md-9': useSession.isRoleResident() }">CERTIFICATE REQUEST LIST</h3>
