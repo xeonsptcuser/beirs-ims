@@ -117,7 +117,7 @@ watchEffect(() => {
       <table class="table" v-show="!navigation.isNavigating">
         <thead class="table-secondary">
           <tr>
-            <th scope="col" class="py-3 border-end border-white" v-show="useSession.isRoleAdmin()">Name</th>
+            <th scope="col" class="py-3 border-end border-white" v-show="!useSession.isRoleResident()">Name</th>
             <th scope="col" class="py-3 border-end border-white d-none d-lg-table-cell">Type</th>
             <th scope="col" class="d-none d-lg-table-cell py-3 border-end border-white">Date Submitted</th>
             <th scope="col" class="py-3 border-end border-white">Status</th>
@@ -126,7 +126,7 @@ watchEffect(() => {
         </thead>
         <tbody>
           <tr v-for="(certificate, i) in certificationRequestItems" :key="i">
-            <td class="align-middle " v-show="useSession.isRoleAdmin()">
+            <td class="align-middle " v-show="!useSession.isRoleResident()">
               <p class="mb-0 py-1 text-md ps-2 text-capitalize">{{ formatName(certificate.profile.first_name,
                 certificate.profile.middle_name, certificate.profile.last_name) ?? '-' }}</p>
             </td>
