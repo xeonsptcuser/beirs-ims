@@ -157,6 +157,10 @@ const age = computed(() => {
   return computeAge(form.date_of_birth)
 });
 
+const isProfileOwner = computed(() => {
+  return responseData.value?.id === useSession.id
+})
+
 watchEffect(() => {
   fetchUserProfile()
   setTimeout(() => {
@@ -237,12 +241,13 @@ watchEffect(() => {
               :is-disabled="isNotEditableUser.passwordConfirmation" />
           </div>
         </div>
-        <div class="ms-md-auto text-center">
+        <div class="ms-md-auto text-center" v-if="isProfileOwner">
           <a href="#" class="text-dark fs-6" @click="handleShowPasswordChange"><i
               class="bi bi-shield-lock-fill  me-1"></i>Change
             Password </a>
         </div>
-        <div class="col-md-8 col-sm-12 mx-auto d-flex justify-items-center gap-2 align-items-center">
+        <div class="col-md-8 col-sm-12 mx-auto d-flex justify-items-center gap-2 align-items-center"
+          v-if="isProfileOwner">
           <FormButton label="Submit" :is-disabled="isEditableSubmit"
             :btn-display="isEditableSubmit ? 'secondary' : 'primary'" />
           <FormButton type="button" label="Edit" btn-display="danger" :is-outlined="true"

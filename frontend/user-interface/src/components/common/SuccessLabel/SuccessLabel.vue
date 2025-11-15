@@ -10,12 +10,17 @@ defineProps({
     type: String,
     required: false,
     default: ''
+  },
+  alertType: {
+    type: String,
+    required: false,
+    default: ''
   }
 })
 
 </script>
 <template>
-  <div class="alert alert-success" :class="{ 'mb-4': isSuccess }" role="alert" v-if="isSuccess">
+  <div class="alert" :class="[{ 'my-4': isSuccess }, `alert-${alertType}`]" role="alert" v-if="isSuccess">
     <span class="text-md"><i class="bi bi-check-circle"></i> {{ message }}</span>
   </div>
 </template>
