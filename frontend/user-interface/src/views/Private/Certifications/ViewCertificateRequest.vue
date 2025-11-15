@@ -33,7 +33,7 @@ const fetchCertificateRequestInfo = async () => {
   }
 }
 
-const handleApproveRejectCertRequest = async (status: StatusOptions) => {
+const handleApproveRejectReleaseCertRequest = async (status: StatusOptions) => {
   if (status === 'cancelled') {
     const userConfirmed = globalThis.confirm('Are you sure you want to cancel request?');
     if (!userConfirmed) return;
@@ -57,18 +57,29 @@ const handleApproveRejectCertRequest = async (status: StatusOptions) => {
   }
 }
 
-const isNotCancelled = computed(() => {
-  return certificateInfo.value?.status !== 'cancelled'
-})
-
 const showIfCertificateRequestOwner = computed(() => {
   return certificateInfo.value?.profile.id === useSession.id
 })
 
-const showApproveRejectBtn = computed(() => {
-  return certificateInfo.value?.status === 'pending' && certificateInfo.value.id !== useSession.id && !useSession.isRoleResident()
+const isApproved = computed(() => {
+  return certificateInfo.value?.status === 'approved'
 })
 
+const isPending = computed(() => {
+  return certificateInfo.value?.status === 'pending'
+})
+
+const showApproveRejectBtn = computed(() => {
+  return isPending.value && !showIfCertificateRequestOwner.value && !useSession.isRoleResident()
+})
+
+const showCancelButton = computed(() => {
+  return showIfCertificateRequestOwner.value && isPending.value
+})
+
+const showReleaseButton = computed(() => {
+  return isApproved && useSession.isRoleStaff();
+});
 
 onMounted(() => {
   fetchCertificateRequestInfo();
@@ -117,18 +128,22 @@ onMounted(() => {
           </div>
         </div>
         <div class="mb-5 mt-3">
-          <div class="col-md-4 col-sm-12 mx-auto" v-if="showIfCertificateRequestOwner && isNotCancelled">
+          <div class="col-md-4 col-sm-12 mx-auto" v-if="showCancelButton">
             <FormButton type="button" label="Cancel" btn-display="danger"
-              @Click.prevent="() => handleApproveRejectCertRequest('cancelled')" />
+              @Click.prevent="() => handleApproveRejectReleaseCertRequest('cancelled')" />
+          </div>
+          <div class="col-md-4 col-sm-12 mx-auto" v-if="showReleaseButton">
+            <FormButton type="button" label="Releasing" btn-display="success"
+              @Click.prevent="() => handleApproveRejectReleaseCertRequest('released')" />
           </div>
           <div class="d-flex justify-content-evenly align-items-center mx-auto" v-if="showApproveRejectBtn">
             <div class="col-md-4 col-12">
               <FormButton type="button" label="Approve" btn-display="primary"
-                @Click.prevent="() => handleApproveRejectCertRequest('approved')" />
+                @Click.prevent="() => handleApproveRejectReleaseCertRequest('approved')" />
             </div>
             <div class="col-md-4 col-12">
               <FormButton type="button" label="Reject" btn-display="danger"
-                @Click.prevent="() => handleApproveRejectCertRequest('rejected')" />
+                @Click.prevent="() => handleApproveRejectReleaseCertRequest('rejected')" />
             </div>
           </div>
         </div>

@@ -3,7 +3,7 @@ import type { RegisterRequest } from '@/Types'
 import { reactive, ref } from 'vue'
 
 export function useRegisterAccount() {
-  const { successResponse, setSuccessResponse } = useSharedAuthResponse()
+  const { successResponse, setSuccessResponse, clearSuccessResponse } = useSharedAuthResponse()
   const form = reactive<RegisterRequest>({
     name: {
       firstName: '',
@@ -93,10 +93,7 @@ export function useRegisterAccount() {
     return isValid
   }
 
-  const setServerErrors = (
-    apiErrors?: Record<string, string[]>,
-    fallbackMessage?: string
-  ) => {
+  const setServerErrors = (apiErrors?: Record<string, string[]>, fallbackMessage?: string) => {
     resetErrors()
 
     const fieldMap: Record<string, keyof RegisterRequest> = {
@@ -138,5 +135,6 @@ export function useRegisterAccount() {
     validateForm,
     setServerErrors,
     setSuccessResponse,
+    clearSuccessResponse,
   }
 }

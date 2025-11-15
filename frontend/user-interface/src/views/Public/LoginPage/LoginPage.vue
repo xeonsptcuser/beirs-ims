@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import FormContainer from "@/components/common/FormContainer/FormContainer.vue";
 import { useLoginAccount } from "./composable/useLoginAccount";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import WarningLabel from "@/components/common/WarningLabel/WarningLabel.vue";
 import FormInput from "@/components/common/FormInput/FormInput.vue";
 import SuccessLabel from "@/components/common/SuccessLabel/SuccessLabel.vue";
@@ -86,6 +86,12 @@ const filteredErrors = computed(() => {
   return fieldErrors
 });
 
+onMounted(() => {
+  setTimeout(() => {
+    clearSuccessResponse();
+    sessionStorage.clear()
+  }, 3000);
+})
 
 </script>
 <template>
