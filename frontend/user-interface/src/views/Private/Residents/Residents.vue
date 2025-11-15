@@ -2,6 +2,7 @@
 import Pagination from '@/components/common/Pagination/Pagination.vue';
 import type { PaginationLink, User } from '@/Types';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
+import { useSessionStore } from '@/Utils/store/useSessionStore';
 import { fetchAllUsers, toggleUserAccountStatus } from '@/Utils/userServices';
 import { onMounted, reactive, ref } from 'vue';
 
@@ -9,6 +10,8 @@ defineProps<{ role: string }>();
 
 const residents = ref<User[]>([]);
 const navigation = useGlobalLoadingStore();
+const useSession = useSessionStore();
+const isAdmin = useSession.isRoleAdmin()
 
 const pagination = reactive({
   current: 1,
@@ -75,7 +78,7 @@ onMounted(() => {
 </script>
 <template>
   <div class="my-5">
-    <div class="d-flex">
+    <div class="d-flex" v-if="isAdmin">
       <router-link :to="{
         name: 'CreateUserProfile'
       }" class="btn btn-primary mb-3 ms-auto">
@@ -92,7 +95,7 @@ onMounted(() => {
             <th scope="col" class="text-center d-none d-lg-table-cell py-3 border-end border-white">Roles</th>
             <th scope="col" class="text-center d-none d-md-table-cell py-3 border-end border-white">Street Address</th>
             <th scope="col" class="text-center py-3 border-end border-white">Status</th>
-            <th scope="col" colspan="2" class="text-center py-3 border-end border-white">Action</th>
+            <th scope="col" colspan="2" class="text-center py-3 border-end border-white" v-if="isAdmin">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -116,7 +119,7 @@ onMounted(() => {
               <p class="mb-0 py-1 text-md "> <i class="bi-record-fill"
                   :class="[resident.profile.is_active ? 'text-success' : 'text-danger']"></i></p>
             </td>
-            <td class="align-middle">
+            <td class="align-middle" v-if="isAdmin">
               <a href="#" @click.prevent="handleToggleUserStatus(resident)"
                 class="text-decoration-none text-black text-nowrap text-md">
                 <span v-if="resident.profile.is_active">
