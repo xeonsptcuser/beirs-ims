@@ -19,7 +19,8 @@ class UsersController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->integer('per_page');
-        $users = $this->users->all(['profile'], $perPage);
+        $search = $this->resolveSearch($request);
+        $users = $this->users->all(['profile'], $perPage, $search);
 
         return response()->json([
             'status' => 'success',
@@ -133,5 +134,16 @@ class UsersController extends Controller
             'status' => 'success',
             'message' => 'User deleted successfully.',
         ]);
+    }
+
+    public function resolveSearch(Request $request)
+    {
+        $search = $request->input('search');
+
+        if (is_null($search)) {
+            return null;
+        }
+
+        return !empty($search) ? $search : null;
     }
 }

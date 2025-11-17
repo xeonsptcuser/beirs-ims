@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import FormSearchInput from '@/components/common/FormSearchInput/FormSearchInput.vue';
 import Pagination from '@/components/common/Pagination/Pagination.vue';
-import type { PaginationLink, User } from '@/Types';
+import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
+import type { ApiErrorResponse, CommonResponse, PaginationLink, User } from '@/Types';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 import { fetchAllUsers, toggleUserAccountStatus } from '@/Utils/userServices';
+import type { AxiosError } from 'axios';
 import { onMounted, reactive, ref } from 'vue';
 
 defineProps<{ role: string }>();
@@ -14,6 +16,8 @@ const navigation = useGlobalLoadingStore();
 const useSession = useSessionStore();
 const isAdmin = useSession.isRoleAdmin()
 const searchByNameKeyWord = ref<string>('');
+const hasError = ref<boolean>(false);
+const errorMessage = ref<string>('');
 
 const pagination = reactive({
   current: 1,
@@ -23,10 +27,10 @@ const pagination = reactive({
   links: [] as PaginationLink[],
 });
 
-const fetchResidentUsers = async (page: number = pagination.current) => {
+const fetchResidentUsers = async (page: number = pagination.current, search?: string) => {
   navigation.startNavigation();
   try {
-    const response = await fetchAllUsers({ page, per_page: pagination.perPage });
+    const response = await fetchAllUsers({ page, per_page: pagination.perPage, search });
 
     if (response.status !== 'success') {
       throw response;
@@ -74,15 +78,9 @@ const handleToggleUserStatus = async (resident: User) => {
 }
 
 const handleSearchResidentByName = async () => {
-  navigation.startNavigation();
-  try {
-    console.log(searchByNameKeyWord.value)
-  } catch (error) {
-    console.log(error)
-  } finally {
-    searchByNameKeyWord.value = ''
-    navigation.endNavigation();
-  }
+  console.log(searchByNameKeyWord.value)
+  pagination.current = 1
+  fetchResidentUsers(pagination.current, searchByNameKeyWord.value)
 }
 
 onMounted(() => {
@@ -91,6 +89,7 @@ onMounted(() => {
 
 </script>
 <template>
+  <WarningLabel :has-error="hasError" :errors="[{ error: errorMessage }]" />
   <div class="my-5">
     <div class="d-flex" v-if="isAdmin">
       <router-link :to="{

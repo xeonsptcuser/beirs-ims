@@ -23,12 +23,14 @@ class CertificateRequest extends Model
         'start_residency_date',
         'end_residency_date',
         'cert_request_reason',
+        'is_current',
         'status'
     ];
 
     protected $casts = [
         'start_residency_date' => 'date',
         'end_residency_date' => 'date',
+        'is_current' => 'boolean'
     ];
 
     protected $attributes = [

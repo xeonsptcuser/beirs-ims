@@ -39,9 +39,22 @@ const fetchCertificateRequestInfo = async () => {
   try {
     const response = await fetchCertificateInfo(props.id);
     certificateInfo.value = response.data;
+    console.log(certificateInfo.value)
 
   } catch (error) {
-    console.log(error)
+    const axiosError = error as AxiosError<ApiErrorResponse>;
+    const fallbackResponse = error as CommonResponse;
+
+    if (axiosError?.isAxiosError) {
+      const responseData = axiosError.response?.data;
+      errorMessage.value = responseData?.message ?? '';
+    } else if (fallbackResponse?.message) {
+      errorMessage.value = fallbackResponse.message ?? '';
+    } else {
+      errorMessage.value = 'Failed to fetch certificate requests.';
+    }
+
+    hasError.value = true;
   } finally {
     navigation.endNavigation()
   }
@@ -88,6 +101,7 @@ const handleApproveRejectReleaseCertRequest = async (status: StatusOptions) => {
       hasDone.value = true;
       successMessage.value = 'Certificate request has been released!'
     }
+
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
     const fallbackResponse = error as CommonResponse;

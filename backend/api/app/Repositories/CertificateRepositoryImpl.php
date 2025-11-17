@@ -79,6 +79,7 @@ class CertificateRepositoryImpl implements CertificateRepositoryInterface
         return DB::transaction(function () use ($certificateData, $profileId) {
             $profile = UserProfile::findOrFail($profileId);
             $certificateData['status'] ??= CertificateRequest::STATUS_PENDING;
+            Log::info($certificateData);
             $certificateRequest = $profile->certificateRequests()->create($certificateData);
 
             return $certificateRequest->load('profile');
