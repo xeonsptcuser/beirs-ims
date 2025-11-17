@@ -11,6 +11,9 @@ export const evaluateStatus = (status: string) => {
     return 'bg-primary'
   }
   if (status === 'released') {
+    return 'bg-info'
+  }
+  if (status === 'done') {
     return 'bg-success'
   }
   return 'bg-secondary'

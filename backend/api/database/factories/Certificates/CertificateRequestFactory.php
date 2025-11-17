@@ -21,7 +21,7 @@ class CertificateRequestFactory extends Factory
             'start_residency_date' => fake()->date(),
             'end_residency_date' => fake()->date(),
             'cert_request_reason' => fake()->text(200),
-            'status' => fake()->randomElement(['pending', 'rejected', 'approved', 'cancelled', 'released']),
+            'status' => fake()->randomElement(['pending', 'rejected', 'approved', 'cancelled', 'released', 'done']),
         ];
     }
 }

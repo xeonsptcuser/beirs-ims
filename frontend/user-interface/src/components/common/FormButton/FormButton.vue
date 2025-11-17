@@ -2,7 +2,7 @@
 withDefaults(defineProps<{
   label: string
   type?: 'submit' | 'button' | 'reset'
-  btnDisplay?: 'primary' | 'warning' | 'success' | 'danger' | 'secondary'
+  btnDisplay?: 'primary' | 'warning' | 'success' | 'danger' | 'secondary' | 'info'
   isOutlined?: boolean
   isDisabled?: boolean
 }>(), {

@@ -18,7 +18,9 @@ class CertificateRequestsController extends Controller
     public function findAll(Request $request)
     {
         $perPage = $request->integer('per_page');
-        $certificates = $this->certificate->getAll(['profile'], $perPage);
+        $search = $request->string('search');
+        $statuses = $this->resolveStatuses($request);
+        $certificates = $this->certificate->getAll(['profile'], $perPage, $statuses, $search);
 
         return response()->json([
             'status' => 'success',
@@ -30,7 +32,9 @@ class CertificateRequestsController extends Controller
     {
         $perPage = $request->integer('per_page');
         $userId = $request->integer('user_id');
-        $certificates = $this->certificate->getAllById(['profile'], $perPage, $userId);
+        $search = $request->string('search');
+        $statuses = $this->resolveStatuses($request);
+        $certificates = $this->certificate->getAllById(['profile'], $userId, $perPage, $statuses, $search);
 
         return response()->json([
             'status' => 'success',
@@ -102,5 +106,40 @@ class CertificateRequestsController extends Controller
             'status' => 'success',
             'data' => $certificate
         ]);
+    }
+
+    private function resolveStatuses(Request $request): ?array
+    {
+        $statuses = $request->input('statuses');
+
+        if (is_null($statuses)) {
+            return null;
+        }
+
+        if (is_string($statuses)) {
+            $statuses = explode(',', $statuses);
+        }
+
+        if (!is_array($statuses)) {
+            return null;
+        }
+
+        $allowedStatuses = [
+            CertificateRequest::STATUS_PENDING,
+            CertificateRequest::STATUS_APPROVED,
+            CertificateRequest::STATUS_REJECTED,
+            CertificateRequest::STATUS_CANCELLED,
+            CertificateRequest::STATUS_RELEASED,
+            CertificateRequest::STATUS_DONE,
+        ];
+
+        $filteredStatuses = array_values(array_unique(array_filter(array_map(
+            static fn($status) => is_string($status) ? strtolower(trim($status)) : null,
+            $statuses
+        ))));
+
+        $validStatuses = array_values(array_intersect($filteredStatuses, $allowedStatuses));
+
+        return !empty($validStatuses) ? $validStatuses : null;
     }
 }
