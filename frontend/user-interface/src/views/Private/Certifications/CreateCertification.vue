@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import DropdownInput from '@/components/common/DropdownInput/DropdownInput.vue';
 import FormContainer from '@/components/common/FormContainer/FormContainer.vue';
-import FormInput from '@/components/common/FormInput/FormInput.vue';
 import { useCreateCertificate } from '@/views/Private/Certifications/composables/useCreateCertificate';
 import FormButton from '@/components/common/FormButton/FormButton.vue';
 import { computed, ref, watch, watchEffect } from 'vue';
@@ -15,6 +14,7 @@ import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
 import type { CreateCertificateRequestPayload } from '@/Types/certificate-related-types';
 import router from '@/router';
 import { submitCertificationRequest } from '@/Utils/certificateServices';
+import FormFloatingInput from '@/components/common/FormFloatingInput/FormFloatingInput.vue';
 
 const props = defineProps<{
   role: string,
@@ -164,20 +164,21 @@ watchEffect(() => {
             :has-error="errors.certificateRequestType" />
         </div>
         <div class="col-12">
-          <FormInput type="text" label="Complete Name" id="complete-name" v-model="requestorName" :is-disabled="true" />
+          <FormFloatingInput type="text" label="Complete Name" id="complete-name" v-model="requestorName"
+            :is-disabled="true" />
         </div>
         <div class="col-12">
-          <FormInput type="text" label="Address" id="address" v-model="requestorAddress" :is-disabled="true" />
+          <FormFloatingInput type="text" label="Address" id="address" v-model="requestorAddress" :is-disabled="true" />
         </div>
         <div class="row gx-2 gy-2">
           <div class="col-12 col-md-5 ">
-            <FormInput type="date" label="Start Residency Date" :optional="true" id="start-residency-date"
+            <FormFloatingInput type="date" label="Start Residency Date" :optional="true" id="start-residency-date"
               v-model="form.startResidencyDate" :max="today" />
           </div>
           <div class="col-12 col-md-7 ">
             <div class="row align-items-center">
               <div class="col-12 col-md-8">
-                <FormInput type="date" label="End Residency Date" :optional="true" id="end-residency-date"
+                <FormFloatingInput type="date" label="End Residency Date" :optional="true" id="end-residency-date"
                   v-model="form.endResidencyDate" :is-disabled="form.isCurrent" :max="today" />
               </div>
               <div class="col-4 ms-auto">

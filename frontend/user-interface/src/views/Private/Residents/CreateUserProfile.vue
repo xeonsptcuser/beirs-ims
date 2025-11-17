@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import FormContainer from '@/components/common/FormContainer/FormContainer.vue';
-import FormInput from '@/components/common/FormInput/FormInput.vue';
 import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
 import { useCreateUserAccount } from './composable/useCreateUserAccount';
 import { computed, ref } from 'vue';
@@ -11,6 +10,7 @@ import { userAccountCreation } from '@/Utils/userServices';
 import { useRouter } from 'vue-router';
 import type { AxiosError } from 'axios';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
+import FormFloatingInput from '@/components/common/FormFloatingInput/FormFloatingInput.vue';
 
 const props = defineProps<{
   role: string
@@ -105,25 +105,25 @@ const filteredErrors = computed(() => {
           <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleCreateUserAccount">
             <div class="row g-2">
               <div class="col-md-4 col-sm-12">
-                <FormInput type="text" label="First Name" placeholder="First Name" id="first_name"
+                <FormFloatingInput type="text" label="First Name" placeholder="First Name" id="first_name"
                   v-model="form.name.firstName" :has-error="errors.name" :error-message="errorMessages.name.error" />
               </div>
               <div class="col-md-4 col-sm-12">
-                <FormInput type="text" label="Last Name" placeholder="Last Name" id="last_name"
+                <FormFloatingInput type="text" label="Last Name" placeholder="Last Name" id="last_name"
                   v-model="form.name.lastName" :has-error="errors.name" :error-message="errorMessages.name.error" />
               </div>
               <div class="col-md-4 col-sm-12">
-                <FormInput type="text" label="Middle Name" :optional="true" id="middle_name"
+                <FormFloatingInput type="text" label="Middle Name" :optional="true" id="middle_name"
                   v-model="form.name.middleName" />
               </div>
             </div>
             <div class="row g-2">
               <div class="col-md-6 col-sm-12">
-                <FormInput type="email" label="Email Address" placeholder="beirs@test.com" id="email"
+                <FormFloatingInput type="email" label="Email Address" placeholder="beirs@test.com" id="email"
                   v-model="form.email" :has-error="errors.email" :error-message="errorMessages.email.error" />
               </div>
               <div class="col-md-3 col-sm-12">
-                <FormInput type="date" label="Date Of Birth" placeholder="beirs@test.com" id="birthday"
+                <FormFloatingInput type="date" label="Date Of Birth" placeholder="beirs@test.com" id="birthday"
                   v-model="form.date_of_birth" :has-error="errors.date_of_birth"
                   :error-message="errorMessages.date_of_birth.error" />
               </div>
@@ -134,21 +134,21 @@ const filteredErrors = computed(() => {
             </div>
             <div class="row g-2">
               <div class="col-md-6 col-sm-12">
-                <FormInput type="text" label="Mobile Number" id="phoneNumber" v-model="form.mobileNumber"
+                <FormFloatingInput type="text" label="Mobile Number" id="phoneNumber" v-model="form.mobileNumber"
                   :has-error="errors.mobileNumber" :error-message="errorMessages.mobileNumber.error" />
               </div>
               <div class="col-md-6 col-sm-12">
-                <FormInput type="text" label="Street Address" id="streetAddress" v-model="form.streetAddress"
+                <FormFloatingInput type="text" label="Street Address" id="streetAddress" v-model="form.streetAddress"
                   :has-error="errors.streetAddress" :error-message="errorMessages.streetAddress.error" />
               </div>
             </div>
             <div class="row g-2">
               <div class="col-md-6 col-sm-12">
-                <FormInput type="password" label="Password" placeholder="Password" id="password" v-model="form.password"
-                  :has-error="errors.password" :error-message="errorMessages.password.error" />
+                <FormFloatingInput type="password" label="Password" placeholder="Password" id="password"
+                  v-model="form.password" :has-error="errors.password" :error-message="errorMessages.password.error" />
               </div>
               <div class="col-md-6 col-sm-12">
-                <FormInput type="password" label="Confirm Password" placeholder="Password Confirmation"
+                <FormFloatingInput type="password" label="Confirm Password" placeholder="Password Confirmation"
                   id="passwordConfirm" v-model="form.passwordConfirmation" :has-error="errors.passwordConfirmation"
                   :error-message="errorMessages.passwordConfirmation.error" />
               </div>

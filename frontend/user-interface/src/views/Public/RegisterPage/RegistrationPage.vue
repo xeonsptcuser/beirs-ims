@@ -3,13 +3,13 @@ import FormContainer from '@/components/common/FormContainer/FormContainer.vue';
 import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
 import { computed, ref } from 'vue';
 import { useRegisterAccount } from './composable/useRegisterAccount';
-import FormInput from '@/components/common/FormInput/FormInput.vue';
 import type { ApiErrorResponse, RegisterRequestPayload, CommonResponse } from '@/Types';
 import { userRegistration } from '@/Utils/loginServices';
 import { useRouter } from 'vue-router';
 import type { AxiosError } from 'axios';
 import FormButton from '@/components/common/FormButton/FormButton.vue';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
+import FormFloatingInput from '@/components/common/FormFloatingInput/FormFloatingInput.vue';
 
 const {
   form,
@@ -91,36 +91,36 @@ const filteredErrors = computed(() => {
         <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleRegisterAccount">
           <div class="row g-2">
             <div class="col-md-4 col-sm-12">
-              <FormInput type="text" label="First Name" placeholder="First Name" id="first_name"
+              <FormFloatingInput type="text" label="First Name" placeholder="First Name" id="first_name"
                 v-model="form.name.firstName" :has-error="errors.name" :error-message="errorMessages.name.error" />
             </div>
             <div class="col-md-4 col-sm-12">
-              <FormInput type="text" label="Last Name" placeholder="Last Name" id="last_name"
+              <FormFloatingInput type="text" label="Last Name" placeholder="Last Name" id="last_name"
                 v-model="form.name.lastName" :has-error="errors.name" :error-message="errorMessages.name.error" />
             </div>
             <div class="col-md-4 col-sm-12">
-              <FormInput type="text" label="Middle Name" :optional="true" id="middle_name"
+              <FormFloatingInput type="text" label="Middle Name" :optional="true" id="middle_name"
                 v-model="form.name.middleName" />
             </div>
           </div>
           <div class="row g-2">
             <div class="col-md-6 col-sm-12">
-              <FormInput type="email" label="Email Address" placeholder="beirs@test.com" id="email" v-model="form.email"
-                :has-error="errors.email" :error-message="errorMessages.email.error" />
+              <FormFloatingInput type="email" label="Email Address" placeholder="beirs@test.com" id="email"
+                v-model="form.email" :has-error="errors.email" :error-message="errorMessages.email.error" />
             </div>
             <div class="col-md-6 col-sm-12">
-              <FormInput type="date" label="Date Of Birth" placeholder="beirs@test.com" id="birthday"
+              <FormFloatingInput type="date" label="Date Of Birth" placeholder="beirs@test.com" id="birthday"
                 v-model="form.date_of_birth" :has-error="errors.date_of_birth"
                 :error-message="errorMessages.date_of_birth.error" />
             </div>
           </div>
           <div class="row g-2">
             <div class="col-md-6 col-sm-12">
-              <FormInput type="password" label="Password" placeholder="Password" id="password" v-model="form.password"
-                :has-error="errors.password" :error-message="errorMessages.password.error" />
+              <FormFloatingInput type="password" label="Password" placeholder="Password" id="password"
+                v-model="form.password" :has-error="errors.password" :error-message="errorMessages.password.error" />
             </div>
             <div class="col-md-6 col-sm-12">
-              <FormInput type="password" label="Confirm Password" placeholder="Password Confirmation"
+              <FormFloatingInput type="password" label="Confirm Password" placeholder="Password Confirmation"
                 id="passwordConfirm" v-model="form.passwordConfirmation" :has-error="errors.passwordConfirmation"
                 :error-message="errorMessages.passwordConfirmation.error" />
             </div>

@@ -3,7 +3,6 @@ import FormContainer from "@/components/common/FormContainer/FormContainer.vue";
 import { useLoginAccount } from "./composable/useLoginAccount";
 import { computed, onMounted, ref } from "vue";
 import WarningLabel from "@/components/common/WarningLabel/WarningLabel.vue";
-import FormInput from "@/components/common/FormInput/FormInput.vue";
 import SuccessLabel from "@/components/common/SuccessLabel/SuccessLabel.vue";
 import type { ApiErrorResponse, LoginRequestPayload } from "@/Types";
 import { userLogin } from "@/Utils/loginServices";
@@ -11,6 +10,7 @@ import { useRouter } from "vue-router";
 import { useSessionStore } from "@/Utils/store/useSessionStore";
 import FormButton from "@/components/common/FormButton/FormButton.vue";
 import { useGlobalLoadingStore } from "@/Utils/store/useGlobalLoadingStore";
+import FormFloatingInput from "@/components/common/FormFloatingInput/FormFloatingInput.vue";
 
 const {
   form,
@@ -101,9 +101,9 @@ onMounted(() => {
         <WarningLabel :has-error="hasError" :errors="filteredErrors" />
         <SuccessLabel :is-success="!!isSuccessResponse?.status" :message="isSuccessResponse?.message" />
         <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleLogin">
-          <FormInput type="text" label="Email Address" placeholder="Email Address" id="userName" autofocus
+          <FormFloatingInput type="text" label="Email Address" placeholder="Email Address" id="userName" autofocus
             v-model="form.email" :has-error="errors.email" :error-message="errorMessages.email.error" />
-          <FormInput type="password" label="Password" placeholder="Password" id="passWord" autofocus
+          <FormFloatingInput type="password" label="Password" placeholder="Password" id="passWord" autofocus
             v-model="form.password" :has-error="errors.password" :error-message="errorMessages.password.error" />
           <div class="col-md-10 col-sm-12 mx-auto">
             <FormButton label="Sign In" />
