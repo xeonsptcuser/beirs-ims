@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import FormSearchInput from '@/components/common/FormSearchInput/FormSearchInput.vue';
 import Pagination from '@/components/common/Pagination/Pagination.vue';
 import type { PaginationLink, User } from '@/Types';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
@@ -12,6 +13,7 @@ const residents = ref<User[]>([]);
 const navigation = useGlobalLoadingStore();
 const useSession = useSessionStore();
 const isAdmin = useSession.isRoleAdmin()
+const searchByNameKeyWord = ref<string>('');
 
 const pagination = reactive({
   current: 1,
@@ -71,6 +73,18 @@ const handleToggleUserStatus = async (resident: User) => {
   }
 }
 
+const handleSearchResidentByName = async () => {
+  navigation.startNavigation();
+  try {
+    console.log(searchByNameKeyWord.value)
+  } catch (error) {
+    console.log(error)
+  } finally {
+    searchByNameKeyWord.value = ''
+    navigation.endNavigation();
+  }
+}
+
 onMounted(() => {
   fetchResidentUsers();
 });
@@ -88,6 +102,12 @@ onMounted(() => {
     </div>
     <div class="p-4 rounded border border-gray-500 bg-white">
       <h3 class="text-center tracking-wider mb-3">RESIDENTS LIST</h3>
+
+      <div class="my-3">
+        <form @submit.prevent="handleSearchResidentByName" class="col-md-3 col-12 mb-3 mb-md-0 ms-auto">
+          <FormSearchInput v-model="searchByNameKeyWord" />
+        </form>
+      </div>
       <table class="table" v-if="!navigation.isNavigating">
         <thead class="table-secondary">
           <tr>

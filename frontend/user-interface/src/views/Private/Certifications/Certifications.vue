@@ -4,12 +4,12 @@ import FormSearchInput from '@/components/common/FormSearchInput/FormSearchInput
 import Pagination from '@/components/common/Pagination/Pagination.vue';
 import type { ApiErrorResponse, CommonResponse, PaginationLink } from '@/Types';
 import type { CertificateRequestsResponse } from '@/Types/certificate-related-types';
-import { fetchAllCertificates } from '@/Utils/certificateServices';
+import { fetchAllCertificates, fetchAllCertificatesById } from '@/Utils/certificateServices';
 import { formatDateToHuman, formatName } from '@/Utils/helpers/formatters';
 import { evaluateStatus } from '@/Utils/helpers/common-helpers';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
-import { reactive, ref, watchEffect } from 'vue';
+import { computed, reactive, ref, watchEffect } from 'vue';
 import type { AxiosError } from 'axios';
 import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
 
@@ -25,6 +25,11 @@ const certificationRequestItems = ref<CertificateRequestsResponse[]>([])
 const searchByNameKeyWord = ref<string>('');
 const hasError = ref<boolean>(false);
 const errorMessage = ref<string>('');
+const isHistoryScreen = ref<boolean>(false);
+
+const title = computed(() => {
+  return 'CERTIFICATE REQUEST LIST'
+});
 
 const pagination = reactive({
   current: 1,
@@ -39,10 +44,12 @@ const fetchCertificateRequests = async (page: number = pagination.current) => {
   let response = null;
   try {
     if (useSession.isRoleResident()) {
-      response = await fetchAllCertificates({ page, per_page: pagination.perPage, user_id: useSession.id })
+      response = await fetchAllCertificatesById({ page, per_page: pagination.perPage, user_id: useSession.id })
     } else {
       response = await fetchAllCertificates({ page, per_page: pagination.perPage })
     }
+
+    console.log(response.data);
 
     if (response.status !== 'success') {
       throw response;
@@ -75,7 +82,7 @@ const fetchCertificateRequests = async (page: number = pagination.current) => {
 }
 
 const handleSearchCertificates = () => {
-
+  navigation.startNavigation();
   try {
     console.log(`SEARCHED KEYWORD: ${searchByNameKeyWord.value}`)
 
@@ -83,8 +90,22 @@ const handleSearchCertificates = () => {
     console.log(error)
   } finally {
     searchByNameKeyWord.value = ''
+    navigation.endNavigation();
   }
 }
+
+const handleFilterHistory = async () => {
+  navigation.startNavigation();
+  try {
+    console.log(`Is History Screen: ${isHistoryScreen.value}`)
+    isHistoryScreen.value = !isHistoryScreen.value
+  } catch (error) {
+    console.log(error)
+  } finally {
+    navigation.endNavigation();
+  }
+}
+
 
 watchEffect(() => {
   fetchCertificateRequests()
@@ -93,11 +114,17 @@ watchEffect(() => {
 </script>
 <template>
   <div class="my-5 ">
+    <WarningLabel :has-error="hasError" :errors="[{ error: errorMessage }]" />
     <div class="p-4 rounded border border-gray-500 bg-white">
-      <WarningLabel :has-error="hasError" :errors="[{ error: errorMessage }]" />
+      <div class="text-end me-2 mb-3 ">
+        <a href="#" class="text-decoration-none text-secondary" @click="handleFilterHistory">
+          <i class="bi bi-journal-text me-2"></i>View History
+        </a>
+      </div>
       <div class="row mb-0 mb-md-4">
-        <h3 class="text-center tracking-wider mb-3 mb-md-0 mt-md-2"
-          :class="{ 'col-10 col-md-9': useSession.isRoleResident() }">CERTIFICATE REQUEST LIST</h3>
+        <h3 class="text-center tracking-wider mb-3 mb-md-0" :class="{ 'col-10 col-md-9': useSession.isRoleResident() }">
+          {{ title }}
+        </h3>
         <div class="col-2 col-md-3" v-if="useSession.isRoleResident()">
           <router-link v-if="useSession.isLoggedIn()" :to="{
             name: 'CreateCertification',
@@ -108,28 +135,35 @@ watchEffect(() => {
         </div>
       </div>
 
-      <div class="d-md-flex justify-content-between mb-2 g-2 align-items-center ">
+      <div class="d-md-flex justify-content-between my-3 g-2 align-items-center ">
         <form @submit.prevent="handleSearchCertificates" class="col-md-3 col-12 mb-3 mb-md-0">
           <FormSearchInput v-model="searchByNameKeyWord" />
         </form>
         <div class="col-md-6 col-12 row align-items-center">
           <!-- MOBILE SCREEN -->
           <p class="font-bold col-md-3 my-auto d-md-none d-block">Filter:</p>
-          <FormCheckboxInput id="filter-pending-sm" label="Pending"
-            class="col-12 col-md-3 d-md-none form-check-reverse" />
+          <FormCheckboxInput id="filter-pending-sm" label="Pending" class="col-12 col-md-3 d-md-none form-check-reverse"
+            v-if="!isHistoryScreen" />
           <FormCheckboxInput id="filter-approved-sm" label="Approved"
-            class="col-12 col-md-3 d-md-none form-check-reverse" />
+            class="col-12 col-md-3 d-md-none form-check-reverse" v-if="!isHistoryScreen" />
           <FormCheckboxInput id="filter-rejected-sm" label="Rejected"
-            class="col-12 col-md-3 d-md-none form-check-reverse" />
+            class="col-12 col-md-3 d-md-none form-check-reverse" v-if="isHistoryScreen" />
+          <FormCheckboxInput id="filter-cancelled-sm" label="Cancelled"
+            class="col-12 col-md-3 d-md-none form-check-reverse" v-if="isHistoryScreen" />
 
           <!-- DESKTOP SCREEN -->
           <p class="font-bold col-md-3 my-auto d-md-block d-none">Filter:</p>
-          <FormCheckboxInput id="filter-pending-md" label="Pending" class="col-md-3 d-none d-md-block" />
-          <FormCheckboxInput id="filter-approved-md" label="Approved" class="col-md-3 d-none d-md-block" />
-          <FormCheckboxInput id="filter-rejected-md" label="Rejected" class="col-md-3 d-none d-md-block" />
+          <FormCheckboxInput id="filter-pending-md" label="Pending" class="col-md-3 d-none d-md-block"
+            v-if="!isHistoryScreen" />
+          <FormCheckboxInput id="filter-approved-md" label="Approved" class="col-md-3 d-none d-md-block"
+            v-if="!isHistoryScreen" />
+          <FormCheckboxInput id="filter-rejected-md" label="Rejected" class="col-md-3 d-none d-md-block"
+            v-if="isHistoryScreen" />
+          <FormCheckboxInput id="filter-cancelled-md" label="Cancelled" class="col-md-3 d-none d-md-block"
+            v-if="isHistoryScreen" />
         </div>
-
       </div>
+
       <table class="table" v-show="!navigation.isNavigating">
         <thead class="table-secondary">
           <tr>

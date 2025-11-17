@@ -15,9 +15,18 @@ use Illuminate\Validation\ValidationException;
 class CertificateRepositoryImpl implements CertificateRepositoryInterface
 {
 
-    public function all(array $relations = [], ?int $perPage = null, ?int $userId = null): Collection|LengthAwarePaginator
+    public function getAll(array $relations = [], ?int $perPage = null): Collection|LengthAwarePaginator
     {
 
+        $query = CertificateRequest::with($relations)
+
+            ->orderBy('created_at', 'desc');
+
+        return $perPage ? $query->paginate($perPage) : $query->get();
+    }
+
+    public function getAllById(array $relations = [], ?int $userId = null, ?int $perPage = null): Collection|LengthAwarePaginator
+    {
 
         $query = CertificateRequest::with($relations)
             ->orderBy('created_at', 'desc');
@@ -27,18 +36,13 @@ class CertificateRepositoryImpl implements CertificateRepositoryInterface
             if ($user && $user->role === 'resident') {
                 // Resident: only their records, including cancelled
                 $query->where('user_profile_id', $userId);
-            } else {
-                // Admin/other: all except cancelled
-                $query->whereNot('status', CertificateRequest::STATUS_CANCELLED);
             }
-        } else {
-            // No userId: all except cancelled
-            $query->whereNot('status', CertificateRequest::STATUS_CANCELLED);
         }
 
         return $perPage ? $query->paginate($perPage) : $query->get();
     }
-    public function findById(int $id, array $relations = []): ?CertificateRequest
+
+    public function getById(int $id, array $relations = []): ?CertificateRequest
     {
         return CertificateRequest::with($relations)->find($id);
     }

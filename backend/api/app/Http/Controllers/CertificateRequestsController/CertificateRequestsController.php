@@ -15,11 +15,22 @@ class CertificateRequestsController extends Controller
     }
 
     // GET /api/auth/certificates
-    public function index(Request $request)
+    public function findAll(Request $request)
+    {
+        $perPage = $request->integer('per_page');
+        $certificates = $this->certificate->getAll(['profile'], $perPage);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $certificates
+        ]);
+    }
+
+    public function findAllById(Request $request)
     {
         $perPage = $request->integer('per_page');
         $userId = $request->integer('user_id');
-        $certificates = $this->certificate->all(['profile'], $perPage, $userId);
+        $certificates = $this->certificate->getAllById(['profile'], $perPage, $userId);
 
         return response()->json([
             'status' => 'success',
@@ -30,7 +41,7 @@ class CertificateRequestsController extends Controller
     // GET /api/auth/certificates/{id}
     public function show(int $certificateId)
     {
-        $certificate = $this->certificate->findById($certificateId, ['profile']);
+        $certificate = $this->certificate->getById($certificateId, ['profile']);
 
         return response()->json([
             'status' => 'success',
@@ -71,7 +82,7 @@ class CertificateRequestsController extends Controller
     public function update(Request $request, int $id)
     {
         // update this so that when the staff approves or rejects, the resident is notified via sms
-        $certificateRequest = $this->certificate->findById($id, []);
+        $certificateRequest = $this->certificate->getById($id, []);
 
         if (is_null($certificateRequest)) {
             abort(404);
