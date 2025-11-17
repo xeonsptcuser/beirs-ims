@@ -8,15 +8,26 @@ use App\Models\Users\UserProfile;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class UsersRepositoryImpl implements UsersRepositoryInterface
 {
-    public function all(array $relations = [], ?int $perPage = null): Collection|LengthAwarePaginator
+    public function all(array $relations = [], ?int $perPage = null, ?string $search = null): Collection|LengthAwarePaginator
     {
         $query = User::with($relations)
             ->whereIn('role', ['resident', 'staff'])
             ->orderBy('created_at', 'desc');
 
+        $search = $search ? Str::lower($search) : null;
+        if (!empty($search)) {
+            $query->where(function ($builder) use ($search) {
+                $builder->whereHas('profile', function ($profileQuery) use ($search) {
+                    $profileQuery->where(DB::raw("LOWER(CONCAT_WS(' ', first_name, last_name))"), 'like', "%{$search}%")
+                        ->orWhere(DB::raw("LOWER(first_name)"), 'like', "%{$search}%")
+                        ->orWhere(DB::raw("LOWER(last_name)"), 'like', "%{$search}%");
+                });
+            });
+        }
         return $perPage ? $query->paginate($perPage) : $query->get();
     }
     public function findById(int $id, array $relations = []): ?User
