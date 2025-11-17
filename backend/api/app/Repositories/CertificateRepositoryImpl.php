@@ -104,6 +104,7 @@ class CertificateRepositoryImpl implements CertificateRepositoryInterface
             }
 
             $certificate->status = $status;
+            $certificate->handled_by = $certificateData['handled_by'];
             $certificate->save();
 
             return $certificate->load('profile');

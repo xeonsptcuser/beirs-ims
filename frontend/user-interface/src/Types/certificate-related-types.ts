@@ -26,6 +26,7 @@ export interface CertificateRequestsResponse {
   start_residency_date?: string
   end_residency_date?: string
   cert_request_reason: string
+  handler: UserProfile
   is_current?: boolean
   created_at: string
   updated_at?: string

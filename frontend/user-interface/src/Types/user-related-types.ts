@@ -4,10 +4,12 @@ export interface UserProfile {
   middle_name: string
   last_name: string
   street_address: string
+  address_line: string
   mobile_number: string
   date_of_birth: string
   email_verification_at: string | null
   is_active: boolean
+  user?: User
 }
 
 export interface User {
@@ -31,6 +33,7 @@ export interface CreateUserAccountRequest {
   passwordConfirmation: string
   date_of_birth: string
   streetAddress: string
+  addressLine: string
   mobileNumber: string
 }
 
@@ -67,6 +70,7 @@ export interface UpdateAccountRequestPayload {
   role: string
   date_of_birth: string
   street_address: string
+  address_line?: string
   mobile_number: string
 }
 
@@ -78,5 +82,6 @@ export interface UserProfileEditStatus {
   role: boolean
   dateOfBirth: boolean
   streetAddress: boolean
+  addressLine: boolean
   mobileNumber: boolean
 }

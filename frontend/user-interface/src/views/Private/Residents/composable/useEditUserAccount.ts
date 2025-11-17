@@ -8,6 +8,7 @@ export function useEditUserAccount() {
     errors,
     errorMessages,
     roleOptions,
+    addressOptions,
     validateForm,
     setServerErrors,
     successResponse,
@@ -24,6 +25,7 @@ export function useEditUserAccount() {
     passwordConfirmation: true,
     dateOfBirth: true,
     streetAddress: true,
+    addressLine: true,
     mobileNumber: true,
   })
 
@@ -43,6 +45,7 @@ export function useEditUserAccount() {
     errorMessages,
     isNotEditableUser,
     roleOptions,
+    addressOptions,
     isEditableSubmit,
     successResponse,
     validateForm,

@@ -27,6 +27,7 @@ const {
   errorMessages,
   isNotEditableUser,
   roleOptions,
+  addressOptions,
   isEditableSubmit,
   successResponse,
   setServerErrors,
@@ -56,6 +57,7 @@ const handleUpdateUserAccount = async () => {
         email: form.email,
         role: form.role,
         street_address: form.streetAddress,
+        address_line: form.addressLine,
         mobile_number: form.mobileNumber,
         date_of_birth: form.date_of_birth,
       }
@@ -70,15 +72,6 @@ const handleUpdateUserAccount = async () => {
 
       const response = await updateUserAccount(props.id, requestPayload)
       responseData.value = response.data
-
-      form.name.firstName = responseData.value.profile.first_name
-      form.name.middleName = responseData.value.profile.middle_name
-      form.name.lastName = responseData.value.profile.last_name
-      form.email = responseData.value.email
-      form.date_of_birth = responseData.value.profile.date_of_birth
-      form.role = responseData.value.role
-      form.streetAddress = responseData.value.profile.street_address
-      form.mobileNumber = responseData.value.profile.mobile_number
 
       setSuccessResponse({
         status: response.status ?? 'success',
@@ -125,11 +118,12 @@ const fetchUserProfile = async () => {
     form.name.middleName = responseData.value.profile.middle_name
     form.name.lastName = responseData.value.profile.last_name
 
-    form.email = responseData.value.email.trim()
-    form.role = (responseData.value.role).trim()
-    form.streetAddress = responseData.value.profile.street_address.trim()
-    form.mobileNumber = responseData.value.profile.mobile_number.trim()
-    form.date_of_birth = responseData.value.profile.date_of_birth.trim()
+    form.email = responseData.value.email
+    form.role = (responseData.value.role)
+    form.streetAddress = responseData.value.profile.street_address
+    form.addressLine = responseData.value.profile.address_line
+    form.mobileNumber = responseData.value.profile.mobile_number
+    form.date_of_birth = responseData.value.profile.date_of_birth
 
   } catch (error) {
     hasError.value = true
@@ -217,15 +211,20 @@ watchEffect(() => {
           </div>
         </div>
         <div class="row g-2">
-          <div class="col-md-6 col-sm-12">
+          <div class="col-md-4 col-sm-12">
             <FormFloatingInput type="text" label="Mobile Number" id="phoneNumber" v-model="form.mobileNumber"
               :has-error="errors.mobileNumber" :error-message="errorMessages.mobileNumber.error"
               :is-disabled="isNotEditableUser.mobileNumber" />
           </div>
-          <div class="col-md-6 col-sm-12">
-            <FormFloatingInput type="text" label="Street Address" id="streetAddress" v-model="form.streetAddress"
-              :has-error="errors.streetAddress" :error-message="errorMessages.streetAddress.error"
+          <div class="col-md-4 col-sm-12">
+            <DropdownInput :options="addressOptions" label="Sitio" id="sitio-name" v-model="form.streetAddress"
+              :error-message="errorMessages.streetAddress.error" :has-error="errors.streetAddress"
               :is-disabled="isNotEditableUser.streetAddress" />
+          </div>
+          <div class="col-md-4 col-sm-12">
+            <FormFloatingInput type="text" label="Address Line" id="address-line" v-model="form.addressLine"
+              :has-error="errors.addressLine" :error-message="errorMessages.addressLine.error"
+              :is-disabled="isNotEditableUser.mobileNumber" :optional="true" />
           </div>
         </div>
         <div class="row g-2" v-show="isPasswordChangeable">

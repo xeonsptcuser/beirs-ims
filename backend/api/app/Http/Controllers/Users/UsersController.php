@@ -42,6 +42,8 @@ class UsersController extends Controller
     // POST /api/auth/users/
     public function store(Request $request)
     {
+        $legalAgeDate = Carbon::now()->subYears(18)->toDateString();
+
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
@@ -49,8 +51,9 @@ class UsersController extends Controller
             'email' => ['required', 'email', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role' => ['required', Rule::in(['admin', 'staff', 'resident'])],
-            'date_of_birth' => ['required', 'date'],
+            'date_of_birth' => ['required', 'date', "before_or_equal:{$legalAgeDate}"],
             'street_address' => ['nullable', 'string', 'max:255'],
+            'address_line' => ['nullable', 'string', 'max:255'],
             'mobile_number' => ['nullable', 'string', 'max:20'],
         ]);
 
@@ -67,6 +70,7 @@ class UsersController extends Controller
                 'middle_name' => $validated['middle_name'],
                 'date_of_birth' => Carbon::parse($validated['date_of_birth']),
                 'street_address' => $validated['street_address'],
+                'address_line' => $validated['address_line'],
                 'mobile_number' => $validated['mobile_number'],
 
             ]
@@ -88,6 +92,8 @@ class UsersController extends Controller
             throw new ModelNotFoundException("User {$id} not found");
         }
 
+        $legalAgeDate = Carbon::now()->subYears(18)->toDateString();
+
         $validated = $request->validate([
             'email' => ['sometimes', 'email', Rule::unique('users', 'email')->ignore($user->id)],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
@@ -96,8 +102,9 @@ class UsersController extends Controller
             'last_name' => ['sometimes', 'string', 'max:255'],
             'middle_name' => ['sometimes', 'string', 'max:100'],
             'street_address' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'address_line' => ['sometimes', 'nullable', 'string', 'max:255'],
             'mobile_number' => ['sometimes', 'nullable', 'string', 'max:20'],
-            'date_of_birth' => ['sometimes', 'date'],
+            'date_of_birth' => ['sometimes', 'date', "before_or_equal:{$legalAgeDate}"],
             'is_active' => ['sometimes', 'boolean'],
         ]);
 
@@ -107,7 +114,7 @@ class UsersController extends Controller
             ->toArray();
 
         $profileData = collect($validated)
-            ->only(['first_name', 'last_name', 'middle_name', 'street_address', 'mobile_number', 'date_of_birth', 'is_active'])
+            ->only(['first_name', 'last_name', 'middle_name', 'street_address', 'address_line', 'mobile_number', 'date_of_birth', 'is_active'])
             ->filter(fn($value) => !is_null($value))
             ->toArray();
 
