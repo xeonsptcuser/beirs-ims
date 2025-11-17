@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import FormContainer from '@/components/common/FormContainer/FormContainer.vue';
-import FormInput from '@/components/common/FormInput/FormInput.vue';
 import { useEditUserAccount } from './composable/useEditUserAccount';
 import DropdownInput from '@/components/common/DropdownInput/DropdownInput.vue';
 import FormButton from '@/components/common/FormButton/FormButton.vue';
@@ -12,6 +11,7 @@ import { useSessionStore } from '@/Utils/store/useSessionStore';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import { computeAge, formatName } from '@/Utils/helpers/formatters';
 import { navigateToTopPage } from '@/Utils/helpers/common-helpers';
+import FormFloatingInput from '@/components/common/FormFloatingInput/FormFloatingInput.vue';
 
 const props = defineProps<{
   id: string
@@ -183,32 +183,32 @@ watchEffect(() => {
       <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleUpdateUserAccount">
         <div class="row g-2">
           <div class="col-md-4 col-sm-12">
-            <FormInput type="text" label="First Name" placeholder="First Name" id="first_name"
+            <FormFloatingInput type="text" label="First Name" placeholder="First Name" id="first_name"
               v-model="form.name.firstName" :error-message="errorMessages.name.error"
               :is-disabled="isNotEditableUser.name" />
           </div>
           <div class="col-md-4 col-sm-12">
-            <FormInput type="text" label="Middle Name" :optional="true" id="middle_name" v-model="form.name.middleName"
-              :is-disabled="isNotEditableUser.name" />
+            <FormFloatingInput type="text" label="Middle Name" :optional="true" id="middle_name"
+              v-model="form.name.middleName" :is-disabled="isNotEditableUser.name" />
           </div>
           <div class="col-md-4 col-sm-12">
-            <FormInput type="text" label="Last Name" placeholder="Last Name" id="last_name" v-model="form.name.lastName"
-              :has-error="errors.name" :error-message="errorMessages.name.error"
+            <FormFloatingInput type="text" label="Last Name" placeholder="Last Name" id="last_name"
+              v-model="form.name.lastName" :has-error="errors.name" :error-message="errorMessages.name.error"
               :is-disabled="isNotEditableUser.name" />
           </div>
         </div>
         <div class="row g-2 mb-3 mb-md-0">
           <div class="col-md-6 col-sm-12">
-            <FormInput type="email" label="Email Address" placeholder="beirs@test.com" id="email" v-model="form.email"
-              :has-error="errors.email" :error-message="errorMessages.email.error"
+            <FormFloatingInput type="email" label="Email Address" placeholder="beirs@test.com" id="email"
+              v-model="form.email" :has-error="errors.email" :error-message="errorMessages.email.error"
               :is-disabled="isNotEditableUser.email" />
           </div>
           <div class="col-md-3 col-sm-12">
-            <FormInput v-if="!isNotEditableUser.dateOfBirth" type="date" label="Date Of Birth" id="birthday"
+            <FormFloatingInput v-if="!isNotEditableUser.dateOfBirth" type="date" label="Date Of Birth" id="birthday"
               v-model="form.date_of_birth" :has-error="errors.date_of_birth"
               :error-message="errorMessages.date_of_birth.error" />
-            <FormInput type="text" label="Age" id="user-age" v-model="age" :is-disabled="isNotEditableUser.dateOfBirth"
-              v-else />
+            <FormFloatingInput type="text" label="Age" id="user-age" v-model="age"
+              :is-disabled="isNotEditableUser.dateOfBirth" v-else />
           </div>
           <div class="col-md-3 col-sm-12">
             <DropdownInput :options="roleOptions" label="Roles" id="select-roles" v-model="form.role"
@@ -218,25 +218,25 @@ watchEffect(() => {
         </div>
         <div class="row g-2">
           <div class="col-md-6 col-sm-12">
-            <FormInput type="text" label="Mobile Number" id="phoneNumber" v-model="form.mobileNumber"
+            <FormFloatingInput type="text" label="Mobile Number" id="phoneNumber" v-model="form.mobileNumber"
               :has-error="errors.mobileNumber" :error-message="errorMessages.mobileNumber.error"
               :is-disabled="isNotEditableUser.mobileNumber" />
           </div>
           <div class="col-md-6 col-sm-12">
-            <FormInput type="text" label="Street Address" id="streetAddress" v-model="form.streetAddress"
+            <FormFloatingInput type="text" label="Street Address" id="streetAddress" v-model="form.streetAddress"
               :has-error="errors.streetAddress" :error-message="errorMessages.streetAddress.error"
               :is-disabled="isNotEditableUser.streetAddress" />
           </div>
         </div>
         <div class="row g-2" v-show="isPasswordChangeable">
           <div class="col-md-6 col-sm-12">
-            <FormInput type="password" label="Password" placeholder="Password" id="password" v-model="form.password"
-              :has-error="errors.password" :error-message="errorMessages.password.error"
+            <FormFloatingInput type="password" label="Password" placeholder="Password" id="password"
+              v-model="form.password" :has-error="errors.password" :error-message="errorMessages.password.error"
               :is-disabled="isNotEditableUser.password" />
           </div>
           <div class="col-md-6 col-sm-12">
-            <FormInput type="password" label="Confirm Password" placeholder="Password Confirmation" id="passwordConfirm"
-              v-model="form.passwordConfirmation" :has-error="errors.passwordConfirmation"
+            <FormFloatingInput type="password" label="Confirm Password" placeholder="Password Confirmation"
+              id="passwordConfirm" v-model="form.passwordConfirmation" :has-error="errors.passwordConfirmation"
               :error-message="errorMessages.passwordConfirmation.error"
               :is-disabled="isNotEditableUser.passwordConfirmation" />
           </div>
