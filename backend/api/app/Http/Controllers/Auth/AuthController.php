@@ -43,13 +43,15 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         // Add necessary fields here
+        $legalAgeDate = Carbon::now()->subYears(18)->toDateString();
+
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'middle_name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'date_of_birth' => 'required|date',
+            'date_of_birth' => ['required', 'date', "before_or_equal:{$legalAgeDate}"],
             'role' => 'in:admin,staff,resident',
             'street_address' => 'nullable|string|max:255',
             'mobile_number' => 'nullable|string|max:20',

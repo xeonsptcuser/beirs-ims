@@ -196,6 +196,16 @@ onMounted(() => {
             <InfoField label="End Residency"
               :data-value="certificateInfo?.is_current ? 'Current' : formatDateToHuman(certificateInfo?.end_residency_date ?? '') ?? '-'" />
           </div>
+          <div class="row border-bottom border-top py-2">
+            <InfoField label="Assigned To" :data-value="certificateInfo?.handler
+              ? formatName(
+                certificateInfo?.handler.first_name ?? '',
+                certificateInfo?.handler.middle_name ?? '',
+                certificateInfo?.handler.last_name ?? ''
+              )
+              : '-'" />
+            <InfoField label="Position" :data-value="certificateInfo?.handler.user?.role ?? '-'" />
+          </div>
           <div class="mb-1">
             <InfoFieldTextArea label="Purpose" :data-value="certificateInfo?.cert_request_reason ?? '-'" />
           </div>

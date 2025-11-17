@@ -17,6 +17,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean }) {
     passwordConfirmation: '',
     date_of_birth: '',
     streetAddress: '',
+    addressLine: '',
     mobileNumber: '',
   })
 
@@ -28,6 +29,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean }) {
     passwordConfirmation: false,
     date_of_birth: false,
     streetAddress: false,
+    addressLine: false,
     mobileNumber: false,
   })
 
@@ -39,10 +41,34 @@ export function useCreateUserAccount(options?: { requirePassword: boolean }) {
     passwordConfirmation: { error: '' },
     date_of_birth: { error: '' },
     streetAddress: { error: '' },
+    addressLine: { error: '' },
     mobileNumber: { error: '' },
   })
 
   const roleOptions = ['resident', 'staff', 'admin']
+
+  const addressOptions = [
+    'pulang bukid',
+    'mabolo 1',
+    'mabolo 2',
+    'liong',
+    'sacred heart',
+    'sapang daan',
+    'Sumbrero',
+    'kabulihan',
+    'abbra',
+    'hiland',
+    'tres rosas',
+    'ura',
+    'tinago a',
+    'tinago b',
+    'tinago c',
+    'battiler',
+    'Sudlon',
+    'Cenapro',
+    'Perez',
+    'mayol',
+  ]
 
   const resetErrors = () => {
     for (const key of Object.keys(errors.value) as (keyof CreateUserAccountRequest)[]) {
@@ -127,7 +153,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean }) {
     if (!form.streetAddress.trim()) {
       errors.value.streetAddress = true
       errorMessages.value.streetAddress = {
-        error: 'Please enter your street address',
+        error: 'Please select your street address',
       }
       isValid = false
     }
@@ -176,6 +202,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean }) {
     errorMessages,
     successResponse,
     roleOptions,
+    addressOptions,
     validateForm,
     setServerErrors,
     setSuccessResponse,

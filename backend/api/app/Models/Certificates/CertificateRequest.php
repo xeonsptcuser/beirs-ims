@@ -5,6 +5,7 @@ namespace App\Models\Certificates;
 use App\Models\Users\UserProfile;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Notifications\Notifiable;
 
 class CertificateRequest extends Model
@@ -24,7 +25,8 @@ class CertificateRequest extends Model
         'end_residency_date',
         'cert_request_reason',
         'is_current',
-        'status'
+        'status',
+        'handled_by'
     ];
 
     protected $casts = [
@@ -37,9 +39,13 @@ class CertificateRequest extends Model
         'status' => self::STATUS_PENDING,
     ];
 
-    public function profile()
+    public function profile(): BelongsTo
     {
         return $this->belongsTo(UserProfile::class, 'user_profile_id');
     }
 
+    public function handler(): BelongsTo
+    {
+        return $this->belongsTo(UserProfile::class, 'handled_by');
+    }
 }

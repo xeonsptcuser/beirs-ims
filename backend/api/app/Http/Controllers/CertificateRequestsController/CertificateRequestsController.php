@@ -20,7 +20,7 @@ class CertificateRequestsController extends Controller
         $perPage = $request->integer('per_page');
         $search = $request->string('search');
         $statuses = $this->resolveStatuses($request);
-        $certificates = $this->certificate->getAll(['profile'], $perPage, $statuses, $search);
+        $certificates = $this->certificate->getAll(['profile', 'handler.user'], $perPage, $statuses, $search);
 
         return response()->json([
             'status' => 'success',
@@ -34,7 +34,7 @@ class CertificateRequestsController extends Controller
         $userId = $request->integer('user_id');
         $search = $request->string('search');
         $statuses = $this->resolveStatuses($request);
-        $certificates = $this->certificate->getAllById(['profile'], $userId, $perPage, $statuses, $search);
+        $certificates = $this->certificate->getAllById(['profile', 'handler.user'], $userId, $perPage, $statuses, $search);
 
         return response()->json([
             'status' => 'success',
@@ -45,7 +45,7 @@ class CertificateRequestsController extends Controller
     // GET /api/auth/certificates/{id}
     public function show(int $certificateId)
     {
-        $certificate = $this->certificate->getById($certificateId, ['profile']);
+        $certificate = $this->certificate->getById($certificateId, ['profile', 'handler.user']);
 
         return response()->json([
             'status' => 'success',
@@ -88,6 +88,9 @@ class CertificateRequestsController extends Controller
         // update this so that when the staff approves or rejects, the resident is notified via sms
         $certificateRequest = $this->certificate->getById($id, []);
 
+        $user = $request->user()->loadMissing('profile');
+        $handlerProfileId = $user->profile?->id;
+
         if (is_null($certificateRequest)) {
             abort(404);
         }
@@ -100,8 +103,11 @@ class CertificateRequestsController extends Controller
             ->only(['status'])
             ->filter(fn($value) => !is_null($value))
             ->toArray();
+        $certificateData['handled_by'] = $handlerProfileId;
 
         $certificate = $this->certificate->updateCertificateRequest($certificateRequest, $certificateData);
+
+        Log::info($certificate);
         return response()->json([
             'status' => 'success',
             'data' => $certificate
