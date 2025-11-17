@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->date('start_residency_date')->nullable();
             $table->date('end_residency_date')->nullable();
             $table->string('cert_request_reason');
-            $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled', 'released']);
+            $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled', 'released', 'done']);
             $table->timestamps();
         });
     }

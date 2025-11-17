@@ -16,7 +16,7 @@ class CertificateRequest extends Model
     public const STATUS_REJECTED = 'rejected';
     public const STATUS_CANCELLED = 'cancelled';
     public const STATUS_RELEASED = 'released';
-
+    public const STATUS_DONE = 'done';
     protected $fillable = [
         'user_profile_id',
         'cert_request_type',

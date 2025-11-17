@@ -3,13 +3,13 @@ import FormCheckboxInput from '@/components/common/FormCheckboxInput/FormCheckbo
 import FormSearchInput from '@/components/common/FormSearchInput/FormSearchInput.vue';
 import Pagination from '@/components/common/Pagination/Pagination.vue';
 import type { ApiErrorResponse, CommonResponse, PaginationLink } from '@/Types';
-import type { CertificateRequestsResponse } from '@/Types/certificate-related-types';
-import { fetchAllCertificates } from '@/Utils/certificateServices';
+import type { CertificateRequestsResponse, StatusOptions } from '@/Types/certificate-related-types';
+import { fetchAllCertificates, fetchAllCertificatesById } from '@/Utils/certificateServices';
 import { formatDateToHuman, formatName } from '@/Utils/helpers/formatters';
 import { evaluateStatus } from '@/Utils/helpers/common-helpers';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
-import { reactive, ref, watchEffect } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import type { AxiosError } from 'axios';
 import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
 
@@ -25,6 +25,14 @@ const certificationRequestItems = ref<CertificateRequestsResponse[]>([])
 const searchByNameKeyWord = ref<string>('');
 const hasError = ref<boolean>(false);
 const errorMessage = ref<string>('');
+const isHistoryScreen = ref<boolean>(false);
+const transactionStatuses = ['pending', 'approved', 'released'];
+const historyStatuses = ['rejected', 'cancelled', 'done'];
+const selectedStatusFilter = ref<StatusOptions | null>(null);
+
+const title = computed(() => {
+  return 'CERTIFICATE REQUEST LIST'
+});
 
 const pagination = reactive({
   current: 1,
@@ -34,15 +42,21 @@ const pagination = reactive({
   links: [] as PaginationLink[],
 });
 
-const fetchCertificateRequests = async (page: number = pagination.current) => {
+const fetchCertificateRequests = async (page: number = pagination.current, search?: string, status?: string | null) => {
   navigation.startNavigation();
-  let response = null;
+  let statuses = null
+  const activeStatus = status ?? selectedStatusFilter.value
+  if (activeStatus) {
+    statuses = [activeStatus]
+  } else {
+    statuses = isHistoryScreen.value ? historyStatuses : transactionStatuses;
+  }
+  const baseParams = { page, per_page: pagination.perPage, statuses, search }
+
   try {
-    if (useSession.isRoleResident()) {
-      response = await fetchAllCertificates({ page, per_page: pagination.perPage, user_id: useSession.id })
-    } else {
-      response = await fetchAllCertificates({ page, per_page: pagination.perPage })
-    }
+    const response = useSession.isRoleResident()
+      ? await fetchAllCertificatesById({ ...baseParams, user_id: useSession.id })
+      : await fetchAllCertificates(baseParams)
 
     if (response.status !== 'success') {
       throw response;
@@ -74,30 +88,59 @@ const fetchCertificateRequests = async (page: number = pagination.current) => {
   }
 }
 
+const toggleHistoryBtn = computed(() => {
+  if (!isHistoryScreen.value) {
+    return 'View History'
+  }
+  return 'View Transactions'
+})
+
 const handleSearchCertificates = () => {
+  const trimmed = searchByNameKeyWord.value.trim()
+  pagination.current = 1
+  fetchCertificateRequests(1, trimmed || undefined)
+  searchByNameKeyWord.value = ''
+}
 
-  try {
-    console.log(`SEARCHED KEYWORD: ${searchByNameKeyWord.value}`)
+const toggleFetchHistoryTransactions = () => {
+  isHistoryScreen.value = !isHistoryScreen.value
+  selectedStatusFilter.value = null
+  pagination.current = 1
+  fetchCertificateRequests(pagination.current)
+}
 
-  } catch (error) {
-    console.log(error)
-  } finally {
-    searchByNameKeyWord.value = ''
+const filterCertificateRequests = (filterStr: StatusOptions, isChecked: boolean) => {
+  pagination.current = 1
+  if (isChecked) {
+    selectedStatusFilter.value = filterStr
+    fetchCertificateRequests(pagination.current, undefined, filterStr)
+    return
+  }
+
+  if (selectedStatusFilter.value === filterStr) {
+    selectedStatusFilter.value = null
+    fetchCertificateRequests(pagination.current)
   }
 }
 
-watchEffect(() => {
+onMounted(() => {
   fetchCertificateRequests()
 })
 
 </script>
 <template>
   <div class="my-5 ">
+    <WarningLabel :has-error="hasError" :errors="[{ error: errorMessage }]" />
     <div class="p-4 rounded border border-gray-500 bg-white">
-      <WarningLabel :has-error="hasError" :errors="[{ error: errorMessage }]" />
+      <div class="text-end me-2 mb-3 ">
+        <a href="#" class="text-decoration-none text-secondary" @click.prevent="toggleFetchHistoryTransactions">
+          <i class="bi bi-journal-text me-2"></i>{{ toggleHistoryBtn }}
+        </a>
+      </div>
       <div class="row mb-0 mb-md-4">
-        <h3 class="text-center tracking-wider mb-3 mb-md-0 mt-md-2"
-          :class="{ 'col-10 col-md-9': useSession.isRoleResident() }">CERTIFICATE REQUEST LIST</h3>
+        <h3 class="text-center tracking-wider mb-3 mb-md-0" :class="{ 'col-10 col-md-9': useSession.isRoleResident() }">
+          {{ title }}
+        </h3>
         <div class="col-2 col-md-3" v-if="useSession.isRoleResident()">
           <router-link v-if="useSession.isLoggedIn()" :to="{
             name: 'CreateCertification',
@@ -108,28 +151,71 @@ watchEffect(() => {
         </div>
       </div>
 
-      <div class="d-md-flex justify-content-between mb-2 g-2 align-items-center ">
+      <div class="d-md-flex justify-content-between my-3 g-2 align-items-center ">
         <form @submit.prevent="handleSearchCertificates" class="col-md-3 col-12 mb-3 mb-md-0">
           <FormSearchInput v-model="searchByNameKeyWord" />
         </form>
-        <div class="col-md-6 col-12 row align-items-center">
+        <div class="col-md-7 col-12 row align-items-center gx-2">
           <!-- MOBILE SCREEN -->
           <p class="font-bold col-md-3 my-auto d-md-none d-block">Filter:</p>
-          <FormCheckboxInput id="filter-pending-sm" label="Pending"
-            class="col-12 col-md-3 d-md-none form-check-reverse" />
+          <FormCheckboxInput id="filter-pending-sm" label="Pending" class="col-12 col-md-3 d-md-none form-check-reverse"
+            v-if="!isHistoryScreen" :model-value="selectedStatusFilter === 'pending'"
+            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'pending'"
+            @change="(checked) => filterCertificateRequests('pending', checked)" />
           <FormCheckboxInput id="filter-approved-sm" label="Approved"
-            class="col-12 col-md-3 d-md-none form-check-reverse" />
+            class="col-12 col-md-3 d-md-none form-check-reverse" v-if="!isHistoryScreen"
+            :model-value="selectedStatusFilter === 'approved'"
+            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'approved'"
+            @change="(checked) => filterCertificateRequests('approved', checked)" />
+          <FormCheckboxInput id="filter-released-sm" label="Released"
+            class="col-12 col-md-3 d-md-none form-check-reverse" v-if="!isHistoryScreen"
+            :model-value="selectedStatusFilter === 'released'"
+            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'released'"
+            @change="(checked) => filterCertificateRequests('released', checked)" />
           <FormCheckboxInput id="filter-rejected-sm" label="Rejected"
-            class="col-12 col-md-3 d-md-none form-check-reverse" />
+            class="col-12 col-md-3 d-md-none form-check-reverse" v-if="isHistoryScreen"
+            :model-value="selectedStatusFilter === 'rejected'"
+            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'rejected'"
+            @change="(checked) => filterCertificateRequests('rejected', checked)" />
+          <FormCheckboxInput id="filter-cancelled-sm" label="Cancelled"
+            class="col-12 col-md-3 d-md-none form-check-reverse" v-if="isHistoryScreen"
+            :model-value="selectedStatusFilter === 'cancelled'"
+            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'cancelled'"
+            @change="(checked) => filterCertificateRequests('cancelled', checked)" />
+          <FormCheckboxInput id="filter-done-sm" label="Done" class="col-12 col-md-3 d-md-none form-check-reverse ps-3"
+            v-if="isHistoryScreen" :model-value="selectedStatusFilter === 'done'"
+            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'done'"
+            @change="(checked) => filterCertificateRequests('done', checked)" />
 
           <!-- DESKTOP SCREEN -->
           <p class="font-bold col-md-3 my-auto d-md-block d-none">Filter:</p>
-          <FormCheckboxInput id="filter-pending-md" label="Pending" class="col-md-3 d-none d-md-block" />
-          <FormCheckboxInput id="filter-approved-md" label="Approved" class="col-md-3 d-none d-md-block" />
-          <FormCheckboxInput id="filter-rejected-md" label="Rejected" class="col-md-3 d-none d-md-block" />
+          <FormCheckboxInput id="filter-pending-md" label="Pending" class="col-md-3 d-none d-md-block"
+            v-if="!isHistoryScreen" :model-value="selectedStatusFilter === 'pending'"
+            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'pending'"
+            @change="(checked) => filterCertificateRequests('pending', checked)" />
+          <FormCheckboxInput id="filter-approved-md" label="Approved" class="col-md-3 d-none d-md-block"
+            v-if="!isHistoryScreen" :model-value="selectedStatusFilter === 'approved'"
+            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'approved'"
+            @change="(checked) => filterCertificateRequests('approved', checked)" />
+          <FormCheckboxInput id="filter-released-md" label="Released" class="col-md-3 d-none d-md-block"
+            v-if="!isHistoryScreen" :model-value="selectedStatusFilter === 'released'"
+            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'released'"
+            @change="(checked) => filterCertificateRequests('released', checked)" />
+          <FormCheckboxInput id="filter-rejected-md" label="Rejected" class="col-md-3 d-none d-md-block"
+            v-if="isHistoryScreen" :model-value="selectedStatusFilter === 'rejected'"
+            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'rejected'"
+            @change="(checked) => filterCertificateRequests('rejected', checked)" />
+          <FormCheckboxInput id="filter-cancelled-md" label="Cancelled" class="col-md-3 d-none d-md-block"
+            v-if="isHistoryScreen" :model-value="selectedStatusFilter === 'cancelled'"
+            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'cancelled'"
+            @change="(checked) => filterCertificateRequests('cancelled', checked)" />
+          <FormCheckboxInput id="filter-done-md" label="Done" class="col-md-3 d-none d-md-block" v-if="isHistoryScreen"
+            :model-value="selectedStatusFilter === 'done'"
+            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'done'"
+            @change="(checked) => filterCertificateRequests('done', checked)" />
         </div>
-
       </div>
+
       <table class="table" v-show="!navigation.isNavigating">
         <thead class="table-secondary">
           <tr>

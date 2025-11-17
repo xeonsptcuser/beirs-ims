@@ -27,6 +27,8 @@ const useSession = useSessionStore();
 const hasApproval = ref<boolean>(false);
 const hasRejection = ref<boolean>(false);
 const hasReleasing = ref<boolean>(false);
+const hasDone = ref<boolean>(false);
+
 const successMessage = ref<string>('');
 
 const hasError = ref<boolean>(false);
@@ -80,7 +82,12 @@ const handleApproveRejectReleaseCertRequest = async (status: StatusOptions) => {
       successMessage.value = 'Certificate request is ready for releasing!'
     }
 
-
+    if (status === 'done') {
+      hasApproval.value = false
+      hasReleasing.value = false;
+      hasDone.value = true;
+      successMessage.value = 'Certificate request has been released!'
+    }
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
     const fallbackResponse = error as CommonResponse;
@@ -108,6 +115,10 @@ const isApproved = computed(() => {
   return certificateInfo.value?.status === 'approved'
 })
 
+const isReleased = computed(() => {
+  return certificateInfo.value?.status === 'released'
+})
+
 const isPending = computed(() => {
   return certificateInfo.value?.status === 'pending'
 })
@@ -121,7 +132,11 @@ const showCancelButton = computed(() => {
 })
 
 const showReleaseButton = computed(() => {
-  return isApproved.value && useSession.isRoleStaff();
+  return isApproved.value && (useSession.isRoleStaff() || useSession.isRoleAdmin());
+});
+
+const showDoneButton = computed(() => {
+  return isReleased.value && (useSession.isRoleStaff() || useSession.isRoleAdmin());
 });
 
 onMounted(() => {
@@ -132,8 +147,10 @@ onMounted(() => {
 <template>
   <SuccessLabel v-if="hasApproval" :is-success="hasApproval" :message="successMessage" alert-type="primary" />
   <SuccessLabel v-if="hasRejection" :is-success="hasRejection" :message="successMessage" alert-type="warning" />
-  <SuccessLabel v-if="hasReleasing" :is-success="hasReleasing" :message="successMessage" alert-type="success" />
+  <SuccessLabel v-if="hasReleasing" :is-success="hasReleasing" :message="successMessage" alert-type="info" />
+  <SuccessLabel v-if="hasDone" :is-success="hasDone" :message="successMessage" alert-type="success" />
   <WarningLabel :has-error="hasError" :errors="[{ error: errorMessage }]" />
+
   <div class="my-5">
     <div class="p-2 p-md-4 rounded border border-gray-500 bg-white">
       <div class="col-10 mx-auto">
@@ -181,8 +198,12 @@ onMounted(() => {
               @Click="() => handleApproveRejectReleaseCertRequest('cancelled')" />
           </div>
           <div class="col-md-4 col-sm-12 mx-auto" v-if="showReleaseButton">
-            <FormButton type="button" label="Releasing" btn-display="success"
+            <FormButton type="button" label="Releasing" btn-display="info"
               @Click="() => handleApproveRejectReleaseCertRequest('released')" />
+          </div>
+          <div class="col-md-4 col-sm-12 mx-auto" v-if="showDoneButton">
+            <FormButton type="button" label="Done" btn-display="success"
+              @Click="() => handleApproveRejectReleaseCertRequest('done')" />
           </div>
           <div class="d-flex justify-content-evenly align-items-center mx-auto" v-if="showApproveRejectBtn">
             <div class="col-md-4 col-12">

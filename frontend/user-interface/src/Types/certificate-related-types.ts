@@ -32,4 +32,4 @@ export interface CertificateRequestsResponse {
   status: string
 }
 
-export type StatusOptions = 'approved' | 'rejected' | 'cancelled' | 'released'
+export type StatusOptions = 'pending' | 'approved' | 'rejected' | 'cancelled' | 'released' | 'done'

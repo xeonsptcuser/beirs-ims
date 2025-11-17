@@ -28,7 +28,8 @@ export const endpoints = {
   UPDATE_SINGLE_USER: (id: number | string) => `${USER_API_ROUTES}/${id}`,
 
   // CERTIFICATE RELATED
-  GET_ALL_CERTIFICATE: `${CERT_API_ROUTES}`,
+  GET_ALL_CERTIFICATE: `${CERT_API_ROUTES}/all`,
+  GET_ALL_CERTIFICATE_BY_ID: `${CERT_API_ROUTES}/resident`,
   CREATE_CERTIFICATE: (id: number | string) => `${CERT_API_ROUTES}/${id}/create`,
   GET_CERTIFICATE: (id: number | string) => `${CERT_API_ROUTES}/${id}`,
   UPDATE_CERTIFICATE: (id: number | string) => `${CERT_API_ROUTES}/${id}`,

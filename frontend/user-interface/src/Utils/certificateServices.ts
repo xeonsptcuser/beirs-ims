@@ -20,6 +20,18 @@ export const fetchAllCertificates = async (params?: PageInfo) => {
 
   return response
 }
+export const fetchAllCertificatesById = async (params?: PageInfo) => {
+  const response = await certificateRelatedServices.getAllCertificateRequests(
+    endpoints.GET_ALL_CERTIFICATE_BY_ID,
+    params
+  )
+
+  if (!response.status || response.status !== 'success') {
+    throw new Error('Failed to retrieve certificate requests.')
+  }
+
+  return response
+}
 
 export const submitCertificationRequest = async (
   data: CreateCertificateRequestPayload,

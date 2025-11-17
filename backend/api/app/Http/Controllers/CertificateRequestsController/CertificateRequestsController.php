@@ -15,11 +15,26 @@ class CertificateRequestsController extends Controller
     }
 
     // GET /api/auth/certificates
-    public function index(Request $request)
+    public function findAll(Request $request)
+    {
+        $perPage = $request->integer('per_page');
+        $search = $request->string('search');
+        $statuses = $this->resolveStatuses($request);
+        $certificates = $this->certificate->getAll(['profile'], $perPage, $statuses, $search);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $certificates
+        ]);
+    }
+
+    public function findAllById(Request $request)
     {
         $perPage = $request->integer('per_page');
         $userId = $request->integer('user_id');
-        $certificates = $this->certificate->all(['profile'], $perPage, $userId);
+        $search = $request->string('search');
+        $statuses = $this->resolveStatuses($request);
+        $certificates = $this->certificate->getAllById(['profile'], $userId, $perPage, $statuses, $search);
 
         return response()->json([
             'status' => 'success',
@@ -30,7 +45,7 @@ class CertificateRequestsController extends Controller
     // GET /api/auth/certificates/{id}
     public function show(int $certificateId)
     {
-        $certificate = $this->certificate->findById($certificateId, ['profile']);
+        $certificate = $this->certificate->getById($certificateId, ['profile']);
 
         return response()->json([
             'status' => 'success',
@@ -71,7 +86,7 @@ class CertificateRequestsController extends Controller
     public function update(Request $request, int $id)
     {
         // update this so that when the staff approves or rejects, the resident is notified via sms
-        $certificateRequest = $this->certificate->findById($id, []);
+        $certificateRequest = $this->certificate->getById($id, []);
 
         if (is_null($certificateRequest)) {
             abort(404);
@@ -91,5 +106,40 @@ class CertificateRequestsController extends Controller
             'status' => 'success',
             'data' => $certificate
         ]);
+    }
+
+    private function resolveStatuses(Request $request): ?array
+    {
+        $statuses = $request->input('statuses');
+
+        if (is_null($statuses)) {
+            return null;
+        }
+
+        if (is_string($statuses)) {
+            $statuses = explode(',', $statuses);
+        }
+
+        if (!is_array($statuses)) {
+            return null;
+        }
+
+        $allowedStatuses = [
+            CertificateRequest::STATUS_PENDING,
+            CertificateRequest::STATUS_APPROVED,
+            CertificateRequest::STATUS_REJECTED,
+            CertificateRequest::STATUS_CANCELLED,
+            CertificateRequest::STATUS_RELEASED,
+            CertificateRequest::STATUS_DONE,
+        ];
+
+        $filteredStatuses = array_values(array_unique(array_filter(array_map(
+            static fn($status) => is_string($status) ? strtolower(trim($status)) : null,
+            $statuses
+        ))));
+
+        $validStatuses = array_values(array_intersect($filteredStatuses, $allowedStatuses));
+
+        return !empty($validStatuses) ? $validStatuses : null;
     }
 }
