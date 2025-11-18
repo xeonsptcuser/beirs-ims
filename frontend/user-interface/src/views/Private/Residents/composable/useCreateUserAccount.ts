@@ -54,7 +54,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean }) {
     'liong',
     'sacred heart',
     'sapang daan',
-    'Sumbrero',
+    'sumbrero',
     'kabulihan',
     'abbra',
     'hiland',
@@ -64,9 +64,9 @@ export function useCreateUserAccount(options?: { requirePassword: boolean }) {
     'tinago b',
     'tinago c',
     'battiler',
-    'Sudlon',
-    'Cenapro',
-    'Perez',
+    'sudlon',
+    'cenapro',
+    'perez',
     'mayol',
   ]
 

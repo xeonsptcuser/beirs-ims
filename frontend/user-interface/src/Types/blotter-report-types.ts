@@ -1,4 +1,12 @@
 export interface BlotterReport {
-  name1: string
-  name2: string
+  incidentType: string
+  incidentTitle: string
+  dateOfIncident: string
+  timeOfIncident: string
+  incidentStreetAddress: string
+  incidentAddressLine: string
+  incidentPeopleInvolved: string[]
+  incidentWitness: string[]
+  incidentDescription: string
+  evidences: string[]
 }

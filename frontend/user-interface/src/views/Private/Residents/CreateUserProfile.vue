@@ -21,6 +21,7 @@ const {
   errorMessages,
   errors,
   roleOptions,
+  addressOptions,
   validateForm,
   setSuccessResponse,
   setServerErrors
@@ -95,6 +96,7 @@ const handleCreateUserAccount = async () => {
 const filteredErrors = computed(() => {
   return Object.values(errorMessages.value).filter(msg => msg.error && msg.error.trim() !== '');
 });
+
 </script>
 <template>
   <div class="my-5">
@@ -138,8 +140,9 @@ const filteredErrors = computed(() => {
                   :has-error="errors.mobileNumber" :error-message="errorMessages.mobileNumber.error" />
               </div>
               <div class="col-md-6 col-sm-12">
-                <FormFloatingInput type="text" label="Street Address" id="streetAddress" v-model="form.streetAddress"
-                  :has-error="errors.streetAddress" :error-message="errorMessages.streetAddress.error" />
+                <DropdownInput :options="addressOptions" label="Street Address" id="streetAddress"
+                  v-model="form.streetAddress" :has-error="errors.streetAddress"
+                  :error-message="errorMessages.streetAddress.error" />
               </div>
             </div>
             <div class="row g-2">

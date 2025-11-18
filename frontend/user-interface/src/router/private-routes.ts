@@ -1,5 +1,5 @@
-import BlotterReports from '@/views/Private/BlotterReports/BlotterReports.vue'
 import CreateBlotterReport from '@/views/Private/BlotterReports/components/CreateBlotterReport.vue'
+import ViewBlotterReports from '@/views/Private/BlotterReports/ViewBlotterReports.vue'
 import Certifications from '@/views/Private/Certifications/Certifications.vue'
 import CreateCertification from '@/views/Private/Certifications/CreateCertification.vue'
 import ViewCertificateRequest from '@/views/Private/Certifications/ViewCertificateRequest.vue'
@@ -89,7 +89,7 @@ export const privateRoutes: RouteRecordRaw[] = [
       {
         path: 'blotter-reports',
         name: 'BlotterReports',
-        component: BlotterReports,
+        component: ViewBlotterReports,
         props: (route) => ({ role: route.params.role as string }),
         meta: {
           title: 'Blotter Reports',

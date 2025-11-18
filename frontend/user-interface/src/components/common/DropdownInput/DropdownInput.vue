@@ -1,15 +1,24 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 
-defineProps<{
+
+const props = withDefaults(defineProps<{
   id: string
   options: Array<string>
   label: string
   errorMessage?: string
   hasError?: boolean
   isDisabled?: boolean
-}>()
+  isOptional?: boolean
+}>(), {
+  isOptional: false
+})
 
 const model = defineModel<string>()
+
+const formatOptionalLabel = computed(() => {
+  return props.isOptional ? `${props.label}*` : `${props.label}`
+})
 
 </script>
 <template>
@@ -21,7 +30,7 @@ const model = defineModel<string>()
       <option :value="option" v-for="option in options" :key="option" class="text-capitalize">{{ option }}
       </option>
     </select>
-    <label :for="id" class="form-label">{{ label }}</label>
+    <label :for="id" class="form-label">{{ formatOptionalLabel }}</label>
     <div :id class="invalid-feedback" v-show="hasError">
       <small>{{ errorMessage }}</small>
     </div>
