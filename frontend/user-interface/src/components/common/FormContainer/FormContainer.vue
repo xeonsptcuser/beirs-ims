@@ -23,7 +23,9 @@ defineProps({
     <div class="card shadow-sm"
       :style="{ width: '100%', maxWidth: typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth }">
       <div class="card-body d-flex flex-column py-5">
-        <h4 class="card-title text-center" :class="{ 'mb-5': !hasError, 'mb-3': hasError }">{{ title }}</h4>
+        <h4 class="card-title text-center border-bottom pb-2" :class="{ 'mb-4': !hasError, 'mb-3': hasError }">{{ title
+          }}
+        </h4>
         <slot />
       </div>
     </div>

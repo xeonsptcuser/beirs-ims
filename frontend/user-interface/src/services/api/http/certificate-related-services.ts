@@ -1,10 +1,12 @@
-import type { ApiResponse, PageInfo, PaginatedData } from '@/Types'
-import { ApiService } from '../ApiService'
 import type {
+  ApiResponse,
   CertificateRequestsResponse,
   CreateCertificateRequestPayload,
+  PageInfo,
+  PaginatedData,
   UpdateCertificateRequestPayload,
-} from '@/Types/certificate-related-types'
+} from '@/Types'
+import { ApiService } from '../ApiService'
 
 export class CertificateRelatedService {
   private static instance: CertificateRelatedService

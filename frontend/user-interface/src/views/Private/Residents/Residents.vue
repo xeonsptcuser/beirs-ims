@@ -2,11 +2,10 @@
 import FormSearchInput from '@/components/common/FormSearchInput/FormSearchInput.vue';
 import Pagination from '@/components/common/Pagination/Pagination.vue';
 import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
-import type { ApiErrorResponse, CommonResponse, PaginationLink, User } from '@/Types';
+import type { PaginationLink, User } from '@/Types';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 import { fetchAllUsers, toggleUserAccountStatus } from '@/Utils/userServices';
-import type { AxiosError } from 'axios';
 import { onMounted, reactive, ref } from 'vue';
 
 defineProps<{ role: string }>();

@@ -5,13 +5,12 @@ import InfoFieldTextArea from './components/InfoFieldTextArea.vue';
 import { computed, onMounted, ref } from 'vue';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import { fetchCertificateInfo, updateCertificateRequest } from '@/Utils/certificateServices';
-import type { CertificateRequestsResponse, StatusOptions, UpdateCertificateRequestPayload } from '@/Types/certificate-related-types';
 import { computeAge, formatDateToHuman, formatName } from '@/Utils/helpers/formatters';
 import { evaluateStatus, navigateToTopPage } from '@/Utils/helpers/common-helpers';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 import SuccessLabel from '@/components/common/SuccessLabel/SuccessLabel.vue';
 import type { AxiosError } from 'axios';
-import type { ApiErrorResponse, CommonResponse } from '@/Types';
+import type { ApiErrorResponse, CertificateRequestsResponse, CommonResponse, StatusOptions, UpdateCertificateRequestPayload } from '@/Types';
 import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
 
 const props = defineProps<{

@@ -1,4 +1,4 @@
-import type { CreateCertificateFormRequest } from '@/Types/certificate-related-types'
+import type { CreateCertificateFormRequest } from '@/Types'
 import { reactive, ref } from 'vue'
 
 export function useCreateCertificate() {

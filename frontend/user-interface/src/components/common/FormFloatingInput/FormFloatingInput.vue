@@ -58,8 +58,9 @@ const formattedLabel = computed(() => {
   <div class="mb-3 form-floating" v-else>
     <input v-bind="$attrs" :id="id" :type="type" :placeholder="placeholder" v-model="model" class="form-control text-sm"
       :class="{ 'is-invalid': hasError }" :disabled="isDisabled">
-    <label :for="id" class="form-label px-2" :class="{ 'text-danger': hasError }" v-if="label">{{ formattedLabel
-    }}</label>
+    <label :for="id" class="form-label px-2" :class="{ 'text-danger': hasError }" v-if="label">
+      {{ formattedLabel }}
+    </label>
     <div :id class="invalid-feedback" v-show="hasError">
       <small>{{ errorMessage }}</small>
     </div>
