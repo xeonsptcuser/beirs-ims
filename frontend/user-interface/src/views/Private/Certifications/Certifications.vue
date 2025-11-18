@@ -2,8 +2,7 @@
 import FormCheckboxInput from '@/components/common/FormCheckboxInput/FormCheckboxInput.vue';
 import FormSearchInput from '@/components/common/FormSearchInput/FormSearchInput.vue';
 import Pagination from '@/components/common/Pagination/Pagination.vue';
-import type { ApiErrorResponse, CommonResponse, PaginationLink } from '@/Types';
-import type { CertificateRequestsResponse, StatusOptions } from '@/Types/certificate-related-types';
+import type { ApiErrorResponse, CertificateRequestsResponse, CommonResponse, PaginationLink, StatusOptions } from '@/Types';
 import { fetchAllCertificates, fetchAllCertificatesById } from '@/Utils/certificateServices';
 import { formatDateToHuman, formatName } from '@/Utils/helpers/formatters';
 import { evaluateStatus } from '@/Utils/helpers/common-helpers';

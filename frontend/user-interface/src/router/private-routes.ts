@@ -1,4 +1,4 @@
-import CreateBlotterReport from '@/views/Private/BlotterReports/components/CreateBlotterReport.vue'
+import CreateBlotterReport from '@/views/Private/BlotterReports/CreateBlotterReport.vue'
 import ViewBlotterReports from '@/views/Private/BlotterReports/ViewBlotterReports.vue'
 import Certifications from '@/views/Private/Certifications/Certifications.vue'
 import CreateCertification from '@/views/Private/Certifications/CreateCertification.vue'

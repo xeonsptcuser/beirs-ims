@@ -1,10 +1,10 @@
 import { endpoints } from '@/services/api/endpoints'
 import { CertificateRelatedService } from '@/services/api/http/certificate-related-services'
-import type { PageInfo } from '@/Types'
 import type {
   CreateCertificateRequestPayload,
+  PageInfo,
   UpdateCertificateRequestPayload,
-} from '@/Types/certificate-related-types'
+} from '@/Types'
 
 const certificateRelatedServices = CertificateRelatedService.getInstance()
 

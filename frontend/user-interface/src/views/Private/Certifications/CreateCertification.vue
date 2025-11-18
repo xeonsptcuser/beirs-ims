@@ -8,10 +8,9 @@ import FormCheckboxInput from '@/components/common/FormCheckboxInput/FormCheckbo
 import FormTextAreaInput from '@/components/common/FormTextAreaInput/FormTextAreaInput.vue';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import type { AxiosError } from 'axios';
-import type { ApiErrorResponse, CommonResponse } from '@/Types';
+import type { ApiErrorResponse, CommonResponse, CreateCertificateRequestPayload } from '@/Types';
 import { fetchSingleUserProfile } from '@/Utils/userServices';
 import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
-import type { CreateCertificateRequestPayload } from '@/Types/certificate-related-types';
 import router from '@/router';
 import { submitCertificationRequest } from '@/Utils/certificateServices';
 import FormFloatingInput from '@/components/common/FormFloatingInput/FormFloatingInput.vue';
