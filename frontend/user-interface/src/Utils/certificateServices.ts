@@ -71,7 +71,7 @@ export const updateCertificateRequest = async (
   )
 
   if (!response.status || response.status !== 'success') {
-    throw new Error('Failed to submit certificate request.')
+    throw new Error('Failed to update certificate request.')
   }
 
   return response
