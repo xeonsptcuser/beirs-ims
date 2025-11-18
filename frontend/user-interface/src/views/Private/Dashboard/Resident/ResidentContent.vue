@@ -14,7 +14,7 @@ const navItems = [
     name: 'CreateBlotterReport',
     icon: 'bi-file-earmark-text',
     title: 'File Incident Report',
-    btnType: 'btn-success'
+    btnType: 'btn-primary'
   },
   {
     name: 'CreateCertification',
@@ -103,8 +103,7 @@ const handleBlockedNavigation = (event: Event) => {
           <router-link :to="{ name: navItem.name, params: { role: role, id: userId } }"
             class="btn py-4 w-100 action-btn"
             :class="[navItem.btnType, { 'mb-2': navItems.length > 1, disabled: shouldBlockActions }]"
-            :aria-disabled="shouldBlockActions"
-            @click="handleBlockedNavigation">
+            :aria-disabled="shouldBlockActions" @click="handleBlockedNavigation">
             <i class="bi fs-4 me-2" :class="[`${navItem.icon}`]"></i>
             <span> {{ navItem.title }} </span>
           </router-link>
