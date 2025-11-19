@@ -8,9 +8,9 @@ import DropdownInput from '@/components/common/DropdownInput/DropdownInput.vue';
 import { useCreateUserAccount } from '../Residents/composable/useCreateUserAccount';
 import FormButton from '@/components/common/FormButton/FormButton.vue';
 import FormTextAreaInput from '@/components/common/FormTextAreaInput/FormTextAreaInput.vue';
-import DragAndDropUploadFiles from './components/DragAndDropUploadFiles.vue';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
-import type { BlotterReport, BlotterReportRequestPayload } from '@/Types';
+import type { BlotterReportRequestPayload } from '@/Types';
+import UploadFiles from './components/UploadFiles.vue';
 
 defineProps<{
   role: string
@@ -56,7 +56,7 @@ const handleCreateBlotterReport = async () => {
 
   navigation.startNavigation();
   try {
-    console.log()
+    console.log(requestPayload)
   } catch (error) {
     console.log(error);
   } finally {
@@ -80,11 +80,6 @@ const removePersonInvolvedField = (index: number) => {
 }
 const removeWitnessField = (index: number) => {
   form.value.incidentWitnesses.splice(index, 1);
-}
-
-const handleFiles = (files: FileList) => {
-  const uploads = Array.from(files)
-  form.value.evidences = [...form.value.evidences, ...uploads];
 }
 
 const filteredErrors = computed(() => {
@@ -218,10 +213,7 @@ const filteredErrors = computed(() => {
               :has-error="errors.incidentDescription" :is-resizeable="false" max-rows="6" />
           </div>
           <div class="col-12">
-            <div class="bg-blue p-3 border rounded">
-              <DragAndDropUploadFiles accept=".png,.jpg,.jpeg,.pdf,.mp4" :multiple="true"
-                @files-selected="handleFiles" />
-            </div>
+            <UploadFiles v-model="form.evidences" />
           </div>
 
         </section>

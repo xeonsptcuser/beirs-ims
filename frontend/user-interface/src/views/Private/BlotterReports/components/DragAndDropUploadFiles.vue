@@ -42,7 +42,7 @@ const onDrop = (event: DragEvent) => {
 
 </script>
 <template>
-  <div class="border rounded p-4 text-center bg-light"
+  <div class="border rounded p-4 text-center bg-blue"
     :class="{ 'border-primary': isDragging, 'bg-opacity': isDragging }" @dragover.prevent="onDragOver"
     @dragleave.prevent="onDragLeave" @drop.prevent="onDrop" @click="openFileDialog" style="cursor: pointer;">
     <input ref="fileInput" type="file" class="d-none" :accept="accept" :multiple="multiple" @change="onFileSelect">
@@ -63,5 +63,9 @@ const onDrop = (event: DragEvent) => {
 
 .bg-opacity {
   opacity: 75%;
+}
+
+.bg-blue {
+  background-color: #0d6dfd0e;
 }
 </style>
