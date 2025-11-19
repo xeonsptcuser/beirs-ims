@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 
 
-const props = withDefaults(defineProps<{
+withDefaults(defineProps<{
   multiple: boolean
   accept: string
 }>(), {
@@ -62,6 +62,6 @@ const onDrop = (event: DragEvent) => {
 }
 
 .bg-opacity {
-  opacity: 80%;
+  opacity: 75%;
 }
 </style>

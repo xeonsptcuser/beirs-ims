@@ -42,6 +42,17 @@ class UserProfile extends Model
     {
         return $this->hasMany(CertificateRequest::class, 'user_profile_id');
     }
+
+    public function routeNotificationForItextmo(): ?string
+    {
+        if (!$this->mobile_number) {
+            return null;
+        }
+
+        $digits = preg_replace('/[^0-9+]/', '', $this->mobile_number);
+        return str_starts_with($digits, '+') ? $digits : '+63' . ltrim($digits, '0');
+    }
+
     /**
      * The attributes that should be cast to native types.
      *

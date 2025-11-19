@@ -25,9 +25,16 @@ const searchByNameKeyWord = ref<string>('');
 const hasError = ref<boolean>(false);
 const errorMessage = ref<string>('');
 const isHistoryScreen = ref<boolean>(false);
-const transactionStatuses = ['pending', 'approved', 'released'];
-const historyStatuses = ['rejected', 'cancelled', 'done'];
 const selectedStatusFilter = ref<StatusOptions | null>(null);
+const isStaffView = computed(() => useSession.isRoleStaff());
+const transactionStatuses = computed<StatusOptions[]>(() => isStaffView.value
+  ? ['pending', 'approved']
+  : ['pending', 'approved', 'released']
+);
+const historyStatuses = computed<StatusOptions[]>(() => isStaffView.value
+  ? []
+  : ['rejected', 'cancelled', 'done']
+);
 
 const title = computed(() => {
   return 'CERTIFICATE REQUEST LIST'
@@ -41,14 +48,15 @@ const pagination = reactive({
   links: [] as PaginationLink[],
 });
 
-const fetchCertificateRequests = async (page: number = pagination.current, search?: string, status?: string | null) => {
+const fetchCertificateRequests = async (page: number = pagination.current, search?: string, status?: StatusOptions | null) => {
   navigation.startNavigation();
-  let statuses = null
+  let statuses: StatusOptions[] | null = null
   const activeStatus = status ?? selectedStatusFilter.value
   if (activeStatus) {
     statuses = [activeStatus]
   } else {
-    statuses = isHistoryScreen.value ? historyStatuses : transactionStatuses;
+    const defaultStatuses = isHistoryScreen.value ? historyStatuses.value : transactionStatuses.value;
+    statuses = defaultStatuses.length ? defaultStatuses : null;
   }
   const baseParams = { page, per_page: pagination.perPage, statuses, search }
 
@@ -102,6 +110,9 @@ const handleSearchCertificates = () => {
 }
 
 const toggleFetchHistoryTransactions = () => {
+  if (isStaffView.value) {
+    return
+  }
   isHistoryScreen.value = !isHistoryScreen.value
   selectedStatusFilter.value = null
   pagination.current = 1
@@ -132,7 +143,8 @@ onMounted(() => {
     <WarningLabel :has-error="hasError" :errors="[{ error: errorMessage }]" />
     <div class="p-4 rounded border border-gray-500 bg-white">
       <div class="text-end me-2 mb-3 ">
-        <a href="#" class="text-decoration-none text-secondary" @click.prevent="toggleFetchHistoryTransactions">
+        <a href="#" class="text-decoration-none text-secondary" v-if="!isStaffView"
+          @click.prevent="toggleFetchHistoryTransactions">
           <i class="bi bi-journal-text me-2"></i>{{ toggleHistoryBtn }}
         </a>
       </div>
@@ -167,22 +179,22 @@ onMounted(() => {
             :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'approved'"
             @change="(checked) => filterCertificateRequests('approved', checked)" />
           <FormCheckboxInput id="filter-released-sm" label="Released"
-            class="col-12 col-md-3 d-md-none form-check-reverse" v-if="!isHistoryScreen"
+            class="col-12 col-md-3 d-md-none form-check-reverse" v-if="!isHistoryScreen && !isStaffView"
             :model-value="selectedStatusFilter === 'released'"
             :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'released'"
             @change="(checked) => filterCertificateRequests('released', checked)" />
           <FormCheckboxInput id="filter-rejected-sm" label="Rejected"
-            class="col-12 col-md-3 d-md-none form-check-reverse" v-if="isHistoryScreen"
+            class="col-12 col-md-3 d-md-none form-check-reverse" v-if="!isStaffView && isHistoryScreen"
             :model-value="selectedStatusFilter === 'rejected'"
             :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'rejected'"
             @change="(checked) => filterCertificateRequests('rejected', checked)" />
           <FormCheckboxInput id="filter-cancelled-sm" label="Cancelled"
-            class="col-12 col-md-3 d-md-none form-check-reverse" v-if="isHistoryScreen"
+            class="col-12 col-md-3 d-md-none form-check-reverse" v-if="!isStaffView && isHistoryScreen"
             :model-value="selectedStatusFilter === 'cancelled'"
             :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'cancelled'"
             @change="(checked) => filterCertificateRequests('cancelled', checked)" />
           <FormCheckboxInput id="filter-done-sm" label="Done" class="col-12 col-md-3 d-md-none form-check-reverse ps-3"
-            v-if="isHistoryScreen" :model-value="selectedStatusFilter === 'done'"
+            v-if="!isStaffView && isHistoryScreen" :model-value="selectedStatusFilter === 'done'"
             :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'done'"
             @change="(checked) => filterCertificateRequests('done', checked)" />
 
@@ -197,19 +209,19 @@ onMounted(() => {
             :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'approved'"
             @change="(checked) => filterCertificateRequests('approved', checked)" />
           <FormCheckboxInput id="filter-released-md" label="Released" class="col-md-3 d-none d-md-block"
-            v-if="!isHistoryScreen" :model-value="selectedStatusFilter === 'released'"
+            v-if="!isHistoryScreen && !isStaffView" :model-value="selectedStatusFilter === 'released'"
             :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'released'"
             @change="(checked) => filterCertificateRequests('released', checked)" />
           <FormCheckboxInput id="filter-rejected-md" label="Rejected" class="col-md-3 d-none d-md-block"
-            v-if="isHistoryScreen" :model-value="selectedStatusFilter === 'rejected'"
+            v-if="!isStaffView && isHistoryScreen" :model-value="selectedStatusFilter === 'rejected'"
             :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'rejected'"
             @change="(checked) => filterCertificateRequests('rejected', checked)" />
           <FormCheckboxInput id="filter-cancelled-md" label="Cancelled" class="col-md-3 d-none d-md-block"
-            v-if="isHistoryScreen" :model-value="selectedStatusFilter === 'cancelled'"
+            v-if="!isStaffView && isHistoryScreen" :model-value="selectedStatusFilter === 'cancelled'"
             :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'cancelled'"
             @change="(checked) => filterCertificateRequests('cancelled', checked)" />
-          <FormCheckboxInput id="filter-done-md" label="Done" class="col-md-3 d-none d-md-block" v-if="isHistoryScreen"
-            :model-value="selectedStatusFilter === 'done'"
+          <FormCheckboxInput id="filter-done-md" label="Done" class="col-md-3 d-none d-md-block"
+            v-if="!isStaffView && isHistoryScreen" :model-value="selectedStatusFilter === 'done'"
             :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'done'"
             @change="(checked) => filterCertificateRequests('done', checked)" />
         </div>

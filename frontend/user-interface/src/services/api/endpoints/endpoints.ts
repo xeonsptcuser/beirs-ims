@@ -11,6 +11,7 @@ const AUTH_BASE = `${API_CONFIG.BASE_PATH}/${API_CONFIG.MODULES.AUTHENTICATION}`
 const COMMON_BASE = `${API_CONFIG.BASE_PATH}` // will be used later on.
 const USER_API_ROUTES = `${AUTH_BASE}/users`
 const CERT_API_ROUTES = `${AUTH_BASE}/certificates`
+const BLOTTER_API_ROUTES = `${AUTH_BASE}/blotter-reports`
 
 export const endpoints = {
   // PUBLIC ENDPOINTS
@@ -33,4 +34,11 @@ export const endpoints = {
   CREATE_CERTIFICATE: (id: number | string) => `${CERT_API_ROUTES}/${id}/create`,
   GET_CERTIFICATE: (id: number | string) => `${CERT_API_ROUTES}/${id}`,
   UPDATE_CERTIFICATE: (id: number | string) => `${CERT_API_ROUTES}/${id}`,
+
+  // BLOTTER REPORT RELATED
+  GET_ALL_BLOTTER_REPORTS: `${BLOTTER_API_ROUTES}/all`,
+  GET_ALL_BLOTTER_REPORTS_BY_ID: `${BLOTTER_API_ROUTES}/resident`,
+  CREATE_BLOTTER_REPORT: (id: number | string) => `${BLOTTER_API_ROUTES}/${id}/create`,
+  GET_BLOTTER_REPORT: (id: number | string) => `${BLOTTER_API_ROUTES}/${id}`,
+  UPDATE_BLOTTER_REPORT: (id: number | string) => `${BLOTTER_API_ROUTES}/${id}/update`,
 }

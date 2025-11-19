@@ -26,9 +26,9 @@ export function useBlotterReports() {
     incidentStreetAddress: '',
     incidentAddressLine: '',
     incidentPeopleInvolved: [''],
-    incidentWitness: [''],
+    incidentWitnesses: [''],
     incidentDescription: '',
-    evidences: [''],
+    evidences: [],
   })
 
   const errors = ref<Record<keyof BlotterReport, boolean>>({
@@ -39,7 +39,7 @@ export function useBlotterReports() {
     incidentStreetAddress: false,
     incidentAddressLine: false,
     incidentPeopleInvolved: false,
-    incidentWitness: false,
+    incidentWitnesses: false,
     incidentDescription: false,
     evidences: false,
   })
@@ -52,7 +52,7 @@ export function useBlotterReports() {
     incidentStreetAddress: { error: '' },
     incidentAddressLine: { error: '' },
     incidentPeopleInvolved: { error: '' },
-    incidentWitness: { error: '' },
+    incidentWitnesses: { error: '' },
     incidentDescription: { error: '' },
     evidences: { error: '' },
   })

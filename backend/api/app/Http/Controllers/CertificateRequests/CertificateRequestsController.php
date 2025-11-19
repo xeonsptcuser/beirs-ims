@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\CertificateRequestsController;
+namespace App\Http\Controllers\CertificateRequests;
 
 use App\Http\Controllers\Controller;
 use App\Interfaces\CertificateRepositoryInterface;
 use App\Models\Certificates\CertificateRequest;
+use App\Notifications\CertificateRequestStatusUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -20,7 +21,15 @@ class CertificateRequestsController extends Controller
         $perPage = $request->integer('per_page');
         $search = $request->string('search');
         $statuses = $this->resolveStatuses($request);
-        $certificates = $this->certificate->getAll(['profile', 'handler.user'], $perPage, $statuses, $search);
+        $user = $request->user()?->loadMissing('profile');
+
+        if ($user && $user->role === 'staff') {
+            $handlerProfileId = $user->profile?->id;
+            $staffStatuses = $this->resolveStaffStatuses($statuses);
+            $certificates = $this->certificate->getAllHandledByStaff(['profile', 'handler.user'], $handlerProfileId, $perPage, $staffStatuses, $search);
+        } else {
+            $certificates = $this->certificate->getAll(['profile', 'handler.user'], $perPage, $statuses, $search);
+        }
 
         return response()->json([
             'status' => 'success',
@@ -91,6 +100,12 @@ class CertificateRequestsController extends Controller
         $user = $request->user()->loadMissing('profile');
         $handlerProfileId = $user->profile?->id;
 
+        if ($certificateRequest->profile) {
+            $certificateRequest->profile->notify(
+                new CertificateRequestStatusUpdated($certificateRequest, $user)
+            );
+        }
+
         if (is_null($certificateRequest)) {
             abort(404);
         }
@@ -107,7 +122,6 @@ class CertificateRequestsController extends Controller
 
         $certificate = $this->certificate->updateCertificateRequest($certificateRequest, $certificateData);
 
-        Log::info($certificate);
         return response()->json([
             'status' => 'success',
             'data' => $certificate
@@ -147,5 +161,21 @@ class CertificateRequestsController extends Controller
         $validStatuses = array_values(array_intersect($filteredStatuses, $allowedStatuses));
 
         return !empty($validStatuses) ? $validStatuses : null;
+    }
+
+    private function resolveStaffStatuses(?array $statuses): array
+    {
+        $allowedStatuses = [
+            CertificateRequest::STATUS_PENDING,
+            CertificateRequest::STATUS_APPROVED,
+        ];
+
+        if (is_null($statuses)) {
+            return $allowedStatuses;
+        }
+
+        $filtered = array_values(array_intersect($statuses, $allowedStatuses));
+
+        return !empty($filtered) ? $filtered : $allowedStatuses;
     }
 }

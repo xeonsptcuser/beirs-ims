@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'itextmo' => [
+        'code' => env('ITEXTMO_API_CODE'),
+        'password' => env('ITEXTMO_API_PASSWORD'),
+        'sender' => env('ITEXTMO_SENDER_ID'),
+    ],
 ];

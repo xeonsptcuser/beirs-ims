@@ -9,6 +9,8 @@ import { useCreateUserAccount } from '../Residents/composable/useCreateUserAccou
 import FormButton from '@/components/common/FormButton/FormButton.vue';
 import FormTextAreaInput from '@/components/common/FormTextAreaInput/FormTextAreaInput.vue';
 import DragAndDropUploadFiles from './components/DragAndDropUploadFiles.vue';
+import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
+import type { BlotterReport, BlotterReportRequestPayload } from '@/Types';
 
 defineProps<{
   role: string
@@ -23,6 +25,7 @@ const {
 } = useBlotterReports();
 
 const { addressOptions } = useCreateUserAccount();
+const navigation = useGlobalLoadingStore();
 
 const hasError = ref<boolean>(false);
 const complainantFullName = ref<string>('')
@@ -30,8 +33,36 @@ const complainantAge = ref<string>('')
 const complainantContactInfo = ref<string>('')
 const address = ref<string>('')
 
+
 const handleCreateBlotterReport = async () => {
-  // HANDLE CREATE BLOTTER REPORT HERE
+
+  hasError.value = !validateForm();
+  if (hasError.value) return;
+
+
+
+  const requestPayload: BlotterReportRequestPayload = {
+    incident_type: form.value.incidentType,
+    incident_title: form.value.incidentTitle,
+    date_of_incident: form.value.dateOfIncident,
+    time_of_incident: form.value.timeOfIncident,
+    incident_street_address: form.value.incidentStreetAddress,
+    incident_address_line: form.value.incidentAddressLine,
+    incident_people_involved: form.value.incidentPeopleInvolved,
+    incident_witnesses: form.value.incidentWitnesses,
+    incident_description: form.value.incidentDescription,
+    evidences: form.value.evidences,
+  }
+
+  navigation.startNavigation();
+  try {
+    console.log()
+  } catch (error) {
+    console.log(error);
+  } finally {
+    navigation.endNavigation();
+  }
+
 }
 
 const addPersonInvolvedField = () => {
@@ -40,20 +71,20 @@ const addPersonInvolvedField = () => {
 }
 
 const addWitnessField = () => {
-  if (form.value.incidentWitness.length > 10) return
-  form.value.incidentWitness.push('')
+  if (form.value.incidentWitnesses.length > 10) return
+  form.value.incidentWitnesses.push('')
 }
 
 const removePersonInvolvedField = (index: number) => {
   form.value.incidentPeopleInvolved.splice(index, 1);
 }
 const removeWitnessField = (index: number) => {
-  form.value.incidentWitness.splice(index, 1);
+  form.value.incidentWitnesses.splice(index, 1);
 }
 
 const handleFiles = (files: FileList) => {
-
-  console.log("FILES:", files)
+  const uploads = Array.from(files)
+  form.value.evidences = [...form.value.evidences, ...uploads];
 }
 
 const filteredErrors = computed(() => {
@@ -94,6 +125,12 @@ const filteredErrors = computed(() => {
               <DropdownInput :options="incidentTypeOptions" label="Incident Type" id="incident-type"
                 v-model="form.incidentType" :has-error="errors.incidentType"
                 :error-message="errorMessages.incidentType.error" />
+            </div>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col">
+              <FormFloatingInput type="text" label="Incident Title" id="incident-title" v-model="form.incidentTitle"
+                :has-error="errors.incidentTitle" :error-message="errorMessages.incidentTitle.error" />
             </div>
           </div>
           <div class="row g-2">
@@ -139,7 +176,7 @@ const filteredErrors = computed(() => {
                         :error-message="errorMessages.incidentPeopleInvolved.error" :optional="true" />
                     </div>
                     <div v-if="index !== 0" class="col-2 px-1" style="margin-top: 11px;">
-                      <button type="button" class=" btn btn-outline-danger p-1"
+                      <button type="button" class=" btn btn-danger p-1"
                         @click.prevent="() => removePersonInvolvedField(index)"><i class="bi bi-x "></i></button>
                     </div>
                   </div>
@@ -149,20 +186,20 @@ const filteredErrors = computed(() => {
             <div class="col-md-6 col-12">
               <div class="row">
                 <div class="col-2 pe-0">
-                  <FormButton v-if="form.incidentWitness.length <= 10" type="button" btn-display="primary"
+                  <FormButton v-if="form.incidentWitnesses.length <= 10" type="button" btn-display="primary"
                     :is-outlined="true" @click="addWitnessField">
                     <i class="bi bi-person-plus-fill"></i>
                   </FormButton>
                 </div>
                 <div class="col-10">
-                  <div v-for="(person, index) in form.incidentWitness" :key="`person-${index}`" class="mb-2 row">
+                  <div v-for="(person, index) in form.incidentWitnesses" :key="`witness-${index}`" class="mb-2 row">
                     <div class="col-10 pe-1 my-0">
-                      <FormFloatingInput type="text" label="Witness" :id="`people-involved-${index + 1}`"
-                        v-model="form.incidentWitness[index]" :has-error="errors.incidentWitness"
-                        :error-message="errorMessages.incidentWitness.error" :optional="true" />
+                      <FormFloatingInput type="text" label="Witness" :id="`witness-${index + 1}`"
+                        v-model="form.incidentWitnesses[index]" :has-error="errors.incidentWitnesses"
+                        :error-message="errorMessages.incidentWitnesses.error" :optional="true" />
                     </div>
                     <div v-if="index !== 0" class="col-2 px-1" style="margin-top: 11px;">
-                      <button type="button" class=" btn btn-outline-danger p-1"
+                      <button type="button" class=" btn btn-danger p-1"
                         @click.prevent="() => removeWitnessField(index)"><i class="bi bi-x "></i></button>
                     </div>
                   </div>
@@ -186,6 +223,7 @@ const filteredErrors = computed(() => {
                 @files-selected="handleFiles" />
             </div>
           </div>
+
         </section>
         <hr>
         <div class="col-md-6 col-sm-12 mx-auto ">
