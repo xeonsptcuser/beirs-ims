@@ -55,7 +55,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean }) {
     'sacred heart',
     'sapang daan',
     'sumbrero',
-    'kabulihan',
+    'kalubihan',
     'abbra',
     'hiland',
     'tres rosas',

@@ -245,7 +245,7 @@ watchEffect(() => {
               class="bi bi-shield-lock-fill  me-1"></i>Change
             Password </a>
         </div>
-        <div class="col-md-8 col-sm-12 mx-auto d-flex justify-items-center gap-2 align-items-center"
+        <div class="col-md-8 col-sm-12 mx-auto d-flex justify-content-center gap-2 align-content-center"
           v-if="isProfileOwner">
           <FormButton label="Submit" :is-disabled="isEditableSubmit"
             :btn-display="isEditableSubmit ? 'secondary' : 'primary'" />
