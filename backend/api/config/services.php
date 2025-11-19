@@ -34,4 +34,10 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+
+    'itextmo' => [
+        'code' => env('ITEXTMO_API_CODE'),
+        'password' => env('ITEXTMO_API_PASSWORD'),
+        'sender' => env('ITEXTMO_SENDER_ID'),
+    ],
 ];
