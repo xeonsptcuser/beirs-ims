@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 interface CertificateRepositoryInterface
 {
     public function getAll(array $relations = [], ?int $perPage = null, ?array $statuses = null, ?string $search = null): Collection|LengthAwarePaginator;
+    public function getAllHandledByStaff(array $relations = [], ?int $handlerProfileId = null, ?int $perPage = null, ?array $statuses = null, ?string $search = null): Collection|LengthAwarePaginator;
     public function getAllById(array $relations = [], ?int $userId = null, ?int $perPage = null, ?array $statuses = null, ?string $search = null): Collection|LengthAwarePaginator;
     public function getById(int $id, array $relations = []): ?CertificateRequest;
     public function createCertificateRequest(array $certificateData, int $profileId): CertificateRequest;

@@ -21,7 +21,15 @@ class CertificateRequestsController extends Controller
         $perPage = $request->integer('per_page');
         $search = $request->string('search');
         $statuses = $this->resolveStatuses($request);
-        $certificates = $this->certificate->getAll(['profile', 'handler.user'], $perPage, $statuses, $search);
+        $user = $request->user()?->loadMissing('profile');
+
+        if ($user && $user->role === 'staff') {
+            $handlerProfileId = $user->profile?->id;
+            $staffStatuses = $this->resolveStaffStatuses($statuses);
+            $certificates = $this->certificate->getAllHandledByStaff(['profile', 'handler.user'], $handlerProfileId, $perPage, $staffStatuses, $search);
+        } else {
+            $certificates = $this->certificate->getAll(['profile', 'handler.user'], $perPage, $statuses, $search);
+        }
 
         return response()->json([
             'status' => 'success',
@@ -153,5 +161,21 @@ class CertificateRequestsController extends Controller
         $validStatuses = array_values(array_intersect($filteredStatuses, $allowedStatuses));
 
         return !empty($validStatuses) ? $validStatuses : null;
+    }
+
+    private function resolveStaffStatuses(?array $statuses): array
+    {
+        $allowedStatuses = [
+            CertificateRequest::STATUS_PENDING,
+            CertificateRequest::STATUS_APPROVED,
+        ];
+
+        if (is_null($statuses)) {
+            return $allowedStatuses;
+        }
+
+        $filtered = array_values(array_intersect($statuses, $allowedStatuses));
+
+        return !empty($filtered) ? $filtered : $allowedStatuses;
     }
 }

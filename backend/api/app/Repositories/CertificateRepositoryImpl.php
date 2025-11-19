@@ -40,6 +40,61 @@ class CertificateRepositoryImpl implements CertificateRepositoryInterface
         return $perPage ? $query->paginate($perPage) : $query->get();
     }
 
+    public function getAllHandledByStaff(array $relations = [], ?int $handlerProfileId = null, ?int $perPage = null, ?array $statuses = null, ?string $search = null): Collection|LengthAwarePaginator
+    {
+        $allowedStatuses = [
+            CertificateRequest::STATUS_PENDING,
+            CertificateRequest::STATUS_APPROVED,
+        ];
+
+        $statuses = $statuses ? array_values(array_intersect($statuses, $allowedStatuses)) : $allowedStatuses;
+
+        if (empty($statuses)) {
+            $statuses = $allowedStatuses;
+        }
+
+        $query = CertificateRequest::with($relations)
+            ->orderBy('created_at', 'desc')
+            ->where(function ($builder) use ($statuses, $handlerProfileId) {
+                $includePending = in_array(CertificateRequest::STATUS_PENDING, $statuses, true);
+                $includeApproved = in_array(CertificateRequest::STATUS_APPROVED, $statuses, true);
+
+                if (!$includePending && !$includeApproved) {
+                    $builder->whereRaw('1 = 0');
+                    return;
+                }
+
+                if ($includePending) {
+                    $builder->where('status', CertificateRequest::STATUS_PENDING);
+                }
+
+                if ($includeApproved) {
+                    $method = $includePending ? 'orWhere' : 'where';
+
+                    $builder->{$method}(function ($approvedQuery) use ($handlerProfileId) {
+                        $approvedQuery->where('status', CertificateRequest::STATUS_APPROVED);
+
+                        if (!is_null($handlerProfileId)) {
+                            $approvedQuery->where('handled_by', $handlerProfileId);
+                        }
+                    });
+                }
+            });
+
+        $search = $search ? Str::lower($search) : null;
+        if (!empty($search)) {
+            $query->where(function ($builder) use ($search) {
+                $builder->whereHas('profile', function ($profileQuery) use ($search) {
+                    $profileQuery->where(DB::raw("LOWER(CONCAT_WS(' ', first_name, last_name))"), 'like', "%{$search}%")
+                        ->orWhere(DB::raw("LOWER(first_name)"), 'like', "%{$search}%")
+                        ->orWhere(DB::raw("LOWER(last_name)"), 'like', "%{$search}%");
+                })->orWhere(DB::raw('LOWER(cert_request_type)'), 'like', "%{$search}%");
+            });
+        }
+
+        return $perPage ? $query->paginate($perPage) : $query->get();
+    }
+
     public function getAllById(array $relations = [], ?int $userId = null, ?int $perPage = null, ?array $statuses = null, ?string $search = null): Collection|LengthAwarePaginator
     {
         $query = CertificateRequest::with($relations)
