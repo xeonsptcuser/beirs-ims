@@ -11,6 +11,7 @@ import FormTextAreaInput from '@/components/common/FormTextAreaInput/FormTextAre
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import type { BlotterReportRequestPayload } from '@/Types';
 import UploadFiles from './components/UploadFiles.vue';
+import { maxDate } from '@/Utils/helpers/formatters';
 
 defineProps<{
   role: string
@@ -82,6 +83,17 @@ const removeWitnessField = (index: number) => {
   form.value.incidentWitnesses.splice(index, 1);
 }
 
+const orderedAddressOptions = computed(() => {
+  return [...addressOptions].sort((a, b) => {
+    return a.localeCompare(b)
+  })
+})
+const orderedincidentTypeOptions = computed(() => {
+  return [...incidentTypeOptions].sort((a, b) => {
+    return a.localeCompare(b)
+  })
+})
+
 const filteredErrors = computed(() => {
   return Object.values(errorMessages.value).filter(msg => msg.error && msg.error.trim() !== '');
 });
@@ -89,7 +101,7 @@ const filteredErrors = computed(() => {
 </script>
 <template>
   <div class="my-5">
-    <FormContainer :has-error="hasError" title="Incident Report Form" :max-width="'750px'">
+    <FormContainer :has-error="hasError" title="Incident Report Form" :max-width="'976px'">
       <WarningLabel :has-error="hasError && filteredErrors.length > 0" :errors="filteredErrors" />
       <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleCreateBlotterReport">
         <section>
@@ -117,21 +129,22 @@ const filteredErrors = computed(() => {
           </div>
           <div class="row g-2 mb-3">
             <div class="col">
-              <DropdownInput :options="incidentTypeOptions" label="Incident Type" id="incident-type"
+              <DropdownInput :options="orderedincidentTypeOptions" label="Select Case Type" id="case-type"
                 v-model="form.incidentType" :has-error="errors.incidentType"
                 :error-message="errorMessages.incidentType.error" />
             </div>
           </div>
           <div class="row g-2 mb-3">
             <div class="col">
-              <FormFloatingInput type="text" label="Incident Title" id="incident-title" v-model="form.incidentTitle"
-                :has-error="errors.incidentTitle" :error-message="errorMessages.incidentTitle.error" />
+              <FormFloatingInput type="text" label="Subject of the Report" id="incident-title"
+                v-model="form.incidentTitle" :has-error="errors.incidentTitle"
+                :error-message="errorMessages.incidentTitle.error" :optional="true" />
             </div>
           </div>
           <div class="row g-2">
             <div class="col-md-6 col-12">
-              <FormFloatingInput type="date" label="Date of Incident" id="incident-date"
-                v-model="form.dateOfIncident" />
+              <FormFloatingInput type="date" label="Date of Incident" id="incident-date" v-model="form.dateOfIncident"
+                :max="maxDate()" />
             </div>
             <div class="col-md-6 col-12">
               <FormFloatingInput type="time" label="Time of Incident" id="incident-time"
@@ -140,13 +153,14 @@ const filteredErrors = computed(() => {
           </div>
           <div class="row g-2 mb-3">
             <div class="col-md-6 col-12">
-              <DropdownInput :options="addressOptions" label="Scene of the Incident" id="scene-of-the-incident"
+              <DropdownInput :options="orderedAddressOptions" label="Where did it happened?" id="incident-location"
                 v-model="form.incidentStreetAddress" :has-error="errors.incidentStreetAddress"
                 :error-message="errorMessages.incidentStreetAddress.error" :is-optional="true" />
             </div>
             <div class="col-md-6 col-12">
-              <FormFloatingInput type="text" label="Landmark" id="landmark" v-model="form.incidentAddressLine"
-                :has-error="errors.incidentAddressLine" :error-message="errorMessages.incidentAddressLine.error" />
+              <FormFloatingInput type="text" label="landmark" id="landmark" v-model="form.incidentAddressLine"
+                :has-error="errors.incidentAddressLine" :error-message="errorMessages.incidentAddressLine.error"
+                :optional="true" />
             </div>
           </div>
         </section>
@@ -205,15 +219,17 @@ const filteredErrors = computed(() => {
         </section>
         <section>
           <div class="border-bottom mb-4">
-            <h5 class="mb-2">Incident Description & Evidences</h5>
+            <h5 class="mb-2">Description & Evidences</h5>
           </div>
-          <div class="col-12">
-            <FormTextAreaInput label="Purpose of Certificate" id="certificate-request-purpose"
-              v-model="form.incidentDescription" :error-message="errorMessages.incidentDescription.error"
-              :has-error="errors.incidentDescription" :is-resizeable="false" max-rows="6" />
-          </div>
-          <div class="col-12">
-            <UploadFiles v-model="form.evidences" />
+          <div class="border p-4 bg-blue ">
+            <div class="col-12">
+              <FormTextAreaInput label="" id="certificate-request-purpose" v-model="form.incidentDescription"
+                :error-message="errorMessages.incidentDescription.error" :has-error="errors.incidentDescription"
+                :is-resizeable="false" max-rows="6" />
+            </div>
+            <div class="col-12">
+              <UploadFiles v-model="form.evidences" />
+            </div>
           </div>
 
         </section>
@@ -229,6 +245,6 @@ const filteredErrors = computed(() => {
 
 <style scoped>
 .bg-blue {
-  background-color: #0d6dfd71;
+  background-color: #0d6dfd12;
 }
 </style>

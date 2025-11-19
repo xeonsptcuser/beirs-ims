@@ -2,6 +2,7 @@
 
 namespace App\Models\Users;
 
+use App\Models\BlotterReport\BlotterReport;
 use App\Models\Certificates\CertificateRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -42,6 +43,11 @@ class UserProfile extends Model
     {
         return $this->hasMany(CertificateRequest::class, 'user_profile_id');
     }
+    public function blotterReport()
+    {
+        return $this->hasMany(BlotterReport::class, 'user_profile_id');
+    }
+
 
     public function routeNotificationForItextmo(): ?string
     {

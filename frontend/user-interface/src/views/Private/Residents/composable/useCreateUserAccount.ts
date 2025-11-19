@@ -45,7 +45,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean }) {
     mobileNumber: { error: '' },
   })
 
-  const roleOptions = ['resident', 'staff', 'admin']
+  const roleOptions = ['admin', 'resident', 'staff']
 
   const addressOptions = [
     'pulang bukid',

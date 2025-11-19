@@ -10,6 +10,7 @@ import type { AxiosError } from 'axios';
 import FormButton from '@/components/common/FormButton/FormButton.vue';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import FormFloatingInput from '@/components/common/FormFloatingInput/FormFloatingInput.vue';
+import { maxDate } from '@/Utils/helpers/formatters';
 
 const {
   form,
@@ -24,11 +25,7 @@ const {
 const router = useRouter();
 const hasError = ref<boolean>(false);
 const navigation = useGlobalLoadingStore();
-const maxBirthDate = computed(() => {
-  const today = new Date();
-  today.setDate(today.getDate() - 1);
-  return today.toISOString().split('T')[0];
-});
+
 
 const handleRegisterAccount = async () => {
   navigation.startNavigation();
@@ -115,7 +112,7 @@ const filteredErrors = computed(() => {
             </div>
             <div class="col-md-6 col-sm-12">
               <FormFloatingInput type="date" label="Date Of Birth" placeholder="beirs@test.com" id="birthday"
-                v-model="form.date_of_birth" :has-error="errors.date_of_birth" :max="maxBirthDate"
+                v-model="form.date_of_birth" :has-error="errors.date_of_birth" :max="maxDate()"
                 :error-message="errorMessages.date_of_birth.error" />
             </div>
           </div>

@@ -87,7 +87,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class=" p-3 border rounded">
+  <div class="bg-white p-3 border rounded">
     <DragAndDropUploadFiles accept=".png,.jpg,.jpeg,.pdf,.mp4" :multiple="true" @files-selected="handleFiles" />
 
     <div v-if="filePreviews.length" class="mt-3">
