@@ -23,7 +23,7 @@ class UserProfileFactory extends Factory
                 'sacred heart',
                 'sapang daan',
                 'sumbrero',
-                'kabulihan',
+                'Kalubihan',
                 'abbra',
                 'hiland',
                 'tres rosas',

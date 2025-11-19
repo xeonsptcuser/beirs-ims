@@ -68,15 +68,15 @@ const getTooltip = (location: string, caseType: string): string => {
 </script>
 
 <template>
-  <div class="bg-white my-5">
-    <div class="container py-4 ps-5 d-none d-md-block border rounded">
-      <div class="d-flex align-items-center mb-2">
-        <div class="me-3" style="width: 120px;">&nbsp;</div>
-        <div class="d-flex flex-wrap" style="flex: 1; white-space: nowrap; overflow-x: hidden;">
+  <div class="bg-white my-5 ">
+    <div class="container-fluid py-4 ps-5 d-none d-md-block border rounded heatmap-container">
+      <div class="d-flex align-items-center mb-2 heatmap-row">
+        <div class="me-3 heatmap-location-label">&nbsp;</div>
+        <div class="d-flex heatmap-cols">
           <div v-for="caseType in incidentTypeOptions" :key="caseType"
-            class="text-center fw-bold align-middle p-1 mx-1 mb-1" style="
-              min-width: 100px;
-              height: 100px; /* Adjust height to accommodate rotation */
+            class="text-center fw-bold align-middle p-1 mx-1 mb-1 heatmap-case-type" style="
+              min-width: 75px;
+              height: 80px; /* Adjust height to accommodate rotation */
               overflow: hidden;  /* Hide overflow if text is too long */
               position: relative;
             ">
@@ -85,20 +85,24 @@ const getTooltip = (location: string, caseType: string): string => {
             position:absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            white-space: wrap; /* Ensures the rotated text doesn't break */
+            transform: translate(-50%, -50%);
+            width: 100%;
+            text-align: center;
+            white-space: normal;
+            word-break: break-word;
+            line-height: 1.1;
           ">
               {{ caseType }}
             </span>
           </div>
         </div>
       </div>
-      <div v-for="location in addressOptions" class="d-flex align-items-center mb-1">
-        <div class="me-3" style="width: 120px;"> {{ location }}</div>
-        <div class="d-flex flex-wrap" style="flex: 1;">
+      <div v-for="location in addressOptions" class="d-flex align-items-center mb-1 heatmap-row">
+        <div class="me-3 heatmap-location-label text-capitalize"> {{ location }}</div>
+        <div class="d-flex heatmap-cols">
           <div v-for="caseType in incidentTypeOptions" :key="caseType" class="mx-1 rounded text-center mb-2"
             :style="getCellStyle(location, caseType)" v-b-tooltip.hover :title="getTooltip(location, caseType)"
-            style="min-width: 100px; height: 60px; line-height: 60px; cursor: pointer; ">
+            style="min-width: 75px; height: 50px; line-height: 50px; cursor: pointer; ">
             {{ getCount(location, caseType) || '' }}
           </div>
         </div>
@@ -112,6 +116,30 @@ const getTooltip = (location: string, caseType: string): string => {
 </template>
 
 <style>
+.heatmap-container {
+  overflow-x: auto;
+}
+
+.heatmap-row {
+  min-width: max-content;
+}
+
+.heatmap-location-label {
+  width: 120px;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+}
+
+.heatmap-cols {
+  flex-wrap: nowrap;
+  flex: 1;
+  min-width: max-content;
+}
+
+.heatmap-case-type span {
+  font-size: 0.6rem;
+}
+
 .mobile-screen {
   min-height: 50vh;
   display: flex;
