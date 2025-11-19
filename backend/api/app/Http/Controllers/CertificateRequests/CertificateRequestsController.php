@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\CertificateRequestsController;
+namespace App\Http\Controllers\CertificateRequests;
 
 use App\Http\Controllers\Controller;
 use App\Interfaces\CertificateRepositoryInterface;
 use App\Models\Certificates\CertificateRequest;
+use App\Notifications\CertificateRequestStatusUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -91,6 +92,12 @@ class CertificateRequestsController extends Controller
         $user = $request->user()->loadMissing('profile');
         $handlerProfileId = $user->profile?->id;
 
+        if ($certificateRequest->profile) {
+            $certificateRequest->profile->notify(
+                new CertificateRequestStatusUpdated($certificateRequest, $user)
+            );
+        }
+
         if (is_null($certificateRequest)) {
             abort(404);
         }
@@ -107,7 +114,6 @@ class CertificateRequestsController extends Controller
 
         $certificate = $this->certificate->updateCertificateRequest($certificateRequest, $certificateData);
 
-        Log::info($certificate);
         return response()->json([
             'status' => 'success',
             'data' => $certificate

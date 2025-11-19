@@ -1,9 +1,11 @@
 <script setup lang="ts">
-defineProps<{
+withDefaults(defineProps<{
   label: string
-  dataValue: string
+  dataValue?: string
   styles?: string
-}>()
+}>(), {
+  dataValue: '-'
+})
 
 </script>
 <template>

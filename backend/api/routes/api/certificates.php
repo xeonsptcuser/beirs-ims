@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\CertificateRequestsController\CertificateRequestsController;
+use App\Http\Controllers\CertificateRequests\CertificateRequestsController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth/certificates')->group(function () {
