@@ -20,6 +20,11 @@ const formatOptionalLabel = computed(() => {
   return props.isOptional ? `${props.label}*` : `${props.label}`
 })
 
+const orderedOptions = (optionsList: string[]) => {
+  return [...optionsList].sort((a, b) => {
+    return a.localeCompare(b)
+  })
+}
 </script>
 <template>
   <slot v-if="$slots.default" />

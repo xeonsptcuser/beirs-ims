@@ -31,7 +31,7 @@ export class BlotterReportRelatedService {
   }
 
   async createBlotterReports(
-    data: BlotterReportRequestPayload,
+    data: BlotterReportRequestPayload | FormData,
     url: string
   ): Promise<ApiResponse<BlotterReportResponse>> {
     return this.apiService.post(url, data)

@@ -5,9 +5,11 @@ import { ref } from 'vue';
 withDefaults(defineProps<{
   multiple: boolean
   accept: string
+  isDisabled?: boolean
 }>(), {
   multiple: false,
-  accept: ""
+  accept: "",
+  isDisabled: false
 })
 
 const emit = defineEmits(["files-selected"]);
@@ -43,9 +45,11 @@ const onDrop = (event: DragEvent) => {
 </script>
 <template>
   <div class="border rounded p-4 text-center bg-blue"
-    :class="{ 'border-primary': isDragging, 'bg-opacity': isDragging }" @dragover.prevent="onDragOver"
-    @dragleave.prevent="onDragLeave" @drop.prevent="onDrop" @click="openFileDialog" style="cursor: pointer;">
-    <input ref="fileInput" type="file" class="d-none" :accept="accept" :multiple="multiple" @change="onFileSelect">
+    :class="{ 'border-primary': isDragging && !isDisabled, 'bg-opacity': isDragging && !isDisabled, 'upload-box--disabled': isDisabled }"
+    @dragover.prevent="onDragOver" @dragleave.prevent="onDragLeave" @drop.prevent="!isDisabled && onDrop($event)"
+    @click="!isDisabled && openFileDialog()" :style="{ cursor: isDisabled ? 'not-allowed' : 'pointer' }">
+    <input ref="fileInput" type="file" class="d-none" :accept="accept" :multiple="multiple" @change="onFileSelect"
+      :disabled="isDisabled">
 
     <div class="py-3">
       <i class="bi bi-cloud-upload text-primary fs-1"></i>
@@ -67,5 +71,13 @@ const onDrop = (event: DragEvent) => {
 
 .bg-blue {
   background-color: #0d6dfd0e;
+}
+
+.upload-box--disabled {
+  background-color: #f5f5f5;
+  color: #45454567;
+  border-color: #d4d4d4;
+  opacity: 0.6;
+  pointer-events: none;
 }
 </style>

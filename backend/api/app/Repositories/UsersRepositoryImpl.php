@@ -16,7 +16,11 @@ class UsersRepositoryImpl implements UsersRepositoryInterface
     {
         $query = User::with($relations)
             ->whereIn('role', ['resident', 'staff'])
-            ->orderBy('created_at', 'desc');
+            ->orderBy(
+                UserProfile::select(DB::raw("LOWER(COALESCE(street_address, ''))"))
+                    ->whereColumn('user_profiles.id', 'users.user_profile_id')
+            );
+        // ->orderBy('created_at', 'desc');
 
         $search = $search ? Str::lower($search) : null;
         if (!empty($search)) {

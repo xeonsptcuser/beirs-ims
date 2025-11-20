@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Interfaces\BlotterReportRepositoryInterface;
 use App\Interfaces\CertificateRepositoryInterface;
 use App\Interfaces\UsersRepositoryInterface;
+use App\Repositories\BlotterReportRepositoryImpl;
 use App\Repositories\CertificateRepositoryImpl;
 use App\Repositories\UsersRepositoryImpl;
 use App\Services\ItextmoClient;
@@ -19,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
         //
         $this->app->bind(UsersRepositoryInterface::class, UsersRepositoryImpl::class);
         $this->app->bind(CertificateRepositoryInterface::class, CertificateRepositoryImpl::class);
+        $this->app->bind(BlotterReportRepositoryInterface::class, BlotterReportRepositoryImpl::class);
         $this->app->singleton(ItextmoClient::class);
     }
 

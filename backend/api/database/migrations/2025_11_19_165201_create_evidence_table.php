@@ -1,0 +1,31 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('evidence', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('blotter_report_id')->constrained('blotter_reports')->cascadeOnDelete(); // foreign key to blotter_report
+            $table->string('storage_path');      // e.g., storage/app/evidences/...
+            $table->string('original_name');     // filename the user uploaded
+            $table->string('mime_type', 100);    // image/png, application/pdf, etc.
+            $table->unsignedBigInteger('size');  // bytes
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('evidences');
+    }
+};

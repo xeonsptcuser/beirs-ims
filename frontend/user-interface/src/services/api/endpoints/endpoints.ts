@@ -12,6 +12,9 @@ const COMMON_BASE = `${API_CONFIG.BASE_PATH}` // will be used later on.
 const USER_API_ROUTES = `${AUTH_BASE}/users`
 const CERT_API_ROUTES = `${AUTH_BASE}/certificates`
 const BLOTTER_API_ROUTES = `${AUTH_BASE}/blotter-reports`
+const NOTIFICATIONS_ROUTE = `${COMMON_BASE}/notifications`
+const PUBLIC_ADDRESSES_ROUTE = `${COMMON_BASE}/addresses`
+const AUTH_ADDRESSES_ROUTE = `${AUTH_BASE}/addresses`
 
 export const endpoints = {
   // PUBLIC ENDPOINTS
@@ -41,4 +44,14 @@ export const endpoints = {
   CREATE_BLOTTER_REPORT: (id: number | string) => `${BLOTTER_API_ROUTES}/${id}/create`,
   GET_BLOTTER_REPORT: (id: number | string) => `${BLOTTER_API_ROUTES}/${id}`,
   UPDATE_BLOTTER_REPORT: (id: number | string) => `${BLOTTER_API_ROUTES}/${id}/update`,
+
+  // NOTIFICATIONS
+  GET_NOTIFICATIONS: `${NOTIFICATIONS_ROUTE}`,
+  MARK_NOTIFICATION: (id: string) => `${NOTIFICATIONS_ROUTE}/${id}`,
+
+  // BARANGAY ADDRESSES
+  GET_ALL_ADDRESSES: `${PUBLIC_ADDRESSES_ROUTE}`,
+  CREATE_ADDRESS: `${AUTH_ADDRESSES_ROUTE}`,
+  UPDATE_ADDRESS: (id: number | string) => `${AUTH_ADDRESSES_ROUTE}/${id}`,
+  DELETE_ADDRESS: (id: number | string) => `${AUTH_ADDRESSES_ROUTE}/${id}`,
 }

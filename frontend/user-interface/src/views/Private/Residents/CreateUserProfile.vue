@@ -11,6 +11,7 @@ import { useRouter } from 'vue-router';
 import type { AxiosError } from 'axios';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import FormFloatingInput from '@/components/common/FormFloatingInput/FormFloatingInput.vue';
+import { orderedOptions } from '@/Utils/helpers/formatters';
 
 const props = defineProps<{
   role: string
@@ -25,7 +26,9 @@ const {
   validateForm,
   setSuccessResponse,
   setServerErrors
-} = useCreateUserAccount();
+} = useCreateUserAccount({
+  requirePassword: false,
+});
 
 const hasError = ref<boolean>(false);
 const router = useRouter();
@@ -54,6 +57,7 @@ const handleCreateUserAccount = async () => {
         date_of_birth: form.date_of_birth,
         street_address: form.streetAddress,
         mobile_number: form.mobileNumber,
+        governmentId: form.governmentId
       }
       const response = await userAccountCreation(requestPayload);
 
@@ -125,19 +129,18 @@ const filteredErrors = computed(() => {
                   v-model="form.email" :has-error="errors.email" :error-message="errorMessages.email.error" />
               </div>
               <div class="col-md-3 col-sm-12">
-                <FormFloatingInput type="date" label="Date Of Birth" placeholder="beirs@test.com" id="birthday"
-                  v-model="form.date_of_birth" :has-error="errors.date_of_birth"
-                  :error-message="errorMessages.date_of_birth.error" />
+                <FormFloatingInput type="date" label="Date Of Birth" id="birthday" v-model="form.date_of_birth"
+                  :has-error="errors.date_of_birth" :error-message="errorMessages.date_of_birth.error" />
               </div>
               <div class="col-md-3 col-sm-12">
-                <DropdownInput :options="roleOptions" label="Roles" id="select-roles" v-model="form.role"
-                  :error-message="errorMessages.role.error" :has-error="errors.role" />
+                <DropdownInput :options="orderedOptions(roleOptions)" label="Roles" id="select-roles"
+                  v-model="form.role" :error-message="errorMessages.role.error" :has-error="errors.role" />
               </div>
             </div>
             <div class="row g-2">
               <div class="col-md-6 col-sm-12">
                 <FormFloatingInput type="text" label="Mobile Number" id="phoneNumber" v-model="form.mobileNumber"
-                  :has-error="errors.mobileNumber" :error-message="errorMessages.mobileNumber.error" />
+                  :has-error="errors.mobileNumber" :error-message="errorMessages.mobileNumber.error" :optional="true" />
               </div>
               <div class="col-md-6 col-sm-12">
                 <DropdownInput :options="addressOptions" label="Street Address" id="streetAddress"
@@ -148,15 +151,15 @@ const filteredErrors = computed(() => {
             <div class="row g-2">
               <div class="col-md-6 col-sm-12">
                 <FormFloatingInput type="password" label="Password" placeholder="Password" id="password"
-                  v-model="form.password" :has-error="errors.password" :error-message="errorMessages.password.error" />
+                  v-model="form.password" :has-error="errors.password" :error-message="errorMessages.password.error"
+                  :optional="true" />
               </div>
               <div class="col-md-6 col-sm-12">
                 <FormFloatingInput type="password" label="Confirm Password" placeholder="Password Confirmation"
                   id="passwordConfirm" v-model="form.passwordConfirmation" :has-error="errors.passwordConfirmation"
-                  :error-message="errorMessages.passwordConfirmation.error" />
+                  :error-message="errorMessages.passwordConfirmation.error" :optional="true" />
               </div>
             </div>
-
             <div class="col-md-6 col-sm-12 mx-auto">
               <FormButton label="Submit" />
             </div>

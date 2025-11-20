@@ -20,3 +20,23 @@ export const computeAge = (dateIsoStr: string) => {
   }
   return age.toString()
 }
+
+export const dateToday = () => {
+  const d = new Date()
+  const yyyy = d.getFullYear()
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  return `${yyyy}-${mm}-${dd}`
+}
+
+export const maxDate = () => {
+  // Allow selecting today by not subtracting a day
+  const today = new Date()
+  return today.toISOString().split('T')[0]
+}
+
+export const orderedOptions = (optionsList: string[]) => {
+  return [...optionsList].sort((a, b) => {
+    return a.localeCompare(b)
+  })
+}

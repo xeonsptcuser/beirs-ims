@@ -14,6 +14,7 @@ import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
 import router from '@/router';
 import { submitCertificationRequest } from '@/Utils/certificateServices';
 import FormFloatingInput from '@/components/common/FormFloatingInput/FormFloatingInput.vue';
+import { dateToday, maxDate, orderedOptions } from '@/Utils/helpers/formatters';
 
 const props = defineProps<{
   role: string,
@@ -112,18 +113,16 @@ const fetchUserProfile = async () => {
   }
 }
 
-const today = computed(() => {
-  const d = new Date()
-  const yyyy = d.getFullYear()
-  const mm = String(d.getMonth() + 1).padStart(2, '0')
-  const dd = String(d.getDate()).padStart(2, '0')
-  return `${yyyy}-${mm}-${dd}`
+const orderedcertificateOptions = computed(() => {
+  return [...certificateOptions.value].sort((a, b) => {
+    return a.localeCompare(b)
+  })
 })
 
 watch(() => form.isCurrent, (isCurrent) => {
   if (isCurrent) {
     // set the endResidencyDate field if Present checkbox is checked
-    form.endResidencyDate = `${today.value}`
+    form.endResidencyDate = `${dateToday}`
   } else {
     // Optionally clear the field when unchecked
     form.endResidencyDate = ''
@@ -158,9 +157,9 @@ watchEffect(() => {
       <WarningLabel :has-error="hasError && filteredErrors.length > 0" :errors="filteredErrors" />
       <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleCreateCertificateRequest">
         <div class="col-12 ">
-          <DropdownInput :options="certificateOptions" label="Certificate Request Type" id="select-certificate-request"
-            v-model="form.certificateRequestType" :error-message="errorMessages.certificateRequestType.error"
-            :has-error="errors.certificateRequestType" />
+          <DropdownInput :options="orderedOptions(certificateOptions)" label="Certificate Request Type"
+            id="select-certificate-request" v-model="form.certificateRequestType"
+            :error-message="errorMessages.certificateRequestType.error" :has-error="errors.certificateRequestType" />
         </div>
         <div class="col-12">
           <FormFloatingInput type="text" label="Complete Name" id="complete-name" v-model="requestorName"
@@ -172,13 +171,13 @@ watchEffect(() => {
         <div class="row gx-2 gy-2">
           <div class="col-12 col-md-5 ">
             <FormFloatingInput type="date" label="Start Residency Date" :optional="true" id="start-residency-date"
-              v-model="form.startResidencyDate" :max="today" />
+              v-model="form.startResidencyDate" :max="maxDate()" />
           </div>
           <div class="col-12 col-md-7 ">
             <div class="row align-items-center">
               <div class="col-12 col-md-8">
                 <FormFloatingInput type="date" label="End Residency Date" :optional="true" id="end-residency-date"
-                  v-model="form.endResidencyDate" :is-disabled="form.isCurrent" :max="today" />
+                  v-model="form.endResidencyDate" :is-disabled="form.isCurrent" :max="maxDate()" />
               </div>
               <div class="col-4 ms-auto">
                 <FormCheckboxInput id="check-resident-present" label="Present" v-model="form.isCurrent" />

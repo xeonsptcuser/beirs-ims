@@ -49,32 +49,50 @@ class UsersController extends Controller
             'last_name' => ['required', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:100'],
             'email' => ['required', 'email', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'role' => ['required', Rule::in(['admin', 'staff', 'resident'])],
             'date_of_birth' => ['required', 'date', "before_or_equal:{$legalAgeDate}"],
-            'street_address' => ['nullable', 'string', 'max:255'],
+            'street_address' => ['required', 'string', 'max:255'],
             'address_line' => ['nullable', 'string', 'max:255'],
             'mobile_number' => ['nullable', 'string', 'max:20'],
+            'government_id' => ['sometimes', 'array'],
+            'government_id.*' => ['file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ]);
 
         $user = $this->users->createWithProfile(
             [
                 'email' => $validated['email'],
-                'password' => $validated['password'],
+                'password' => $validated['password'] ?? $validated['role'],
                 'role' => $validated['role']
             ],
             [
 
                 'first_name' => $validated['first_name'],
                 'last_name' => $validated['last_name'],
-                'middle_name' => $validated['middle_name'],
+                'middle_name' => $validated['middle_name'] ?? null,
                 'date_of_birth' => Carbon::parse($validated['date_of_birth']),
                 'street_address' => $validated['street_address'],
-                'address_line' => $validated['address_line'],
-                'mobile_number' => $validated['mobile_number'],
+                'address_line' => $validated['address_line'] ?? null,
+                'mobile_number' => $validated['mobile_number'] ?? null,
 
             ]
         );
+
+        $governmentIdFiles = $request->file('government_id', []);
+
+        if (!empty($governmentIdFiles)) {
+            foreach ($governmentIdFiles as $file) {
+                $path = $file->store("government-ids/{$user->profile->id}", 'public');
+
+                $user->profile->governmentIdDocument()->create([
+                    'storage_path' => $path,
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getClientMimeType(),
+                    'size' => $file->getSize(),
+                ]);
+            }
+            $user->load('profile.governmentIds');
+        }
 
         return response()->json([
             'status' => 'success',
@@ -106,6 +124,8 @@ class UsersController extends Controller
             'mobile_number' => ['sometimes', 'nullable', 'string', 'max:20'],
             'date_of_birth' => ['sometimes', 'date', "before_or_equal:{$legalAgeDate}"],
             'is_active' => ['sometimes', 'boolean'],
+            'government_id' => ['sometimes', 'array'],
+            'government_id.*' => ['file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ]);
 
         $userData = collect($validated)
@@ -118,7 +138,22 @@ class UsersController extends Controller
             ->filter(fn($value) => !is_null($value))
             ->toArray();
 
+        $governmentIdFiles = $request->file('government_id', []);
         $updated = $this->users->updateWithProfile($user, $userData, $profileData);
+
+        if (!empty($governmentIdFiles)) {
+            foreach ($governmentIdFiles as $file) {
+                $path = $file->store("government-ids/{$updated->profile->id}", 'public');
+
+                $updated->profile->governmentIdDocument()->create([
+                    'storage_path' => $path,
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getClientMimeType(),
+                    'size' => $file->getSize(),
+                ]);
+            }
+            $updated->load('profile.governmentIds');
+        }
 
         return response()->json([
             'status' => 'success',

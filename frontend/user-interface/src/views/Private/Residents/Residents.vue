@@ -3,17 +3,18 @@ import FormSearchInput from '@/components/common/FormSearchInput/FormSearchInput
 import Pagination from '@/components/common/Pagination/Pagination.vue';
 import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
 import type { PaginationLink, User } from '@/Types';
+import { formatName } from '@/Utils/helpers/formatters';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 import { fetchAllUsers, toggleUserAccountStatus } from '@/Utils/userServices';
-import { onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 
 defineProps<{ role: string }>();
 
 const residents = ref<User[]>([]);
 const navigation = useGlobalLoadingStore();
-const useSession = useSessionStore();
-const isAdmin = useSession.isRoleAdmin()
+const session = useSessionStore();
+const isAdmin = computed(() => session.isRoleAdmin());
 const searchByNameKeyWord = ref<string>('');
 const hasError = ref<boolean>(false);
 const errorMessage = ref<string>('');
@@ -21,40 +22,38 @@ const errorMessage = ref<string>('');
 const pagination = reactive({
   current: 1,
   last: 1,
-  perPage: 10,
+  perPage: 9,
   total: 0,
   links: [] as PaginationLink[],
 });
 
 const fetchResidentUsers = async (page: number = pagination.current, search?: string) => {
   navigation.startNavigation();
+  hasError.value = false;
   try {
     const response = await fetchAllUsers({ page, per_page: pagination.perPage, search });
 
     if (response.status !== 'success') {
       throw response;
     }
+
     const paginator = response.data;
     residents.value = paginator.data ?? [];
     pagination.current = paginator.current_page ?? 1;
     pagination.last = paginator.last_page ?? 1;
     pagination.total = paginator.total ?? 0;
     pagination.links = paginator.links ?? [];
-
-  } catch (error) {
-    console.log(error)
+  } catch (error: any) {
+    hasError.value = true;
+    errorMessage.value = error?.message ?? 'Failed to fetch residents.';
   } finally {
-    navigation.endNavigation()
+    navigation.endNavigation();
   }
-}
-
-const formatName = (firstName: string, middleName: string, lastName: string) => {
-  if (!firstName && !lastName) {
-    return ''
-  }
-  return `${firstName ?? ''} ${middleName ?? ''} ${lastName ?? ''}`
-
 };
+
+const totalResidents = computed(() => pagination.total ?? residents.value.length);
+const activeResidents = computed(() => residents.value.filter((user) => user.profile?.is_active).length);
+const inactiveResidents = computed(() => residents.value.filter((user) => !user.profile?.is_active).length);
 
 const handleToggleUserStatus = async (resident: User) => {
   const targetStatus = !resident.profile.is_active;
@@ -65,99 +64,139 @@ const handleToggleUserStatus = async (resident: User) => {
     return;
   }
 
-  navigation.startNavigation()
+  navigation.startNavigation();
   try {
     await toggleUserAccountStatus(resident.id, targetStatus);
     await fetchResidentUsers(pagination.current);
   } catch (error) {
-    console.log(error);
+    hasError.value = true;
+    errorMessage.value = 'Failed to update user status.';
   } finally {
-    navigation.endNavigation()
+    navigation.endNavigation();
   }
-}
+};
 
-const handleSearchResidentByName = async () => {
-  console.log(searchByNameKeyWord.value)
-  pagination.current = 1
-  fetchResidentUsers(pagination.current, searchByNameKeyWord.value)
-}
+const handleSearchResidentByName = () => {
+  pagination.current = 1;
+  fetchResidentUsers(pagination.current, searchByNameKeyWord.value.trim() || undefined);
+};
+
+const resetSearch = () => {
+  searchByNameKeyWord.value = '';
+  pagination.current = 1;
+  fetchResidentUsers();
+};
 
 onMounted(() => {
   fetchResidentUsers();
 });
-
 </script>
+
 <template>
-  <WarningLabel :has-error="hasError" :errors="[{ error: errorMessage }]" />
   <div class="my-5">
-    <div class="d-flex" v-if="isAdmin">
-      <router-link :to="{
-        name: 'CreateUserProfile'
-      }" class="btn btn-primary mb-3 ms-auto">
-        <i class="bi bi-person-plus me-2 mb-0 fs-5"></i>
-        <span>Add Resident</span>
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center mb-4 gap-3">
+      <div>
+        <p class="text-uppercase text-muted mb-1">Community Directory</p>
+        <h2 class="fw-bold mb-0">Resident Profiles</h2>
+        <p class="text-secondary small mb-0">Monitor household records, manage access, and keep resident data up-to-date.</p>
+      </div>
+      <router-link v-if="isAdmin" :to="{ name: 'CreateUserProfile' }" class="btn btn-primary text-nowrap">
+        <i class="bi bi-person-plus me-2"></i> Add Resident
       </router-link>
     </div>
-    <div class="p-4 rounded border border-gray-500 bg-white">
-      <h3 class="text-center tracking-wider mb-3">RESIDENTS LIST</h3>
 
-      <div class="my-3">
-        <form @submit.prevent="handleSearchResidentByName" class="col-md-3 col-12 mb-3 mb-md-0 ms-auto">
-          <FormSearchInput v-model="searchByNameKeyWord" />
-        </form>
-      </div>
-      <table class="table" v-if="!navigation.isNavigating">
-        <thead class="table-secondary">
-          <tr>
-            <th scope="col" class="py-3 border-end border-white">Full Name</th>
-            <th scope="col" class="text-center d-none d-lg-table-cell py-3 border-end border-white">Roles</th>
-            <th scope="col" class="text-center d-none d-md-table-cell py-3 border-end border-white">Street Address</th>
-            <th scope="col" class="text-center py-3 border-end border-white">Status</th>
-            <th scope="col" colspan="2" class="text-center py-3 border-end border-white" v-if="isAdmin">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="resident in residents" :key="resident.id">
-            <td class="align-middle">
-              <router-link :to="{
-                name: 'UserProfile',
-                params: { id: resident.id }
-              }" class="mb-0 py-1 text-md text-capitalize text-decoration-none">
-                {{ formatName(resident.profile.first_name, resident.profile.middle_name, resident.profile.last_name,)
-                  ?? '-' }}
-              </router-link>
-            </td>
-            <td class="align-middle d-none d-lg-table-cell">
-              <p class="mb-0 py-1 text-md ps-2 text-capitalize">{{ resident.role ?? '-' }}</p>
-            </td>
-            <td class="align-middle d-none d-md-table-cell">
-              <p class="mb-0 py-1 text-md ps-2">{{ resident.profile?.street_address ?? '-' }}</p>
-            </td>
-            <td class="align-middle text-center">
-              <p class="mb-0 py-1 text-md "> <i class="bi-record-fill"
-                  :class="[resident.profile.is_active ? 'text-success' : 'text-danger']"></i></p>
-            </td>
-            <td class="align-middle" v-if="isAdmin">
-              <a href="#" @click.prevent="handleToggleUserStatus(resident)"
-                class="text-decoration-none text-black text-nowrap text-md">
-                <span v-if="resident.profile.is_active">
-                  <i class="bi bi-slash-circle-fill fs-6 text-danger"></i> Deactivate
-                </span>
-                <span v-else>
-                  <i class="bi bi-check-circle-fill fs-6 text-success"></i> Activate
-                </span>
-              </a>
-            </td>
-          </tr>
-        </tbody>
+    <WarningLabel :has-error="hasError" :errors="hasError ? [{ error: errorMessage }] : []" />
 
-      </table>
-      <div v-else class="text-center">
-        <p class="fs-3 tracking-widest">Loading...</p>
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <p class="text-muted small mb-1">Total Residents</p>
+            <h4 class="fw-bold mb-0">{{ totalResidents }}</h4>
+          </div>
+        </div>
       </div>
-      <Pagination v-if="!navigation.isNavigating" class="d-flex justify-content-center" :links="pagination.links"
-        :disabled="navigation.isNavigating" :current-page="pagination.current" @change="fetchResidentUsers" />
+      <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <p class="text-muted small mb-1">Active Accounts</p>
+            <h4 class="fw-bold text-success mb-0">{{ activeResidents }}</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <p class="text-muted small mb-1">Inactive Accounts</p>
+            <h4 class="fw-bold text-danger mb-0">{{ inactiveResidents }}</h4>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-body">
+        <form class="row gy-3 align-items-center" @submit.prevent="handleSearchResidentByName">
+          <div class="col-md-6 col-lg-4">
+            <FormSearchInput v-model="searchByNameKeyWord" />
+          </div>
+          <div class="col-md-6 col-lg-4 d-flex gap-2">
+            <button class="btn btn-primary w-100" type="submit">Search</button>
+            <button class="btn btn-outline-secondary w-100" type="button" @click="resetSearch">Reset</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div v-if="!residents.length && !navigation.isNavigating" class="text-center py-5 bg-light rounded">
+      <i class="bi bi-people display-4 text-muted"></i>
+      <p class="mt-3 mb-1 fw-semibold">No residents found.</p>
+      <p class="text-secondary mb-0">Adjust your search or add a new resident.</p>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3" v-else>
+      <div class="col" v-for="resident in residents" :key="resident.id">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <router-link class="text-decoration-none text-dark fw-bold" :to="{ name: 'UserProfile', params: { id: resident.id } }">
+                  {{ formatName(resident.profile.first_name, resident.profile.middle_name, resident.profile.last_name) }}
+                </router-link>
+                <p class="text-muted small mb-0">{{ resident.email }}</p>
+              </div>
+              <span class="badge text-uppercase" :class="resident.profile.is_active ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-muted'">
+                {{ resident.role }}
+              </span>
+            </div>
+            <div class="text-secondary small mb-3">
+              <p class="mb-1"><i class="bi bi-geo-alt me-2 text-primary"></i>{{ resident.profile?.street_address || 'No address provided' }}</p>
+              <p class="mb-1"><i class="bi bi-telephone me-2 text-primary"></i>{{ resident.profile?.mobile_number || 'No contact info' }}</p>
+            </div>
+            <div class="mt-auto d-flex flex-column gap-2">
+              <div class="d-flex align-items-center justify-content-between">
+                <span class="fw-semibold">
+                  <i class="bi" :class="resident.profile.is_active ? 'bi-check-circle text-success' : 'bi-slash-circle text-danger'"></i>
+                  {{ resident.profile.is_active ? 'Active' : 'Inactive' }}
+                </span>
+                <router-link class="btn btn-sm btn-outline-primary" :to="{ name: 'UserProfile', params: { id: resident.id } }">
+                  View Profile
+                </router-link>
+              </div>
+              <button v-if="isAdmin" class="btn btn-sm" :class="resident.profile.is_active ? 'btn-outline-danger' : 'btn-outline-success'"
+                type="button" @click="handleToggleUserStatus(resident)">
+                <span v-if="resident.profile.is_active"><i class="bi bi-slash-circle me-1"></i>Deactivate</span>
+                <span v-else><i class="bi bi-check-circle me-1"></i>Activate</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-center mt-4" v-if="pagination.links.length > 1">
+      <Pagination :links="pagination.links" :disabled="navigation.isNavigating" :current-page="pagination.current"
+        @change="fetchResidentUsers" />
+    </div>
   </div>
 </template>
