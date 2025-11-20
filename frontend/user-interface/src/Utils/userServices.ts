@@ -48,9 +48,38 @@ export const fetchSingleUserProfile = async (userId: string) => {
 }
 
 export const updateUserAccount = async (userId: string, data: UpdateAccountRequestPayload) => {
+  const hasFiles = Array.isArray(data.governmentId) && data.governmentId.length > 0
+  let payload: UpdateAccountRequestPayload | FormData = data
+
+  if (hasFiles) {
+    const formData = new FormData()
+    const appendIfPresent = (key: string, value?: string | number | boolean | null) => {
+      if (value === undefined || value === null || value === '') return
+      formData.append(key, value as any)
+    }
+
+    appendIfPresent('first_name', data.first_name)
+    appendIfPresent('middle_name', data.middle_name)
+    appendIfPresent('last_name', data.last_name)
+    appendIfPresent('email', data.email)
+    appendIfPresent('role', data.role)
+    appendIfPresent('street_address', data.street_address)
+    appendIfPresent('address_line', data.address_line)
+    appendIfPresent('mobile_number', data.mobile_number)
+    appendIfPresent('date_of_birth', data.date_of_birth)
+    appendIfPresent('password', data.password)
+    appendIfPresent('password_confirmation', data.password_confirmation)
+
+    data.governmentId?.forEach((file) => {
+      formData.append('government_id[]', file)
+    })
+
+    payload = formData
+  }
+
   const response = await userRelatedService.updateSingleUserAccount(
     endpoints.UPDATE_SINGLE_USER(userId),
-    data
+    payload
   )
 
   if (!response.status || response.status !== 'success') {
