@@ -121,9 +121,9 @@ onMounted(() => {
                 v-model="form.email" :has-error="errors.email" :error-message="errorMessages.email.error" />
               <FormFloatingInput type="password" label="Password" placeholder="Password" id="passWord"
                 v-model="form.password" :has-error="errors.password" :error-message="errorMessages.password.error" />
-              <div class="d-flex justify-content-between align-items-center">
+              <FormButton label="Sign In" class="w-100" />
+              <div class="text-center">
                 <small class="text-muted">Forgot password? Contact your barangay staff.</small>
-                <FormButton label="Sign In" class="w-auto" />
               </div>
               <div class="text-center border-top pt-3">
                 <p class="mb-0">Don't have an account yet?
@@ -141,5 +141,9 @@ onMounted(() => {
 <style scoped>
 .login-wrapper {
   background: #fff;
+}
+
+.btn.w-100 {
+  display: block;
 }
 </style>

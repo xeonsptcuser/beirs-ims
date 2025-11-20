@@ -7,8 +7,10 @@ import { formatDateToHuman } from '@/Utils/helpers/formatters';
 import AppLogo from '../common/AppLogo/AppLogo.vue';
 import HamburgerButton from '../common/HamburgerButton/HamburgerButton.vue';
 import SlidingNavbar from '../common/SlidingNavbar/SlidingNavbar.vue';
+import { useRouter } from 'vue-router';
 
 const session = useSessionStore();
+const router = useRouter();
 const isLoggedIn = computed(() => session.isLoggedIn());
 const navItems = computed(() => {
   if (!isLoggedIn.value) {
@@ -59,6 +61,7 @@ const primaryActionLabel = computed(() => (isLoggedIn.value ? 'Dashboard' : 'Log
 
 const handleLogout = async () => {
   await session.logout();
+  router.replace({ name: 'LoginPage' });
 };
 
 const notifications = ref<UserNotification[]>([]);

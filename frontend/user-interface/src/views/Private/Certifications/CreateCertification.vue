@@ -156,10 +156,26 @@ watchEffect(() => {
     <FormContainer title="Certification Request Form" max-width="750px">
       <WarningLabel :has-error="hasError && filteredErrors.length > 0" :errors="filteredErrors" />
       <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleCreateCertificateRequest">
-        <div class="col-12 ">
-          <DropdownInput :options="orderedOptions(certificateOptions)" label="Certificate Request Type"
-            id="select-certificate-request" v-model="form.certificateRequestType"
-            :error-message="errorMessages.certificateRequestType.error" :has-error="errors.certificateRequestType" />
+        <div class="col-12">
+          <p class="text-muted mb-2 small">Certificate Request Type</p>
+          <div class="d-flex flex-wrap gap-2">
+            <button
+              v-for="option in orderedOptions(certificateOptions)"
+              :key="option"
+              type="button"
+              class="btn option-pill"
+              :class="{
+                'btn-primary text-white border-0': form.certificateRequestType === option,
+                'btn-outline-secondary': form.certificateRequestType !== option
+              }"
+              @click="form.certificateRequestType = option"
+            >
+              {{ option.charAt(0).toUpperCase() + option.slice(1) }}
+            </button>
+          </div>
+          <small v-if="errors.certificateRequestType" class="text-danger">
+            {{ errorMessages.certificateRequestType.error }}
+          </small>
         </div>
         <div class="col-12">
           <FormFloatingInput type="text" label="Complete Name" id="complete-name" v-model="requestorName"
@@ -197,3 +213,18 @@ watchEffect(() => {
     </FormContainer>
   </div>
 </template>
+
+<style scoped>
+.option-pill {
+  padding: 0.65rem 1.2rem;
+  border-radius: 999px;
+  font-weight: 600;
+  text-transform: capitalize;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.option-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0.4rem 1rem rgba(0, 0, 0, 0.08);
+}
+</style>
