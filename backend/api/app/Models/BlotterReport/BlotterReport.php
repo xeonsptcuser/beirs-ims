@@ -20,7 +20,8 @@ class BlotterReport extends Model
 
     protected $fillable = [
         'user_profile_id',
-        'handler_id',
+        'handled_by',
+        'status',
         'incident_type',
         'incident_title',
         'datetime_of_incident',
@@ -34,12 +35,18 @@ class BlotterReport extends Model
 
     protected $casts = [
         'person_involved' => 'array',
-        'witnesses' => 'array'
+        'witnesses' => 'array',
+        'datetime_of_incident' => 'datetime',
     ];
 
     public function profile(): BelongsTo
     {
         return $this->belongsTo(UserProfile::class, 'user_profile_id');
+    }
+
+    public function handler(): BelongsTo
+    {
+        return $this->belongsTo(UserProfile::class, 'handled_by');
     }
 
     public function evidence(): HasMany

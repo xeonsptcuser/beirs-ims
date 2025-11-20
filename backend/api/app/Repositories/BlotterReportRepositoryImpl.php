@@ -108,9 +108,8 @@ class BlotterReportRepositoryImpl implements BlotterReportRepositoryInterface
 
         if (!is_null($userId) && $userId !== 0) {
             $user = User::findOrFail($userId);
-            if ($user && $user->role === 'resident') {
-                $query->where('user_profile_id', $userId);
-
+            if ($user && $user->role === 'resident' && $user->user_profile_id) {
+                $query->where('user_profile_id', $user->user_profile_id);
             }
         }
         if (!empty($statuses)) {
@@ -141,34 +140,33 @@ class BlotterReportRepositoryImpl implements BlotterReportRepositoryInterface
             $blotterData['status'] ??= BlotterReport::STATUS_PENDING;
             $blotterReport = $profile->blotterReport()->create($blotterData);
 
-            return $blotterReport->load('profile');
+            return $blotterReport->load(['profile', 'handler']);
         });
     }
     public function updateBlotterReport(BlotterReport $blotterReport, array $blotterReportData): BlotterReport
-    { {
-            return DB::transaction(function () use ($blotterReport, $blotterReportData) {
-                $status = $blotterReportData['status'] ?? null;
+    {
+        return DB::transaction(function () use ($blotterReport, $blotterReportData) {
+            $status = $blotterReportData['status'] ?? null;
 
-                if (
-                    !in_array($status, [
-                        BlotterReport::STATUS_APPROVED,
-                        BlotterReport::STATUS_REJECTED,
-                        BlotterReport::STATUS_CANCELLED,
-                        BlotterReport::STATUS_RELEASED,
-                        BlotterReport::STATUS_DONE,
-                    ], true)
-                ) {
-                    throw ValidationException::withMessages([
-                        'status' => "Status must only be approved, rejected, cancelled or released",
-                    ]);
-                }
+            if (
+                !in_array($status, [
+                    BlotterReport::STATUS_APPROVED,
+                    BlotterReport::STATUS_REJECTED,
+                    BlotterReport::STATUS_CANCELLED,
+                    BlotterReport::STATUS_RELEASED,
+                    BlotterReport::STATUS_DONE,
+                ], true)
+            ) {
+                throw ValidationException::withMessages([
+                    'status' => "Status must only be approved, rejected, cancelled or released",
+                ]);
+            }
 
-                $blotterReport->status = $status;
-                $blotterReport->handled_by = $blotterReportData['handled_by'];
-                $blotterReport->save();
+            $blotterReport->status = $status;
+            $blotterReport->handled_by = $blotterReportData['handled_by'];
+            $blotterReport->save();
 
-                return $blotterReport->load('profile');
-            });
-        }
+            return $blotterReport->load(['profile', 'handler']);
+        });
     }
 }

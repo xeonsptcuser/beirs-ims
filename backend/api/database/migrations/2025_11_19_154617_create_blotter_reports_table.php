@@ -13,16 +13,17 @@ return new class extends Migration {
         Schema::create('blotter_reports', function (Blueprint $table) {
             $table->id()->unsigned()->primary();
             $table->foreignId('user_profile_id')->constrained('user_profiles')->cascadeOnDelete(); // foreign key to users
-            $table->foreignId('handler_id')->constrained('user_profiles')->cascadeOnDelete(); // foreign key to handler/staff
+            $table->foreignId('handled_by')->nullable()->constrained('user_profiles')->nullOnDelete(); // foreign key to handler/staff
+            $table->enum('status', ['pending', 'approved', 'processing', 'rejected', 'cancelled', 'released', 'done']);
             $table->string('incident_type');
             $table->string('incident_title')->nullable();
-            $table->datetime('datetime_of_incident');
+            $table->dateTime('datetime_of_incident');
             $table->string('location');
             $table->string('landmark')->nullable();
             $table->json('person_involved')->nullable();
             $table->json('witnesses')->nullable();
-            $table->string('description');
-            $table->string('remarks')->nullable();
+            $table->text('description');
+            $table->text('remarks')->nullable();
             $table->timestamps();
         });
     }

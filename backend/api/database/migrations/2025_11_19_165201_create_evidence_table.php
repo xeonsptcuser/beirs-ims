@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('evidences', function (Blueprint $table) {
+        Schema::create('evidence', function (Blueprint $table) {
             $table->id();
             $table->foreignId('blotter_report_id')->constrained('blotter_reports')->cascadeOnDelete(); // foreign key to blotter_report
             $table->string('storage_path');      // e.g., storage/app/evidences/...

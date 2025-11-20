@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import FormContainer from '@/components/common/FormContainer/FormContainer.vue';
 import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useBlotterReports } from './composable/useBlotterReport';
 import FormFloatingInput from '@/components/common/FormFloatingInput/FormFloatingInput.vue';
 import DropdownInput from '@/components/common/DropdownInput/DropdownInput.vue';
@@ -9,12 +9,17 @@ import { useCreateUserAccount } from '../Residents/composable/useCreateUserAccou
 import FormButton from '@/components/common/FormButton/FormButton.vue';
 import FormTextAreaInput from '@/components/common/FormTextAreaInput/FormTextAreaInput.vue';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
-import type { BlotterReportRequestPayload } from '@/Types';
+import type { ApiErrorResponse, BlotterReportRequestPayload, CommonResponse, UserProfile as UserProfileType } from '@/Types';
 import UploadFiles from './components/UploadFiles.vue';
 import { maxDate, orderedOptions } from '@/Utils/helpers/formatters';
+import { submitBlotterReport } from '@/Utils/blotterReportServices';
+import type { AxiosError } from 'axios';
+import router from '@/router';
+import { fetchSingleUserProfile } from '@/Utils/userServices';
 
-defineProps<{
-  role: string
+const props = defineProps<{
+  role: string,
+  id: string
 }>()
 
 const {
@@ -22,7 +27,8 @@ const {
   errors,
   errorMessages,
   incidentTypeOptions,
-  validateForm
+  validateForm,
+  setServerErrors
 } = useBlotterReports();
 
 const { addressOptions } = useCreateUserAccount();
@@ -34,13 +40,69 @@ const complainantAge = ref<string>('')
 const complainantContactInfo = ref<string>('')
 const address = ref<string>('')
 
+const buildFullName = (profile: Partial<UserProfileType>): string => {
+  const first = profile.first_name ?? ''
+  const middle = profile.middle_name ?? ''
+  const last = profile.last_name ?? ''
+  return [first, middle, last].filter(Boolean).join(' ').trim()
+}
+
+const computeAge = (birthDate?: string | null): string => {
+  if (!birthDate) return ''
+  const birth = new Date(birthDate)
+  if (Number.isNaN(birth.valueOf())) return ''
+
+  const today = new Date()
+  let age = today.getFullYear() - birth.getFullYear()
+  const monthDiff = today.getMonth() - birth.getMonth()
+  const dayDiff = today.getDate() - birth.getDate()
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--
+  }
+  return age >= 0 ? `${age}` : ''
+}
+
+const fetchUserProfile = async () => {
+  if (!props.id) return
+
+  navigation.startNavigation();
+  try {
+    hasError.value = false
+    const response = await fetchSingleUserProfile(props.id)
+    const profile = (response.data?.profile ?? {}) as Partial<UserProfileType>
+
+    complainantFullName.value = buildFullName(profile)
+    complainantContactInfo.value = profile.mobile_number ?? ''
+    const street = profile.street_address ?? ''
+    const addressLine = profile.address_line ?? ''
+    address.value = [street, addressLine].filter(Boolean).join(', ')
+    complainantAge.value = computeAge(profile.date_of_birth)
+  } catch (error) {
+    const axiosError = error as AxiosError<ApiErrorResponse>;
+    const fallbackResponse = error as CommonResponse;
+    const responseData = axiosError?.response?.data
+    setServerErrors(responseData?.errors, responseData?.message ?? fallbackResponse?.message);
+    hasError.value = true
+  } finally {
+    navigation.endNavigation();
+  }
+}
+
+watch(() => props.id, (newId, oldId) => {
+  if (newId && newId !== oldId) {
+    fetchUserProfile()
+  }
+}, { immediate: true })
 
 const handleCreateBlotterReport = async () => {
-
   hasError.value = !validateForm();
   if (hasError.value) return;
 
-
+  if (!props.id) {
+    setServerErrors(undefined, 'Missing resident identifier for this request.');
+    hasError.value = true;
+    return;
+  }
 
   const requestPayload: BlotterReportRequestPayload = {
     incident_type: form.value.incidentType,
@@ -57,13 +119,29 @@ const handleCreateBlotterReport = async () => {
 
   navigation.startNavigation();
   try {
-    console.log(requestPayload)
+    const response = await submitBlotterReport(requestPayload, props.id);
+    if (response.status !== 'success') {
+      throw response;
+    }
+    hasError.value = false;
+    router.push({ name: 'BlotterReports', params: { role: props.role } });
   } catch (error) {
-    console.log(error);
+    const axiosError = error as AxiosError<ApiErrorResponse>;
+    const fallbackResponse = error as CommonResponse;
+
+    if (axiosError?.isAxiosError) {
+      const responseData = axiosError.response?.data;
+      setServerErrors(responseData?.errors, responseData?.message);
+    } else if (fallbackResponse?.message) {
+      setServerErrors(undefined, fallbackResponse.message);
+    } else {
+      setServerErrors(undefined, 'Failed to submit blotter report.');
+    }
+
+    hasError.value = true;
   } finally {
     navigation.endNavigation();
   }
-
 }
 
 const addPersonInvolvedField = () => {
@@ -82,17 +160,6 @@ const removePersonInvolvedField = (index: number) => {
 const removeWitnessField = (index: number) => {
   form.value.incidentWitnesses.splice(index, 1);
 }
-
-const orderedAddressOptions = computed(() => {
-  return [...addressOptions].sort((a, b) => {
-    return a.localeCompare(b)
-  })
-})
-const orderedincidentTypeOptions = computed(() => {
-  return [...incidentTypeOptions].sort((a, b) => {
-    return a.localeCompare(b)
-  })
-})
 
 const filteredErrors = computed(() => {
   return Object.values(errorMessages.value).filter(msg => msg.error && msg.error.trim() !== '');
@@ -239,7 +306,6 @@ const filteredErrors = computed(() => {
         </div>
       </form>
     </FormContainer>
-
   </div>
 </template>
 

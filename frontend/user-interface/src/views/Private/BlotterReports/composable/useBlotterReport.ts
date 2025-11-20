@@ -107,11 +107,49 @@ export function useBlotterReports() {
     return isValid
   }
 
+  const setServerErrors = (apiErrors?: Record<string, string[]>, fallbackMessage?: string) => {
+    resetErrors()
+
+    const fieldMap: Record<string, keyof BlotterReport> = {
+      incident_type: 'incidentType',
+      incident_title: 'incidentTitle',
+      date_of_incident: 'dateOfIncident',
+      time_of_incident: 'timeOfIncident',
+      incident_street_address: 'incidentStreetAddress',
+      incident_address_line: 'incidentAddressLine',
+      incident_people_involved: 'incidentPeopleInvolved',
+      incident_witnesses: 'incidentWitnesses',
+      incident_description: 'incidentDescription',
+      evidences: 'evidences',
+    }
+
+    if (!apiErrors || Object.keys(apiErrors).length === 0) {
+      if (fallbackMessage) {
+        errorMessages.value.incidentType.error = fallbackMessage
+        errors.value.incidentType = true
+      }
+      return
+    }
+
+    for (const [field, messages] of Object.entries(apiErrors)) {
+      const key = fieldMap[field]
+      if (!key) {
+        continue
+      }
+
+      errors.value[key] = true
+      errorMessages.value[key] = {
+        error: messages?.[0] ?? fallbackMessage ?? 'Please review this field.',
+      }
+    }
+  }
+
   return {
     form,
     errors,
     errorMessages,
     incidentTypeOptions,
     validateForm,
+    setServerErrors,
   }
 }

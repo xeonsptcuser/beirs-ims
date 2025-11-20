@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 
 interface BlotterReportRepositoryInterface
 {
-    public function getAll(): Collection|LengthAwarePaginator;
+    public function getAll(array $relations = [], ?int $perPage = null, ?array $statuses = null, ?string $search = null): Collection|LengthAwarePaginator;
     public function getAllHandledByStaff(array $relations = [], ?int $handlerProfileId = null, ?int $perPage = null, ?array $statuses = null, ?string $search = null): Collection|LengthAwarePaginator;
     public function getAllById(array $relations = [], ?int $userId = null, ?int $perPage = null, ?array $statuses = null, ?string $search = null): Collection|LengthAwarePaginator;
     public function getById(int $id, array $relations = []): ?BlotterReport;
