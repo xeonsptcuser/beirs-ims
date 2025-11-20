@@ -18,6 +18,7 @@ export interface UserProfile extends ProfileCore {
   email_verification_at: string | null
   is_active: boolean
   user?: User
+  government_id_document?: GovernmentIdDocument | null
 }
 
 export interface User {
@@ -71,6 +72,17 @@ export type UpdateAccountRequestPayload = Partial<
     governmentId: File[]
   }
 >
+
+export interface GovernmentIdDocument {
+  id: number
+  user_profile_id: number
+  storage_path: string
+  original_name: string
+  mime_type: string
+  size: number
+  created_at: string
+  updated_at: string
+}
 
 type EditableFields =
   | 'name'

@@ -41,6 +41,17 @@ const navigation = useGlobalLoadingStore();
 const isPasswordChangeable = ref<boolean>(false);
 const localErrorMsg = ref<string>('')
 const hasGovernmentId = ref<boolean>(false)
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '');
+const storageBaseUrl =
+  (import.meta.env.VITE_STORAGE_URL as string | undefined) ||
+  (apiBaseUrl ? `${apiBaseUrl}/storage` : '/storage');
+
+const governmentIdUrl = computed(() => {
+  const doc = responseData.value?.profile?.government_id_document;
+  if (!doc?.storage_path) return '';
+  const normalizedBase = storageBaseUrl.endsWith('/') ? storageBaseUrl.slice(0, -1) : storageBaseUrl;
+  return `${normalizedBase}/${doc.storage_path}`.replace(/([^:]\/)\/+/g, '$1');
+});
 
 
 const handleUpdateUserAccount = async () => {
@@ -63,6 +74,7 @@ const handleUpdateUserAccount = async () => {
         address_line: form.addressLine,
         mobile_number: form.mobileNumber,
         date_of_birth: form.date_of_birth,
+        governmentId: form.governmentId,
       }
 
       const trimmedPassword = form.password.trim()
@@ -116,6 +128,7 @@ const fetchUserProfile = async () => {
     }
 
     responseData.value = response.data
+    hasGovernmentId.value = !!responseData.value.profile?.government_id_document;
 
     form.name.firstName = responseData.value.profile.first_name
     form.name.middleName = responseData.value.profile.middle_name
@@ -251,7 +264,7 @@ watchEffect(() => {
           <div class="card-body">
             <h6 class="fw-semibold mb-3">Government ID</h6>
             <div v-if="hasGovernmentId" class="border rounded text-center p-3">
-              <img :src="nationalId" alt="Government ID" class="img-fluid" />
+              <img :src="governmentIdUrl || nationalId" alt="Government ID" class="img-fluid" />
             </div>
             <div v-else class="text-center text-muted">
               <p class="mb-3">No government ID on file.</p>

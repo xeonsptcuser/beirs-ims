@@ -42,7 +42,7 @@ export class UserRelatedService {
 
   async updateSingleUserAccount(
     url: string,
-    data: UpdateAccountRequestPayload
+    data: UpdateAccountRequestPayload | FormData
   ): Promise<ApiResponse<User>> {
     return this.apiService.patch(url, data)
   }

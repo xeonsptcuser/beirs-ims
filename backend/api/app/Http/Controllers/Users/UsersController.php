@@ -20,7 +20,7 @@ class UsersController extends Controller
     {
         $perPage = $request->integer('per_page');
         $search = $this->resolveSearch($request);
-        $users = $this->users->all(['profile'], $perPage, $search);
+        $users = $this->users->all(['profile.governmentIdDocument'], $perPage, $search);
 
         return response()->json([
             'status' => 'success',
@@ -31,7 +31,7 @@ class UsersController extends Controller
     // GET /api/auth/users/{id}
     public function show(int $userId)
     {
-        $user = $this->users->findById($userId, ['profile']);
+        $user = $this->users->findById($userId, ['profile.governmentIdDocument']);
 
         return response()->json([
             'status' => 'success',
@@ -91,7 +91,7 @@ class UsersController extends Controller
                     'size' => $file->getSize(),
                 ]);
             }
-            $user->load('profile.governmentIds');
+            $user->load('profile.governmentIdDocument');
         }
 
         return response()->json([
@@ -104,7 +104,7 @@ class UsersController extends Controller
     // PUT /api/auth/users/{id}
     public function update(Request $request, $id)
     {
-        $user = $this->users->findById($id, ['profile']);
+        $user = $this->users->findById($id, ['profile.governmentIdDocument']);
 
         if (!$user) {
             throw new ModelNotFoundException("User {$id} not found");
@@ -152,8 +152,9 @@ class UsersController extends Controller
                     'size' => $file->getSize(),
                 ]);
             }
-            $updated->load('profile.governmentIds');
+            $updated->load('profile.governmentIdDocument');
         }
+        $updated->loadMissing('profile.governmentIdDocument');
 
         return response()->json([
             'status' => 'success',

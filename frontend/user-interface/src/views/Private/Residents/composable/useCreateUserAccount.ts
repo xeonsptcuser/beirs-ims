@@ -3,8 +3,9 @@ import { useBarangayAddresses } from '@/composables/useBarangayAddresses'
 import type { CreateUserAccountRequest } from '@/Types'
 import { reactive, ref } from 'vue'
 
-export function useCreateUserAccount(options?: { requirePassword: boolean }) {
+export function useCreateUserAccount(options?: { requirePassword: boolean; requireGovernmentId?: boolean }) {
   const requiredPassword = options?.requirePassword ?? true
+  const requireGovernmentId = options?.requireGovernmentId ?? true
   const { successResponse, setSuccessResponse } = useSharedAuthResponse()
   const { addressOptions, loadBarangayAddresses } = useBarangayAddresses()
 
@@ -135,7 +136,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean }) {
       isValid = false
     }
 
-    if (form.governmentId.length === 0) {
+    if (requireGovernmentId && form.governmentId.length === 0) {
       errors.value.governmentId = true
       errorMessages.value.governmentId = {
         error:

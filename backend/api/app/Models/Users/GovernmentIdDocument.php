@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class GovernmentIdDocument extends Model
 {
+    // Explicit table name to match migration
+    protected $table = 'government_id_document';
+
     protected $fillable = [
         'user_profile_id',
         'storage_path',

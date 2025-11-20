@@ -15,6 +15,7 @@ export function useEditUserAccount() {
     setSuccessResponse,
   } = useCreateUserAccount({
     requirePassword: false,
+    requireGovernmentId: false,
   })
 
   const isNotEditableUser = ref<Record<keyof UserProfileEditStatus, boolean>>({
