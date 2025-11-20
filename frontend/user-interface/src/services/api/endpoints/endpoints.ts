@@ -43,7 +43,7 @@ export const endpoints = {
   GET_ALL_BLOTTER_REPORTS_BY_ID: `${BLOTTER_API_ROUTES}/resident`,
   CREATE_BLOTTER_REPORT: (id: number | string) => `${BLOTTER_API_ROUTES}/${id}/create`,
   GET_BLOTTER_REPORT: (id: number | string) => `${BLOTTER_API_ROUTES}/${id}`,
-  UPDATE_BLOTTER_REPORT: (id: number | string) => `${BLOTTER_API_ROUTES}/${id}/update`,
+  UPDATE_BLOTTER_REPORT: (id: number | string) => `${BLOTTER_API_ROUTES}/${id}`,
 
   // NOTIFICATIONS
   GET_NOTIFICATIONS: `${NOTIFICATIONS_ROUTE}`,
