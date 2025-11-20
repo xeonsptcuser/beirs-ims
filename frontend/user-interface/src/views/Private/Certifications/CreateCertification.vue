@@ -14,7 +14,7 @@ import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
 import router from '@/router';
 import { submitCertificationRequest } from '@/Utils/certificateServices';
 import FormFloatingInput from '@/components/common/FormFloatingInput/FormFloatingInput.vue';
-import { dateToday, maxDate } from '@/Utils/helpers/formatters';
+import { dateToday, maxDate, orderedOptions } from '@/Utils/helpers/formatters';
 
 const props = defineProps<{
   role: string,
@@ -113,7 +113,11 @@ const fetchUserProfile = async () => {
   }
 }
 
-
+const orderedcertificateOptions = computed(() => {
+  return [...certificateOptions.value].sort((a, b) => {
+    return a.localeCompare(b)
+  })
+})
 
 watch(() => form.isCurrent, (isCurrent) => {
   if (isCurrent) {
@@ -153,9 +157,9 @@ watchEffect(() => {
       <WarningLabel :has-error="hasError && filteredErrors.length > 0" :errors="filteredErrors" />
       <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleCreateCertificateRequest">
         <div class="col-12 ">
-          <DropdownInput :options="certificateOptions" label="Certificate Request Type" id="select-certificate-request"
-            v-model="form.certificateRequestType" :error-message="errorMessages.certificateRequestType.error"
-            :has-error="errors.certificateRequestType" />
+          <DropdownInput :options="orderedOptions(certificateOptions)" label="Certificate Request Type"
+            id="select-certificate-request" v-model="form.certificateRequestType"
+            :error-message="errorMessages.certificateRequestType.error" :has-error="errors.certificateRequestType" />
         </div>
         <div class="col-12">
           <FormFloatingInput type="text" label="Complete Name" id="complete-name" v-model="requestorName"

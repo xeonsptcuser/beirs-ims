@@ -19,6 +19,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean }) {
     streetAddress: '',
     addressLine: '',
     mobileNumber: '',
+    governmentId: [],
   })
 
   const errors = ref<Record<keyof CreateUserAccountRequest, boolean>>({
@@ -31,6 +32,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean }) {
     streetAddress: false,
     addressLine: false,
     mobileNumber: false,
+    governmentId: false,
   })
 
   const errorMessages = ref<Record<keyof CreateUserAccountRequest, { error: string }>>({
@@ -43,6 +45,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean }) {
     streetAddress: { error: '' },
     addressLine: { error: '' },
     mobileNumber: { error: '' },
+    governmentId: { error: '' },
   })
 
   const roleOptions = ['admin', 'resident', 'staff']
@@ -142,18 +145,19 @@ export function useCreateUserAccount(options?: { requirePassword: boolean }) {
       isValid = false
     }
 
-    if (!form.mobileNumber.trim()) {
-      errors.value.mobileNumber = true
-      errorMessages.value.mobileNumber = {
-        error: 'Please enter mobile number',
-      }
-      isValid = false
-    }
-
     if (!form.streetAddress.trim()) {
       errors.value.streetAddress = true
       errorMessages.value.streetAddress = {
         error: 'Please select your street address',
+      }
+      isValid = false
+    }
+
+    if (form.governmentId.length === 0) {
+      errors.value.governmentId = true
+      errorMessages.value.governmentId = {
+        error:
+          'Please upload image of your Id (e.g Nationall ID, Drivers License, Postal Id, Passport etc...)',
       }
       isValid = false
     }

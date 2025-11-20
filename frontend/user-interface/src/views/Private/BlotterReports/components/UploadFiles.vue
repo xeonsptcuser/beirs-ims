@@ -10,6 +10,16 @@ type FilePreview = {
   url: string | null
 }
 
+withDefaults(defineProps<{
+  isDisabled?: boolean
+  multiple?: boolean
+  accept?: string
+}>(), {
+  isDisabled: false,
+  multiple: true,
+  accept: '.png,.jpg,.jpeg,.pdf,.mp4'
+})
+
 const files = defineModel<File[]>({ default: [] })
 const filePreviews = ref<FilePreview[]>([])
 
@@ -88,7 +98,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="bg-white p-3 border rounded">
-    <DragAndDropUploadFiles accept=".png,.jpg,.jpeg,.pdf,.mp4" :multiple="true" @files-selected="handleFiles" />
+    <DragAndDropUploadFiles :accept :multiple @files-selected="handleFiles" :is-disabled="isDisabled" />
 
     <div v-if="filePreviews.length" class="mt-3">
       <p class="fw-semibold text-secondary mb-2">Selected files</p>

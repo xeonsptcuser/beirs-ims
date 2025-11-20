@@ -9,9 +9,11 @@ import type { AxiosError } from 'axios';
 import type { ApiErrorResponse, CommonResponse, UpdateAccountRequestPayload, User } from '@/Types';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
-import { computeAge, formatName } from '@/Utils/helpers/formatters';
+import { computeAge, formatName, orderedOptions } from '@/Utils/helpers/formatters';
 import { navigateToTopPage } from '@/Utils/helpers/common-helpers';
 import FormFloatingInput from '@/components/common/FormFloatingInput/FormFloatingInput.vue';
+import UploadFiles from '../BlotterReports/components/UploadFiles.vue';
+import nationalId from '@/assets/images/nat-id.png';
 
 const props = defineProps<{
   id: string
@@ -39,6 +41,8 @@ const {
 const navigation = useGlobalLoadingStore();
 const isPasswordChangeable = ref<boolean>(false);
 const localErrorMsg = ref<string>('')
+const hasGovernmentId = ref<boolean>(false)
+
 
 const handleUpdateUserAccount = async () => {
   navigation.startNavigation();
@@ -170,7 +174,7 @@ watchEffect(() => {
     <div v-else-if="hasError" class="alert alert-danger" role="alert">
       {{ localErrorMsg ?? '' }}
     </div>
-    <div>
+    <div class="mb-3">
       <a href="#" @click="navigateToTopPage"><i class="bi bi-arrow-left me-2"></i>PREVIOUS PAGE</a>
     </div>
     <FormContainer title="User Profile" :max-width="'750px'">
@@ -217,9 +221,9 @@ watchEffect(() => {
               :is-disabled="isNotEditableUser.mobileNumber" />
           </div>
           <div class="col-md-4 col-sm-12">
-            <DropdownInput :options="addressOptions" label="Sitio" id="sitio-name" v-model="form.streetAddress"
-              :error-message="errorMessages.streetAddress.error" :has-error="errors.streetAddress"
-              :is-disabled="isNotEditableUser.streetAddress" />
+            <DropdownInput :options="orderedOptions(addressOptions)" label="Sitio" id="sitio-name"
+              v-model="form.streetAddress" :error-message="errorMessages.streetAddress.error"
+              :has-error="errors.streetAddress" :is-disabled="isNotEditableUser.streetAddress" />
           </div>
           <div class="col-md-4 col-sm-12">
             <FormFloatingInput type="text" label="Address Line" id="address-line" v-model="form.addressLine"
@@ -238,6 +242,16 @@ watchEffect(() => {
               id="passwordConfirm" v-model="form.passwordConfirmation" :has-error="errors.passwordConfirmation"
               :error-message="errorMessages.passwordConfirmation.error"
               :is-disabled="isNotEditableUser.passwordConfirmation" />
+          </div>
+        </div>
+        <div v-if="!hasGovernmentId">
+          <UploadFiles v-model="form.governmentId" :has-error="hasError"
+            :error-message="errorMessages.governmentId.error" :is-disabled="isNotEditableUser.governmentId"
+            accept=".png,.jpg,.jpeg" :multiple="false" />
+        </div>
+        <div v-if="hasGovernmentId">
+          <div class="border p-3 rounded text-center">
+            <img :src="nationalId" alt="identification" class="img-fluid">
           </div>
         </div>
         <div class="ms-md-auto text-center" v-if="isProfileOwner">

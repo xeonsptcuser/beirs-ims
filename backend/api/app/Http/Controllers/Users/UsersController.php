@@ -49,10 +49,10 @@ class UsersController extends Controller
             'last_name' => ['required', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:100'],
             'email' => ['required', 'email', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'role' => ['required', Rule::in(['admin', 'staff', 'resident'])],
             'date_of_birth' => ['required', 'date', "before_or_equal:{$legalAgeDate}"],
-            'street_address' => ['nullable', 'string', 'max:255'],
+            'street_address' => ['required', 'string', 'max:255'],
             'address_line' => ['nullable', 'string', 'max:255'],
             'mobile_number' => ['nullable', 'string', 'max:20'],
         ]);
@@ -60,18 +60,18 @@ class UsersController extends Controller
         $user = $this->users->createWithProfile(
             [
                 'email' => $validated['email'],
-                'password' => $validated['password'],
+                'password' => $validated['password'] ?? $validated['role'],
                 'role' => $validated['role']
             ],
             [
 
                 'first_name' => $validated['first_name'],
                 'last_name' => $validated['last_name'],
-                'middle_name' => $validated['middle_name'],
+                'middle_name' => $validated['middle_name'] ?? null,
                 'date_of_birth' => Carbon::parse($validated['date_of_birth']),
                 'street_address' => $validated['street_address'],
-                'address_line' => $validated['address_line'],
-                'mobile_number' => $validated['mobile_number'],
+                'address_line' => $validated['address_line'] ?? null,
+                'mobile_number' => $validated['mobile_number'] ?? null,
 
             ]
         );

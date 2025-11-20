@@ -11,7 +11,7 @@ import FormTextAreaInput from '@/components/common/FormTextAreaInput/FormTextAre
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import type { BlotterReportRequestPayload } from '@/Types';
 import UploadFiles from './components/UploadFiles.vue';
-import { maxDate } from '@/Utils/helpers/formatters';
+import { maxDate, orderedOptions } from '@/Utils/helpers/formatters';
 
 defineProps<{
   role: string
@@ -129,7 +129,7 @@ const filteredErrors = computed(() => {
           </div>
           <div class="row g-2 mb-3">
             <div class="col">
-              <DropdownInput :options="orderedincidentTypeOptions" label="Select Case Type" id="case-type"
+              <DropdownInput :options="orderedOptions(incidentTypeOptions)" label="Select Case Type" id="case-type"
                 v-model="form.incidentType" :has-error="errors.incidentType"
                 :error-message="errorMessages.incidentType.error" />
             </div>
@@ -153,8 +153,8 @@ const filteredErrors = computed(() => {
           </div>
           <div class="row g-2 mb-3">
             <div class="col-md-6 col-12">
-              <DropdownInput :options="orderedAddressOptions" label="Where did it happened?" id="incident-location"
-                v-model="form.incidentStreetAddress" :has-error="errors.incidentStreetAddress"
+              <DropdownInput :options="orderedOptions(addressOptions)" label="Where did it happened?"
+                id="incident-location" v-model="form.incidentStreetAddress" :has-error="errors.incidentStreetAddress"
                 :error-message="errorMessages.incidentStreetAddress.error" :is-optional="true" />
             </div>
             <div class="col-md-6 col-12">

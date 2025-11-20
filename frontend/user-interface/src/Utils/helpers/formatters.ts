@@ -34,3 +34,9 @@ export const maxDate = () => {
   today.setDate(today.getDate() - 1)
   return today.toISOString().split('T')[0]
 }
+
+export const orderedOptions = (optionsList: string[]) => {
+  return [...optionsList].sort((a, b) => {
+    return a.localeCompare(b)
+  })
+}

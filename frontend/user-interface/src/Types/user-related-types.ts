@@ -1,12 +1,20 @@
-export interface UserProfile {
-  id: number
+type NameFields = {
   first_name: string
   middle_name: string
   last_name: string
+}
+type AddressFields = {
   street_address: string
-  address_line: string
+  address_line?: string
   mobile_number: string
-  date_of_birth: string
+}
+type ProfileCore = NameFields &
+  AddressFields & {
+    date_of_birth: string
+  }
+
+export interface UserProfile extends ProfileCore {
+  id: number
   email_verification_at: string | null
   is_active: boolean
   user?: User
@@ -20,68 +28,60 @@ export interface User {
   profile: UserProfile
 }
 
-interface FullName {
-  firstName: string
-  lastName: string
-  middleName: string
+type UiName = {
+  name: {
+    firstName: string
+    middleName: string
+    lastName: string
+  }
 }
-export interface CreateUserAccountRequest {
-  name: FullName
-  role: string
-  email: string
-  password: string
-  passwordConfirmation: string
-  date_of_birth: string
+type UiAddress = {
   streetAddress: string
-  addressLine: string
+  addressLine?: string
   mobileNumber: string
 }
 
-export interface CreateAccountRequestPayload {
-  first_name: string
-  last_name: string
-  middle_name: string
+export type CreateUserAccountRequest = UiName &
+  UiAddress & {
+    role: string
+    email: string
+    password: string
+    passwordConfirmation: string
+    date_of_birth: string
+    governmentId: File[]
+  }
+
+export type UpdateUserAccountRequest = Partial<CreateUserAccountRequest>
+
+type PayloadBase = ProfileCore & {
   email: string
+  role: string
+}
+
+export interface CreateAccountRequestPayload extends PayloadBase {
   password: string
   password_confirmation: string
-  role: string
-  date_of_birth: string
-  street_address: string
-  mobile_number: string
+  governmentId: File[]
 }
 
-export interface UpdateAccountRequest {
-  name?: FullName
-  role?: string
-  email?: string
-  password?: string
-  passwordConfirmation?: string
-  date_of_birth?: string
-  streetAddress?: string
-  mobileNumber?: string
-}
-export interface UpdateAccountRequestPayload {
-  first_name: string
-  last_name: string
-  middle_name: string
-  email: string
-  password?: string
-  password_confirmation?: string
-  role: string
-  date_of_birth: string
-  street_address: string
-  address_line?: string
-  mobile_number: string
-}
+export type UpdateAccountRequestPayload = Partial<
+  PayloadBase & {
+    password: string
+    password_confirmation: string
+    governmentId: File[]
+  }
+>
 
-export interface UserProfileEditStatus {
-  name: boolean
-  email: boolean
-  password: boolean
-  passwordConfirmation: boolean
-  role: boolean
-  dateOfBirth: boolean
-  streetAddress: boolean
-  addressLine: boolean
-  mobileNumber: boolean
-}
+type EditableFields =
+  | 'name'
+  | 'email'
+  | 'password'
+  | 'passwordConfirmation'
+  | 'role'
+  | 'dateOfBirth'
+  | 'streetAddress'
+  | 'addressLine'
+  | 'mobileNumber'
+  | 'governmentId'
+
+export type UserProfileEditStatus = Record<EditableFields, boolean>
