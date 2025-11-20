@@ -6,6 +6,7 @@ use App\Models\BlotterReport\BlotterReport;
 use App\Models\Certificates\CertificateRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Notifications\Notifiable;
 
 class UserProfile extends Model
@@ -48,6 +49,10 @@ class UserProfile extends Model
         return $this->hasMany(BlotterReport::class, 'user_profile_id');
     }
 
+    public function governmentIdDocument(): HasOne
+    {
+        return $this->hasOne(GovernmentIdDocument::class, 'user_profile_id');
+    }
 
     public function routeNotificationForItextmo(): ?string
     {
