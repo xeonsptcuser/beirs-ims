@@ -111,7 +111,7 @@ class BlotterReportsController extends Controller
      */
     public function show(int $blotterReportId)
     {
-        $blotter_report = $this->blotter_report->getById($blotterReportId, ['profile', 'handler.user']);
+        $blotter_report = $this->blotter_report->getById($blotterReportId, ['profile', 'handler.user', 'evidence']);
 
         return response()->json([
             'status' => 'success',

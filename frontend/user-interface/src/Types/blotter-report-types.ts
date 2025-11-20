@@ -1,3 +1,5 @@
+import type { UserProfile } from './user-related-types'
+
 export interface BlotterReport {
   incidentType: string
   incidentTitle: string
@@ -10,6 +12,15 @@ export interface BlotterReport {
   incidentDescription: string
   evidences: File[]
 }
+
+export type BlotterReportStatus =
+  | 'pending'
+  | 'approved'
+  | 'processing'
+  | 'rejected'
+  | 'cancelled'
+  | 'released'
+  | 'done'
 
 export interface BlotterReportRequestPayload {
   incident_type: string
@@ -24,11 +35,36 @@ export interface BlotterReportRequestPayload {
   evidences: File[]
 }
 
+export interface BlotterEvidence {
+  id: number
+  blotter_report_id: number
+  storage_path: string
+  original_name: string
+  mime_type: string
+  size: number
+  created_at: string
+  updated_at: string
+}
+
 export interface BlotterReportResponse {
-  // Update Keys: Types
-  key: string
+  id: number
+  incident_type: string
+  incident_title?: string | null
+  datetime_of_incident: string
+  location: string
+  landmark?: string | null
+  person_involved?: string[] | null
+  witnesses?: string[] | null
+  description: string
+  remarks?: string | null
+  status: BlotterReportStatus
+  profile: UserProfile
+  handler?: UserProfile | null
+  created_at: string
+  updated_at: string
+  evidence?: BlotterEvidence[]
 }
 
 export interface UpdateBlotterReportRequestPayload {
-  // Update Keys: Types
+  status: BlotterReportStatus
 }

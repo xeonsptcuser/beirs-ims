@@ -1,10 +1,15 @@
 import { useSharedAuthResponse } from '@/composables/useSharedAuthResponse'
+import { useBarangayAddresses } from '@/composables/useBarangayAddresses'
 import type { CreateUserAccountRequest } from '@/Types'
 import { reactive, ref } from 'vue'
 
 export function useCreateUserAccount(options?: { requirePassword: boolean }) {
   const requiredPassword = options?.requirePassword ?? true
   const { successResponse, setSuccessResponse } = useSharedAuthResponse()
+  const { addressOptions, loadBarangayAddresses } = useBarangayAddresses()
+
+  loadBarangayAddresses()
+
   const form = reactive<CreateUserAccountRequest>({
     name: {
       firstName: '',
@@ -49,29 +54,6 @@ export function useCreateUserAccount(options?: { requirePassword: boolean }) {
   })
 
   const roleOptions = ['admin', 'resident', 'staff']
-
-  const addressOptions = [
-    'pulang bukid',
-    'mabolo 1',
-    'mabolo 2',
-    'liong',
-    'sacred heart',
-    'sapang daan',
-    'sumbrero',
-    'kalubihan',
-    'abbra',
-    'hiland',
-    'tres rosas',
-    'ura',
-    'tinago a',
-    'tinago b',
-    'tinago c',
-    'battiler',
-    'sudlon',
-    'cenapro',
-    'perez',
-    'mayol',
-  ]
 
   const resetErrors = () => {
     for (const key of Object.keys(errors.value) as (keyof CreateUserAccountRequest)[]) {
@@ -207,6 +189,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean }) {
     successResponse,
     roleOptions,
     addressOptions,
+    loadBarangayAddresses,
     validateForm,
     setServerErrors,
     setSuccessResponse,

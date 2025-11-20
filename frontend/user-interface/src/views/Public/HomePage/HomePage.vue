@@ -27,29 +27,39 @@ const features = [
 </script>
 
 <template>
-  <div class="container-fluid my-5 bg-white py-3 ps-3 pe-5 rounded shadow-lg">
-    <div class="row align-items-start g-4">
-      <!-- LEFT COLUMN: Illustration & Title -->
-      <div class="col-md-6 col-12 mt-auto">
-        <img :src="femaleStaff" alt="landing-img" class="img-fluid">
-      </div>
-
-      <!-- RIGHT COLUMN: Feature Cards -->
-      <div class="col-md-6 col-12 ">
-        <div class="mb-3 text-center">
-          <h1 class="fw-bold mt-3">BLOTTER SYSTEM</h1>
-          <h5 class="text-muted text-uppercase">Key Features</h5>
+  <div class="landing-wrapper py-5">
+    <div class="container py-5">
+      <div class="row align-items-center g-5 mb-5">
+        <div class="col-lg-6 ps-5">
+          <p class="text-uppercase small fw-semibold text-primary mb-2">Welcome to Barangay Alang-Alang</p>
+          <h1 class="display-5 fw-bold text-dark mb-3">Your Digital Desk for Barangay Services</h1>
+          <p class="text-muted mb-4">
+            File incident reports, request certificates, and stay informed without leaving your home. We're making
+            barangay services convenient, transparent, and resident-friendly.
+          </p>
+          <div class="d-flex gap-3 flex-wrap">
+            <router-link to="/login" class="btn btn-primary btn-lg px-4">Login</router-link>
+            <router-link to="/registration" class="btn btn-outline-secondary btn-lg px-4">Register</router-link>
+          </div>
         </div>
-        <hr class="mb-5">
+        <div class="col-lg-6 text-center">
+          <img :src="femaleStaff" alt="landing-img" class="img-fluid hero-illustration" />
+        </div>
+      </div>
+      <div class="bg-white rounded-4 shadow-sm p-4">
+        <div class="mb-4 text-center">
+          <h2 class="fw-bold mb-2">What you can do</h2>
+          <p class="text-muted mb-0">Everything you need to stay connected with your barangay.</p>
+        </div>
         <div class="row g-3">
-          <div class="col-sm-6" v-for="(feature, i) in features" :key="i">
+          <div class="col-sm-6 col-lg-3" v-for="(feature, i) in features" :key="i">
             <div class="card shadow-sm border-0 h-100">
-              <div class="card-header bg-light fw-bold">
+              <div class="card-header bg-light fw-bold text-primary">
                 {{ feature.title }}
               </div>
               <ul class="list-group list-group-flush small">
                 <li class="list-group-item" v-for="(item, j) in feature.items" :key="j">
-                  {{ item }}
+                  <i class="bi bi-check-circle text-primary me-2"></i>{{ item }}
                 </li>
               </ul>
             </div>
@@ -62,6 +72,15 @@ const features = [
 
 
 <style scoped>
+.landing-wrapper {
+  background: linear-gradient(135deg, #f8fbff, #e8f0ff);
+}
+
+.hero-illustration {
+  max-width: 480px;
+  width: 100%;
+}
+
 .card-header {
   color: #0f172a;
 }

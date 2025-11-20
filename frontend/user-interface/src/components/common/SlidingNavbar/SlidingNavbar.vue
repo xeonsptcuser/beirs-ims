@@ -2,6 +2,7 @@
 import type { NavItem } from '@/Types';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 import { computed } from 'vue';
+import { Offcanvas } from 'bootstrap';
 
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import { useRouter } from 'vue-router';
@@ -48,6 +49,11 @@ const navItems = [
     label: 'Heat-Map',
     roles: ['admin']
   },
+  {
+    name: 'ManageAddresses',
+    label: 'Addresses',
+    roles: ['admin']
+  },
 ]
 
 const filteredRoles = computed(() => {
@@ -72,10 +78,21 @@ const handleLogout = async () => {
   }
 }
 
+const closeOffcanvas = () => {
+  const element = document.getElementById('offcanvasScrolling');
+  if (!element) return;
+  const offcanvas = Offcanvas.getInstance(element) ?? new Offcanvas(element);
+  offcanvas.hide();
+};
+
+const handleNavClick = () => {
+  closeOffcanvas();
+};
+
 </script>
 <template>
 
-  <div class="offcanvas offcanvas-start" data-bs-scroll="true" id="offcanvasScrolling" data-bs-backdrop="true"
+  <div class="offcanvas offcanvas-start" data-bs-scroll="true" id="offcanvasScrolling" data-bs-backdrop="false"
     tabindex="-1" aria-labelledby="offcanvasScrollingLabel">
     <div class="offcanvas-header bg-primary-gradient">
       <h5 class="offcanvas-title text-center text-white" id="offcanvasScrollingLabel">{{ title }}</h5>
@@ -85,10 +102,12 @@ const handleLogout = async () => {
       <ul class="list-group-flush ms-auto" v-if="!useSession.isLoggedIn()">
         <div class="d-md-flex gap-md-3 align-items-center pt-2">
           <li v-for="item in navLinks" :key="item.path" class="list-group-item">
-            <router-link class="nav-link py-2 text-responsive" :to="item.path">{{ item.label }}</router-link>
+            <router-link class="nav-link py-2 text-responsive" :to="item.path" @click="handleNavClick">
+              {{ item.label }}
+            </router-link>
           </li>
           <li class="list-group-item ms-md-5 mt-3 mt-md-0">
-            <router-link class="nav-link text-responsive" to="/login">
+            <router-link class="nav-link text-responsive" to="/login" @click="handleNavClick">
               Login
             </router-link>
           </li>
@@ -98,7 +117,7 @@ const handleLogout = async () => {
         <div class="d-md-flex align-items-center pt-2 d-none">
           <li class="list-group-item px-2" v-for="navItem in filteredRoles">
             <router-link :to="{ name: `${navItem.name}`, params: { role: useSession.role } }"
-              class="text-light text-decoration-none">
+              class="text-light text-decoration-none" @click="handleNavClick">
               {{ navItem.label }}
             </router-link>
           </li>
@@ -202,10 +221,10 @@ const handleLogout = async () => {
                   <span class="text-md text-nowrap px-3">{{ useSession.name }}</span>
                 </li>
                 <li>
-                  <router-link :to="{ name: 'UserProfile', params: { role: useSession.role, id: useSession.id } }"
-                    class="dropdown-item"><i class="bi bi-person"></i> Profile
-                  </router-link>
-                </li>
+            <router-link :to="{ name: 'UserProfile', params: { role: useSession.role, id: useSession.id } }"
+              class="dropdown-item" @click="handleNavClick"><i class="bi bi-person"></i> Profile
+            </router-link>
+          </li>
                 <li><a class="dropdown-item disabled" href="#"><i class="bi bi-gear"></i> Settings</a></li>
                 <li>
                   <hr class="dropdown-divider" />
@@ -224,7 +243,7 @@ const handleLogout = async () => {
         <ul class="list-group-flush">
           <li class="list-group-item py-2" v-for="navItem in filteredRoles">
             <router-link :to="{ name: `${navItem.name}`, params: { role: useSession.role } }"
-              class="text-dark text-decoration-none">
+              class="text-dark text-decoration-none" @click="handleNavClick">
               {{ navItem.label }}
             </router-link>
           </li>
@@ -238,7 +257,7 @@ const handleLogout = async () => {
               <ul class="list-group-flush ps-4">
                 <li class="list-group-item bg-transparent border-0 mb-1">
                   <router-link :to="{ name: 'UserProfile', params: { role: useSession.role, id: useSession.id } }"
-                    class="dropdown-item"><i class="bi bi-person"></i> Profile
+                    class="dropdown-item" @click="handleNavClick"><i class="bi bi-person"></i> Profile
                   </router-link>
                 </li>
                 <li class="list-group-item bg-transparent border-0 mb-1">

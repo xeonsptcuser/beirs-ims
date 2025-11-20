@@ -1,4 +1,5 @@
 import CreateBlotterReport from '@/views/Private/BlotterReports/CreateBlotterReport.vue'
+import ViewBlotterReportInfo from '@/views/Private/BlotterReports/ViewBlotterReportInfo.vue'
 import ViewBlotterReports from '@/views/Private/BlotterReports/ViewBlotterReports.vue'
 import Certifications from '@/views/Private/Certifications/Certifications.vue'
 import CreateCertification from '@/views/Private/Certifications/CreateCertification.vue'
@@ -8,6 +9,7 @@ import HeatMaps from '@/views/Private/HeatMaps/HeatMaps.vue'
 import CreateUserProfile from '@/views/Private/Residents/CreateUserProfile.vue'
 import Residents from '@/views/Private/Residents/Residents.vue'
 import UserProfile from '@/views/Private/Residents/UserProfile.vue'
+import ManageAddresses from '@/views/Private/Settings/ManageAddresses.vue'
 
 import type { RouteRecordRaw } from 'vue-router'
 
@@ -107,6 +109,16 @@ export const privateRoutes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'blotter-reports/report/:id',
+        name: 'ViewBlotterReport',
+        component: ViewBlotterReportInfo,
+        props: (route) => ({ role: route.params.role as string, id: route.params.id as string }),
+        meta: {
+          title: 'File Blotter Report',
+          requiresAuth: true,
+        },
+      },
+      {
         path: 'heat-maps',
         name: 'HeatMaps',
         component: HeatMaps,
@@ -114,6 +126,17 @@ export const privateRoutes: RouteRecordRaw[] = [
         meta: {
           title: 'View Heat Map',
           requiresAuth: true,
+        },
+      },
+      {
+        path: 'settings/addresses',
+        name: 'ManageAddresses',
+        component: ManageAddresses,
+        props: (route) => ({ role: route.params.role as string }),
+        meta: {
+          title: 'Manage Barangay Addresses',
+          requiresAuth: true,
+          roles: ['admin'],
         },
       },
     ],

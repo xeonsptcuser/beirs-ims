@@ -54,7 +54,7 @@ export const fetchAllBlotterReports = async (params?: PageInfo) => {
 
 export const fetchAllBlotterReportsById = async (params?: PageInfo) => {
   const response = await blotterReportRelatedServices.getAllBlotterReports(
-    endpoints.GET_ALL_CERTIFICATE_BY_ID,
+    endpoints.GET_ALL_BLOTTER_REPORTS_BY_ID,
     params
   )
 

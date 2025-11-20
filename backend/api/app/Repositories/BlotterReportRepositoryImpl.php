@@ -166,7 +166,7 @@ class BlotterReportRepositoryImpl implements BlotterReportRepositoryInterface
             $blotterReport->handled_by = $blotterReportData['handled_by'];
             $blotterReport->save();
 
-            return $blotterReport->load(['profile', 'handler']);
+            return $blotterReport->load(['profile', 'handler', 'evidence']);
         });
     }
 }

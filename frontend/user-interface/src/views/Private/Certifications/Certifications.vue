@@ -5,7 +5,6 @@ import Pagination from '@/components/common/Pagination/Pagination.vue';
 import type { ApiErrorResponse, CertificateRequestsResponse, CommonResponse, PaginationLink, StatusOptions } from '@/Types';
 import { fetchAllCertificates, fetchAllCertificatesById } from '@/Utils/certificateServices';
 import { formatDateToHuman, formatName } from '@/Utils/helpers/formatters';
-import { evaluateStatus } from '@/Utils/helpers/common-helpers';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 import { computed, onMounted, reactive, ref } from 'vue';
@@ -35,6 +34,56 @@ const historyStatuses = computed<StatusOptions[]>(() => isStaffView.value
   ? []
   : ['rejected', 'cancelled', 'done']
 );
+
+const summaryStats = computed(() => {
+  const items = certificationRequestItems.value;
+  const total = pagination.total ?? items.length;
+  const pending = items.filter((item) => item.status === 'pending').length;
+  const approved = items.filter((item) => item.status === 'approved').length;
+  const released = items.filter((item) => item.status === 'released').length;
+
+  return [
+    { label: 'Total Requests', value: total, accent: 'text-primary' },
+    { label: 'Pending', value: pending, accent: 'text-warning' },
+    { label: isStaffView.value ? 'Approved' : 'Approved', value: approved, accent: 'text-success' },
+    { label: 'Released', value: released, accent: 'text-info' },
+  ];
+});
+
+const activeStatusFilters = computed(() => (isHistoryScreen.value ? historyStatuses.value : transactionStatuses.value));
+
+const statusBadgeClass = (status: StatusOptions) => {
+  const mapping: Record<StatusOptions, string> = {
+    pending: 'bg-warning text-dark',
+    approved: 'bg-primary',
+    released: 'bg-success',
+    rejected: 'bg-danger',
+    cancelled: 'bg-secondary',
+    done: 'bg-success',
+  };
+  return mapping[status] ?? 'bg-secondary';
+};
+
+const formatStatusLabel = (status: StatusOptions) => status.replace(/_/g, ' ').toUpperCase();
+
+const truncatedPurpose = (text?: string) => {
+  if (!text) return 'No purpose indicated.';
+  if (text.length <= 120) return text;
+  return `${text.slice(0, 120)}...`;
+};
+
+const formatCaseId = (id: number) => `CERT-${id.toString().padStart(4, '0')}`;
+
+const createCertificateRoute = computed(() => {
+  if (!useSession.isRoleResident() || !useSession.isLoggedIn()) {
+    return null;
+  }
+
+  return {
+    name: 'CreateCertification',
+    params: { role: useSession.role, id: useSession.id },
+  };
+});
 
 const title = computed(() => {
   return 'CERTIFICATE REQUEST LIST'
@@ -109,6 +158,12 @@ const handleSearchCertificates = () => {
   searchByNameKeyWord.value = ''
 }
 
+const resetSearch = () => {
+  searchByNameKeyWord.value = ''
+  pagination.current = 1
+  fetchCertificateRequests()
+}
+
 const toggleFetchHistoryTransactions = () => {
   if (isStaffView.value) {
     return
@@ -139,132 +194,101 @@ onMounted(() => {
 
 </script>
 <template>
-  <div class="my-5 ">
-    <WarningLabel :has-error="hasError" :errors="[{ error: errorMessage }]" />
-    <div class="p-4 rounded border border-gray-500 bg-white">
-      <div class="text-end me-2 mb-3 ">
-        <a href="#" class="text-decoration-none text-secondary" v-if="!isStaffView"
+  <div class="my-5">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center mb-4 gap-3">
+      <div>
+        <p class="text-muted text-uppercase mb-1 small">Requests</p>
+        <h2 class="fw-bold mb-0">Certificate Center</h2>
+        <p class="text-secondary small mb-0">Track certificate requests, review statuses, and manage releases.</p>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <button class="btn btn-link text-decoration-none" type="button" v-if="!isStaffView"
           @click.prevent="toggleFetchHistoryTransactions">
           <i class="bi bi-journal-text me-2"></i>{{ toggleHistoryBtn }}
-        </a>
+        </button>
+        <router-link v-if="createCertificateRoute" :to="createCertificateRoute" class="btn btn-primary">
+          <i class="bi bi-file-earmark-plus me-2"></i> Request Certificate
+        </router-link>
       </div>
-      <div class="row mb-0 mb-md-4">
-        <h3 class="text-center tracking-wider mb-3 mb-md-0" :class="{ 'col-10 col-md-9': useSession.isRoleResident() }">
-          {{ title }}
-        </h3>
-        <div class="col-2 col-md-3" v-if="useSession.isRoleResident()">
-          <router-link v-if="useSession.isLoggedIn()" :to="{
-            name: 'CreateCertification',
-            params: { role, id: useSession.id }
-          }" class="btn btn-outline-success py-2">
-            <i class="bi bi-file-earmark me-1"></i> <span class="d-none d-md-inline-block">Request Certificate</span>
-          </router-link>
+    </div>
+
+    <WarningLabel :has-error="hasError" :errors="hasError ? [{ error: errorMessage }] : []" />
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-3" v-for="stat in summaryStats" :key="stat.label">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <p class="text-muted small mb-1">{{ stat.label }}</p>
+            <h4 class="fw-bold mb-0" :class="stat.accent">{{ stat.value }}</h4>
+          </div>
         </div>
       </div>
+    </div>
 
-      <div class="d-md-flex justify-content-between my-3 g-2 align-items-center ">
-        <form @submit.prevent="handleSearchCertificates" class="col-md-3 col-12 mb-3 mb-md-0">
-          <FormSearchInput v-model="searchByNameKeyWord" />
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-body">
+        <form class="row gy-3 align-items-center" @submit.prevent="handleSearchCertificates">
+          <div class="col-md-6 col-lg-4">
+            <FormSearchInput v-model="searchByNameKeyWord" />
+          </div>
+          <div class="col-md-6 col-lg-4 d-flex gap-2">
+            <button class="btn btn-primary w-100" type="submit">Search</button>
+            <button class="btn btn-outline-secondary w-100" type="button" @click="resetSearch">Reset</button>
+          </div>
+          <div class="col-lg-4 text-lg-end text-md-start">
+            <p class="text-muted small mb-1">Filter by Status</p>
+            <div class="d-flex flex-wrap gap-2">
+              <FormCheckboxInput v-for="status in activeStatusFilters" :key="status"
+                :id="`filter-${status}`" :label="status.toUpperCase()" :model-value="selectedStatusFilter === status"
+                :disabled="!!selectedStatusFilter && selectedStatusFilter !== status"
+                @change="(checked) => filterCertificateRequests(status, checked)" />
+            </div>
+          </div>
         </form>
-        <div class="col-md-7 col-12 row align-items-center gx-2">
-          <!-- MOBILE SCREEN -->
-          <p class="font-bold col-md-3 my-auto d-md-none d-block">Filter:</p>
-          <FormCheckboxInput id="filter-pending-sm" label="Pending" class="col-12 col-md-3 d-md-none form-check-reverse"
-            v-if="!isHistoryScreen" :model-value="selectedStatusFilter === 'pending'"
-            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'pending'"
-            @change="(checked) => filterCertificateRequests('pending', checked)" />
-          <FormCheckboxInput id="filter-approved-sm" label="Approved"
-            class="col-12 col-md-3 d-md-none form-check-reverse" v-if="!isHistoryScreen"
-            :model-value="selectedStatusFilter === 'approved'"
-            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'approved'"
-            @change="(checked) => filterCertificateRequests('approved', checked)" />
-          <FormCheckboxInput id="filter-released-sm" label="Released"
-            class="col-12 col-md-3 d-md-none form-check-reverse" v-if="!isHistoryScreen && !isStaffView"
-            :model-value="selectedStatusFilter === 'released'"
-            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'released'"
-            @change="(checked) => filterCertificateRequests('released', checked)" />
-          <FormCheckboxInput id="filter-rejected-sm" label="Rejected"
-            class="col-12 col-md-3 d-md-none form-check-reverse" v-if="!isStaffView && isHistoryScreen"
-            :model-value="selectedStatusFilter === 'rejected'"
-            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'rejected'"
-            @change="(checked) => filterCertificateRequests('rejected', checked)" />
-          <FormCheckboxInput id="filter-cancelled-sm" label="Cancelled"
-            class="col-12 col-md-3 d-md-none form-check-reverse" v-if="!isStaffView && isHistoryScreen"
-            :model-value="selectedStatusFilter === 'cancelled'"
-            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'cancelled'"
-            @change="(checked) => filterCertificateRequests('cancelled', checked)" />
-          <FormCheckboxInput id="filter-done-sm" label="Done" class="col-12 col-md-3 d-md-none form-check-reverse ps-3"
-            v-if="!isStaffView && isHistoryScreen" :model-value="selectedStatusFilter === 'done'"
-            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'done'"
-            @change="(checked) => filterCertificateRequests('done', checked)" />
+      </div>
+    </div>
 
-          <!-- DESKTOP SCREEN -->
-          <p class="font-bold col-md-3 my-auto d-md-block d-none">Filter:</p>
-          <FormCheckboxInput id="filter-pending-md" label="Pending" class="col-md-3 d-none d-md-block"
-            v-if="!isHistoryScreen" :model-value="selectedStatusFilter === 'pending'"
-            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'pending'"
-            @change="(checked) => filterCertificateRequests('pending', checked)" />
-          <FormCheckboxInput id="filter-approved-md" label="Approved" class="col-md-3 d-none d-md-block"
-            v-if="!isHistoryScreen" :model-value="selectedStatusFilter === 'approved'"
-            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'approved'"
-            @change="(checked) => filterCertificateRequests('approved', checked)" />
-          <FormCheckboxInput id="filter-released-md" label="Released" class="col-md-3 d-none d-md-block"
-            v-if="!isHistoryScreen && !isStaffView" :model-value="selectedStatusFilter === 'released'"
-            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'released'"
-            @change="(checked) => filterCertificateRequests('released', checked)" />
-          <FormCheckboxInput id="filter-rejected-md" label="Rejected" class="col-md-3 d-none d-md-block"
-            v-if="!isStaffView && isHistoryScreen" :model-value="selectedStatusFilter === 'rejected'"
-            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'rejected'"
-            @change="(checked) => filterCertificateRequests('rejected', checked)" />
-          <FormCheckboxInput id="filter-cancelled-md" label="Cancelled" class="col-md-3 d-none d-md-block"
-            v-if="!isStaffView && isHistoryScreen" :model-value="selectedStatusFilter === 'cancelled'"
-            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'cancelled'"
-            @change="(checked) => filterCertificateRequests('cancelled', checked)" />
-          <FormCheckboxInput id="filter-done-md" label="Done" class="col-md-3 d-none d-md-block"
-            v-if="!isStaffView && isHistoryScreen" :model-value="selectedStatusFilter === 'done'"
-            :disabled="!!selectedStatusFilter && selectedStatusFilter !== 'done'"
-            @change="(checked) => filterCertificateRequests('done', checked)" />
+    <div v-if="!certificationRequestItems.length && !navigation.isNavigating" class="text-center py-5 bg-light rounded">
+      <i class="bi bi-file-earmark-text display-4 text-muted"></i>
+      <p class="mt-3 mb-1 fw-semibold">No certificate requests found.</p>
+      <p class="text-secondary mb-0">Adjust your filters or file a new request.</p>
+    </div>
+
+    <div class="row row-cols-1 row-cols-xl-2 g-4" v-else>
+      <div class="col" v-for="request in certificationRequestItems" :key="request.id">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-start">
+              <span class="badge rounded-pill px-3 py-2 text-uppercase" :class="statusBadgeClass(request.status)">
+                {{ formatStatusLabel(request.status) }}
+              </span>
+              <small class="text-muted">{{ formatDateToHuman(request.created_at) || '—' }}</small>
+            </div>
+            <p class="text-muted text-uppercase small mt-2 mb-1">{{ formatCaseId(request.id) }}</p>
+            <h5 class="card-title text-dark">{{ request.cert_request_type }}</h5>
+            <p class="text-secondary small mb-2" v-if="!useSession.isRoleResident()">
+              {{ formatName(request.profile.first_name, request.profile.middle_name, request.profile.last_name) }}
+            </p>
+            <p class="text-muted flex-grow-1">{{ truncatedPurpose(request.cert_request_reason) }}</p>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <div class="text-secondary small">
+                <span>Requested: {{ formatDateToHuman(request.created_at) || '—' }}</span>
+                <span class="mx-2 d-none d-md-inline">•</span>
+                <span v-if="!useSession.isRoleResident()">Residency: {{ request.is_current ? 'Present' : formatDateToHuman(request.start_residency_date || '') || '—' }}</span>
+              </div>
+              <router-link class="btn btn-sm btn-outline-primary"
+                :to="{ name: 'ViewCertificateRequest', params: { role, id: request.id } }">
+                View Details
+              </router-link>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
 
-      <table class="table" v-show="!navigation.isNavigating">
-        <thead class="table-secondary">
-          <tr>
-            <th scope="col" class="py-3 border-end border-white" v-show="!useSession.isRoleResident()">Name</th>
-            <th scope="col" class="py-3 border-end border-white">Type</th>
-            <th scope="col" class="d-none d-md-table-cell py-3 border-end border-white">Date Submitted</th>
-            <th scope="col" class="py-3 border-end border-white d-none d-md-table-cell">Status</th>
-            <th scope="col" colspan="2" class="text-center py-3 border-end border-white">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(certificate, i) in certificationRequestItems" :key="i">
-            <td class="align-middle " v-show="!useSession.isRoleResident()">
-              <p class="mb-0 py-1 text-md ps-2 text-capitalize">{{ formatName(certificate.profile.first_name,
-                certificate.profile.middle_name, certificate.profile.last_name) ?? '-' }}</p>
-            </td>
-            <td class="align-middle">
-              <p class="mb-0 py-1 text-md ps-2 text-capitalize">{{ certificate.cert_request_type ?? '-' }}</p>
-            </td>
-            <td class="align-middle d-none d-md-table-cell">
-              <p class="mb-0 py-1 text-md ps-2 ">{{ formatDateToHuman(certificate.created_at) ?? '-' }}</p>
-            </td>
-            <td class="align-middle d-none d-md-table-cell">
-              <p class="mb-0 py-1 text-md ps-2 text-capitalize badge"
-                :class="evaluateStatus(certificate.status ?? '-')">{{ certificate.status ?? '-' }}</p>
-            </td>
-            <td class="align-middle text-center">
-              <router-link :to="{ name: 'ViewCertificateRequest', params: { role, id: certificate.id } }"
-                class="btn btn-primary">
-                View
-              </router-link>
-            </td>
-          </tr>
-        </tbody>
-
-      </table>
-      <Pagination v-if="!navigation.isNavigating" class="d-flex justify-content-center" :links="pagination.links"
-        :disabled="navigation.isNavigating" :current-page="pagination.current" @change="fetchCertificateRequests" />
+    <div class="d-flex justify-content-center mt-4" v-if="pagination.links.length > 1">
+      <Pagination :links="pagination.links" :disabled="navigation.isNavigating" :current-page="pagination.current"
+        @change="fetchCertificateRequests" />
     </div>
   </div>
 </template>

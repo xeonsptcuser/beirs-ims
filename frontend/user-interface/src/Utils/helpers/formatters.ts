@@ -30,8 +30,8 @@ export const dateToday = () => {
 }
 
 export const maxDate = () => {
+  // Allow selecting today by not subtracting a day
   const today = new Date()
-  today.setDate(today.getDate() - 1)
   return today.toISOString().split('T')[0]
 }
 
