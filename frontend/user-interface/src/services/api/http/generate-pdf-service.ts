@@ -1,4 +1,3 @@
-// e.g., src/Utils/pdfServices.ts
 import api from '@/services/api/axios'
 
 export const openCertificatePdf = async (certificateId: string) => {

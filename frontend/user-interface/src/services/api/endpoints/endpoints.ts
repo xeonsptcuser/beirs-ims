@@ -54,4 +54,8 @@ export const endpoints = {
   CREATE_ADDRESS: `${AUTH_ADDRESSES_ROUTE}`,
   UPDATE_ADDRESS: (id: number | string) => `${AUTH_ADDRESSES_ROUTE}/${id}`,
   DELETE_ADDRESS: (id: number | string) => `${AUTH_ADDRESSES_ROUTE}/${id}`,
+
+  // PDF GENERATE PREVIEW
+  OPEN_CERTIFICATE_PDF: (id: string | number) => `${COMMON_BASE}/generate-certificate/${id}`,
+  OPEN_BLOTTER_REPORT_PDF: (id: string | number) => `${COMMON_BASE}/generate-incident-report/${id}`,
 }

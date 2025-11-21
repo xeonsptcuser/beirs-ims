@@ -9,7 +9,7 @@ import SuccessLabel from '@/components/common/SuccessLabel/SuccessLabel.vue';
 import type { AxiosError } from 'axios';
 import type { ApiErrorResponse, CertificateRequestsResponse, CommonResponse, StatusOptions, UpdateCertificateRequestPayload } from '@/Types';
 import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
-import { openCertificatePdf } from '@/services/api/http/generate-pdf-service';
+import { fetchOpenCertificatePreview } from '@/Utils/pdfServices';
 
 const props = defineProps<{
   role: string,
@@ -331,7 +331,7 @@ onMounted(() => {
               <button v-if="showCancelButton" class="btn btn-outline-secondary w-100"
                 @click="() => handleApproveRejectReleaseCertRequest('cancelled')">Cancel Request</button>
               <button v-if="showPreviewButton" class="btn btn-outline-danger btn-sm" type="button"
-                @click="openCertificatePdf(certificateInfo?.id.toString() ?? '')">
+                @click="fetchOpenCertificatePreview(certificateInfo?.id.toString() ?? '')">
                 Preview PDF
               </button>
             </div>

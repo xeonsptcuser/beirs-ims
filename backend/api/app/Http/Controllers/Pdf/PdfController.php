@@ -26,13 +26,10 @@ class PdfController extends Controller
             'is_current' => $certificate->is_current,
         ];
 
-        // TODO: Point this to your actual certificate Blade/PDF template view
-        $templateView = 'pdf.certificates.certificate-template';
-
-        $pdf = Pdf::loadView($templateView, $data)
-            ->setPaper('A4', 'portrait');
-
-        return $pdf->stream("certificate-preview-{$id}.pdf");
+        return response()->json([
+            'status' => 'success',
+            'data' => $data
+        ]);
     }
 
     public function blotterPreview($id)
@@ -61,13 +58,10 @@ class PdfController extends Controller
             ),
         ];
 
-        // TODO: Point this to your actual blotter report Blade/PDF template view
-        $templateView = 'pdf.blotter.blotter-template';
-
-        $pdf = Pdf::loadView($templateView, $data)
-            ->setPaper('A4', 'portrait');
-
-        return $pdf->stream("blotter-preview-{$id}.pdf");
+        return response()->json([
+            'status' => 'success',
+            'data' => $data
+        ]);
     }
 
     private function formatName(?string $first, ?string $middle, ?string $last): string
