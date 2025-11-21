@@ -85,10 +85,6 @@ const createCertificateRoute = computed(() => {
   };
 });
 
-const title = computed(() => {
-  return 'CERTIFICATE REQUEST LIST'
-});
-
 const pagination = reactive({
   current: 1,
   last: 1,

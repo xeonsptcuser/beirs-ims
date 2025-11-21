@@ -21,7 +21,6 @@ const {
   validateForm,
   setServerErrors,
   setSuccessResponse,
-  clearSuccessResponse
 } = useRegisterAccount();
 const {
   addressOptions: barangayAddressOptions,

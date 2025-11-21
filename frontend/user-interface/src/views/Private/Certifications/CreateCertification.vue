@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import DropdownInput from '@/components/common/DropdownInput/DropdownInput.vue';
 import FormContainer from '@/components/common/FormContainer/FormContainer.vue';
 import { useCreateCertificate } from '@/views/Private/Certifications/composables/useCreateCertificate';
 import FormButton from '@/components/common/FormButton/FormButton.vue';
@@ -113,12 +112,6 @@ const fetchUserProfile = async () => {
   }
 }
 
-const orderedcertificateOptions = computed(() => {
-  return [...certificateOptions.value].sort((a, b) => {
-    return a.localeCompare(b)
-  })
-})
-
 watch(() => form.isCurrent, (isCurrent) => {
   if (isCurrent) {
     // set the endResidencyDate field if Present checkbox is checked
@@ -159,17 +152,11 @@ watchEffect(() => {
         <div class="col-12">
           <p class="text-muted mb-2 small">Certificate Request Type</p>
           <div class="d-flex flex-wrap gap-2">
-            <button
-              v-for="option in orderedOptions(certificateOptions)"
-              :key="option"
-              type="button"
-              class="btn option-pill"
-              :class="{
+            <button v-for="option in orderedOptions(certificateOptions)" :key="option" type="button"
+              class="btn option-pill" :class="{
                 'btn-primary text-white border-0': form.certificateRequestType === option,
                 'btn-outline-secondary': form.certificateRequestType !== option
-              }"
-              @click="form.certificateRequestType = option"
-            >
+              }" @click="form.certificateRequestType = option">
               {{ option.charAt(0).toUpperCase() + option.slice(1) }}
             </button>
           </div>

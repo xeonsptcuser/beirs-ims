@@ -196,7 +196,7 @@ const isToggling = (id: number) => togglingAddresses.value.has(id);
   border-color: rgba(0, 0, 0, 0.05);
 }
 
-.address-list .list-group-item + .list-group-item {
+.address-list .list-group-item+.list-group-item {
   border-top-width: 1px;
 }
 </style>

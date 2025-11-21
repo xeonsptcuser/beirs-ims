@@ -97,7 +97,7 @@ const getTooltip = (location: string, caseType: string): string => {
           </div>
         </div>
       </div>
-      <div v-for="location in addressOptions" class="d-flex align-items-center mb-1 heatmap-row">
+      <div v-for="location in addressOptions" class="d-flex align-items-center mb-1 heatmap-row" :key="location">
         <div class="me-3 heatmap-location-label text-capitalize"> {{ location }}</div>
         <div class="d-flex heatmap-cols">
           <div v-for="caseType in incidentTypeOptions" :key="caseType" class="mx-1 rounded text-center mb-2"
