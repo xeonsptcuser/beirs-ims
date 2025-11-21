@@ -2,7 +2,7 @@ import type { AxiosInstance } from 'axios'
 import api from './axios'
 
 interface IApiService {
-  get<T>(url: string): Promise<T>
+  get<T>(url: string, params?: Record<string, any>, config?: Record<string, any>): Promise<T>
   post<T>(url: string, data?: any): Promise<T>
   put<T>(url: string, data?: any): Promise<T>
   patch<T>(url: string, data?: any): Promise<T>
@@ -23,8 +23,8 @@ export class ApiService implements IApiService {
     return ApiService.instance
   }
 
-  async get<T>(url: string, params?: Record<string, any>): Promise<T> {
-    const response = await this.axiosInstance.get<T>(url, { params })
+  async get<T>(url: string, params?: Record<string, any>, config?: Record<string, any>): Promise<T> {
+    const response = await this.axiosInstance.get<T>(url, { params, ...(config ?? {}) })
     return response.data
   }
 

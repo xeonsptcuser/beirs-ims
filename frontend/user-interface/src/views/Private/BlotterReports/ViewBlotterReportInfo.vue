@@ -14,7 +14,7 @@ import type {
 } from '@/Types';
 import type { AxiosError } from 'axios';
 import { computed, onMounted, ref, watch } from 'vue';
-import { openBlotterPdf } from '@/services/api/http/generate-pdf-service';
+import { fetchOpenBlotterReportPreview } from '@/Utils/pdfServices';
 
 const props = defineProps<{
   role: string,
@@ -219,7 +219,7 @@ const formattedWitnesses = computed(() => {
 });
 
 const showBlotterPreviewButton = computed(() => {
-  return blotterReport.value?.status === 'approved' && isOwner && session.isRoleResident();
+  return blotterReport.value?.status === 'approved' && isOwner.value && session.isRoleResident();
 })
 
 onMounted(fetchReport);
@@ -398,16 +398,16 @@ watch(() => props.id, (newVal, oldVal) => {
           </div>
         </div>
 
-        <div class="card shadow-sm border-0" v-if="statusActions.length">
+        <div class="card shadow-sm border-0" v-if="statusActions.length || showBlotterPreviewButton">
           <div class="card-body">
             <h5 class="card-title fw-semibold mb-3">Update Report Status</h5>
             <div class="d-flex flex-wrap gap-2">
-              <button v-if="showBlotterPreviewButton" class="btn btn-outline-primary" type="button"
-                @click="openBlotterPdf(blotterReport?.id.toString() ?? '')">
+              <button v-if="showBlotterPreviewButton" class="btn btn-outline-danger w-100" type="button"
+                @click="fetchOpenBlotterReportPreview(blotterReport?.id.toString() ?? '')">
                 Preview PDF
               </button>
-              <button v-for="status in statusActions" :key="status" type="button" :class="actionButtonClass(status)"
-                @click="() => handleStatusChange(status)">
+              <button v-else v-for="status in statusActions" :key="status" type="button"
+                :class="actionButtonClass(status)" @click="() => handleStatusChange(status)">
                 {{ statusLabels[status] || status }}
               </button>
 
@@ -417,7 +417,7 @@ watch(() => props.id, (newVal, oldVal) => {
       </div>
     </div>
 
-    <div v-if="previewEvidence" class="modal fade show d-block" tabindex="-1" role="dialog">
+    <dialog v-if="previewEvidence" class="modal fade show d-block" tabindex="-1">
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -439,7 +439,7 @@ watch(() => props.id, (newVal, oldVal) => {
           </div>
         </div>
       </div>
-    </div>
+    </dialog>
   </div>
 </template>
 

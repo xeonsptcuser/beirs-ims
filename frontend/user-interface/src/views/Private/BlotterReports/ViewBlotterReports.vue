@@ -226,7 +226,8 @@ onMounted(() => {
         <div class="row gx-4 gy-2">
           <div class="col-md-6 col-lg-3" v-for="status in (isHistoryScreen ? historyStatuses : transactionStatuses)"
             :key="status">
-            <FormCheckboxInput :id="`status-${status}`" :label="status.toUpperCase()" :model-value="selectedStatusFilter === status"
+            <FormCheckboxInput :id="`status-${status}`" :label="status.toUpperCase()"
+              :model-value="selectedStatusFilter === status"
               @change="(checked: boolean) => handleStatusFilter(status, checked)" />
           </div>
         </div>
@@ -255,7 +256,7 @@ onMounted(() => {
             <p class="text-muted text-uppercase fw-semibold small mt-2 mb-1">{{ report.incident_type }}</p>
             <h5 class="card-title text-dark">{{ report.incident_title || 'Untitled Incident' }}</h5>
             <p class="mb-2 text-secondary"><i class="bi bi-geo-alt me-2 text-primary"></i>{{ report.location }}</p>
-            <p class="card-text text-muted flex-grow-1">
+            <p class="card-text text-muted grow">
               {{ truncatedDescription(report.description) }}
             </p>
             <div class="d-flex justify-content-between align-items-center mt-3">
