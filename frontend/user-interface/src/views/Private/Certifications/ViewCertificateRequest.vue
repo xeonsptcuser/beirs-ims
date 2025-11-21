@@ -74,6 +74,8 @@ const handleApproveRejectReleaseCertRequest = async (status: StatusOptions) => {
 
     certificateInfo.value = response.data;
 
+    globalThis.location.reload()
+
     if (status === 'approved') {
       hasApproval.value = true;
       successMessage.value = 'Certificate request has been approved!'
@@ -96,7 +98,6 @@ const handleApproveRejectReleaseCertRequest = async (status: StatusOptions) => {
       hasDone.value = true;
       successMessage.value = 'Certificate request has been released!'
     }
-
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
     const fallbackResponse = error as CommonResponse;
@@ -250,7 +251,7 @@ onMounted(() => {
                 <p class="fw-semibold mb-0">{{ applicantName }}</p>
                 <small class="text-secondary">{{ computeAge(certificateInfo?.profile.date_of_birth ?? '') }} yrs</small>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-6 text-capitalize">
                 <p class="text-muted small mb-1">Address</p>
                 <p class="fw-semibold mb-0">{{ certificateInfo?.profile.street_address || '—' }}</p>
                 <small class="text-secondary">{{ certificateInfo?.profile.mobile_number || 'No contact info' }}</small>
@@ -261,7 +262,7 @@ onMounted(() => {
                 <p class="text-muted small mb-1">Residency</p>
                 <p class="fw-semibold mb-0">{{ residencyRange }}</p>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-6" v-if="certificateInfo?.handler">
                 <p class="text-muted small mb-1">Assigned Handler</p>
                 <p class="fw-semibold mb-0">{{ handlerName }}</p>
                 <small class="text-secondary text-capitalize">{{ handlerRole }}</small>
@@ -280,7 +281,7 @@ onMounted(() => {
               <p class="text-muted small mb-1">Date Submitted</p>
               <p class="fw-semibold mb-0">{{ formatDateToHuman(certificateInfo?.created_at ?? '') || '—' }}</p>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6" v-if="certificateInfo?.handler">
               <p class="text-muted small mb-1">Last Updated</p>
               <p class="fw-semibold mb-0">{{ formatDateToHuman(certificateInfo?.updated_at ?? '') || '—' }}</p>
             </div>

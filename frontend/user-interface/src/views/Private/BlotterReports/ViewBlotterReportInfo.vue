@@ -239,7 +239,7 @@ watch(() => props.id, (newVal, oldVal) => {
           {{ blotterReport?.status }}
         </span>
         <p class="text-secondary small mt-2 mb-0">Filed on {{ formatDateToHuman(blotterReport?.created_at ?? '') || '—'
-          }}</p>
+        }}</p>
       </div>
     </div>
 
@@ -254,7 +254,7 @@ watch(() => props.id, (newVal, oldVal) => {
             <div class="row g-3">
               <div class="col-md-6">
                 <p class="text-muted mb-1 small">Case Type</p>
-                <p class="fw-semibold mb-0">{{ blotterReport?.incident_type || '—' }}</p>
+                <p class="fw-semibold mb-0 text-capitalize">{{ blotterReport?.incident_type || '—' }}</p>
               </div>
               <div class="col-md-3">
                 <p class="text-muted mb-1 small">Date</p>
@@ -268,7 +268,7 @@ watch(() => props.id, (newVal, oldVal) => {
             <div class="row g-3 mt-2">
               <div class="col-md-6">
                 <p class="text-muted mb-1 small">Location</p>
-                <p class="fw-semibold mb-0">{{ blotterReport?.location || '—' }}</p>
+                <p class="fw-semibold mb-0 text-capitalize">{{ blotterReport?.location || '—' }}</p>
               </div>
               <div class="col-md-6">
                 <p class="text-muted mb-1 small">Landmark</p>
@@ -290,8 +290,8 @@ watch(() => props.id, (newVal, oldVal) => {
             <div class="row g-3">
               <div class="col-md-6">
                 <p class="text-muted text-uppercase small mb-2">Individuals</p>
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item px-0" v-for="(person, index) in formattedPeopleInvolved"
+                <ul class="list-group list-group-flush text-capitalize">
+                  <li class="list-group-item px-0 " v-for="(person, index) in formattedPeopleInvolved"
                     :key="`pi-${index}`">
                     <i class="bi bi-people me-2 text-primary"></i> {{ person }}
                   </li>
@@ -302,7 +302,7 @@ watch(() => props.id, (newVal, oldVal) => {
               </div>
               <div class="col-md-6">
                 <p class="text-muted text-uppercase small mb-2">Witnesses</p>
-                <ul class="list-group list-group-flush">
+                <ul class="list-group list-group-flush text-capitalize">
                   <li class="list-group-item px-0" v-for="(person, index) in formattedWitnesses" :key="`wit-${index}`">
                     <i class="bi bi-eye me-2 text-success"></i> {{ person }}
                   </li>
@@ -346,7 +346,7 @@ watch(() => props.id, (newVal, oldVal) => {
             <h5 class="card-title fw-semibold mb-3">Complainant Profile</h5>
             <div class="mb-3">
               <p class="text-muted small mb-1">Complainant</p>
-              <p class="fw-semibold mb-0">
+              <p class="fw-semibold mb-0 text-capitalize">
                 {{ blotterReport?.profile?.first_name }} {{ blotterReport?.profile?.middle_name }}
                 {{ blotterReport?.profile?.last_name }}
               </p>
@@ -357,14 +357,14 @@ watch(() => props.id, (newVal, oldVal) => {
             </div>
             <div class="mb-3">
               <p class="text-muted small mb-1">Address</p>
-              <p class="fw-semibold mb-0">
+              <p class="fw-semibold mb-0 text-capitalize">
                 {{ blotterReport?.profile?.street_address }}
                 {{ blotterReport?.profile?.address_line ? ', ' + blotterReport?.profile?.address_line : '' }}
               </p>
             </div>
             <div>
               <p class="text-muted small mb-1">Assigned Handler</p>
-              <p class="fw-semibold mb-0">
+              <p class="fw-semibold mb-0 text-capitalize">
                 {{ blotterReport?.handler?.first_name ? `${blotterReport?.handler?.first_name}
                 ${blotterReport?.handler?.last_name}` : 'Unassigned' }}
               </p>

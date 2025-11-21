@@ -275,8 +275,8 @@ const filteredErrors = computed(() => {
                     v-model="complainantContactInfo" :is-disabled="true" />
                 </div>
                 <div class="col-12">
-                  <FormFloatingInput type="text" label="Registered Address" id="complainant-address"
-                    v-model="address" :is-disabled="true" />
+                  <FormFloatingInput type="text" label="Registered Address" id="complainant-address" v-model="address"
+                    :is-disabled="true" />
                 </div>
               </div>
             </div>
@@ -301,9 +301,9 @@ const filteredErrors = computed(() => {
                     :has-error="errors.incidentTitle" />
                 </div>
                 <div class="col-md-6">
-                  <FormFloatingInput type="date" label="Date of Incident" id="incident-date"
-                    v-model="form.dateOfIncident" :max="maxDate()"
-                    :error-message="errorMessages.dateOfIncident.error" :has-error="errors.dateOfIncident" />
+                  <FormFloatingInput type="date" label="Date of Incident" id="incident-date" :is-capitalized="false"
+                    v-model="form.dateOfIncident" :max="maxDate()" :error-message="errorMessages.dateOfIncident.error"
+                    :has-error="errors.dateOfIncident" />
                 </div>
                 <div class="col-md-6">
                   <FormFloatingInput type="time" label="Time of Incident" id="incident-time"
@@ -351,8 +351,8 @@ const filteredErrors = computed(() => {
                           :error-message="errorMessages.incidentPeopleInvolved.error" />
                       </div>
                       <div class="col-auto" v-if="form.incidentPeopleInvolved.length > 1">
-                        <button type="button" class="btn btn-link text-danger p-2 remove-btn"
-                          aria-label="Remove person" @click.prevent="removePersonInvolvedField(index)">
+                        <button type="button" class="btn btn-link text-danger p-2 remove-btn" aria-label="Remove person"
+                          @click.prevent="removePersonInvolvedField(index)">
                           <i class="bi bi-x-lg"></i>
                         </button>
                       </div>
@@ -366,8 +366,7 @@ const filteredErrors = computed(() => {
                       class="row g-2 align-items-start mb-2">
                       <div class="col">
                         <FormFloatingInput type="text" label="Witness" :id="`witness-${index}`"
-                          v-model="form.incidentWitnesses[index]" :optional="true"
-                          :has-error="errors.incidentWitnesses"
+                          v-model="form.incidentWitnesses[index]" :optional="true" :has-error="errors.incidentWitnesses"
                           :error-message="errorMessages.incidentWitnesses.error" />
                       </div>
                       <div class="col-auto" v-if="form.incidentWitnesses.length > 1">
@@ -481,6 +480,7 @@ const filteredErrors = computed(() => {
 }
 
 @media (max-width: 767.98px) {
+
   .hero-card,
   .tip-card,
   .section-card {

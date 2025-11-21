@@ -3,13 +3,15 @@
 namespace App\Models\BlotterReport;
 
 use App\Models\Users\UserProfile;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Notifications\Notifiable;
 
 class BlotterReport extends Model
 {
-
+    use HasFactory, Notifiable;
     public const STATUS_PENDING = 'pending';
     public const STATUS_APPROVED = 'approved';
     public const STATUS_PROCESSING = 'processing';

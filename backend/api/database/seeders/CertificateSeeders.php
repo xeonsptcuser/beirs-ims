@@ -19,7 +19,18 @@ class CertificateSeeders extends Seeder
         UserProfile::query()->each(function (UserProfile $userProfile) {
             CertificateRequest::factory()
                 ->count(fake()->numberBetween(1, 4))
-                ->state(['user_profile_id' => $userProfile->id])
+                ->state(function () use ($userProfile) {
+                    $isPending = fake()->boolean(80); // ~80% pending
+                    return [
+                        'user_profile_id' => $userProfile->id,
+                        'status' => $isPending
+                            ? CertificateRequest::STATUS_PENDING
+                            : fake()->randomElement([
+                                CertificateRequest::STATUS_APPROVED,
+                                CertificateRequest::STATUS_RELEASED,
+                            ]),
+                    ];
+                })
                 ->create();
         });
     }

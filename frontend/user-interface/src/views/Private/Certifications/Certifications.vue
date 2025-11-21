@@ -52,8 +52,8 @@ const summaryStats = computed(() => {
 
 const activeStatusFilters = computed(() => (isHistoryScreen.value ? historyStatuses.value : transactionStatuses.value));
 
-const statusBadgeClass = (status: StatusOptions) => {
-  const mapping: Record<StatusOptions, string> = {
+const statusBadgeClass = (status: StatusOptions | string) => {
+  const mapping: Record<string, string> = {
     pending: 'bg-warning text-dark',
     approved: 'bg-primary',
     released: 'bg-success',
@@ -64,7 +64,7 @@ const statusBadgeClass = (status: StatusOptions) => {
   return mapping[status] ?? 'bg-secondary';
 };
 
-const formatStatusLabel = (status: StatusOptions) => status.replace(/_/g, ' ').toUpperCase();
+const formatStatusLabel = (status: StatusOptions | string) => String(status).replace(/_/g, ' ').toUpperCase();
 
 const truncatedPurpose = (text?: string) => {
   if (!text) return 'No purpose indicated.';
@@ -195,7 +195,8 @@ onMounted(() => {
 </script>
 <template>
   <div class="my-5">
-    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center mb-4 gap-3">
+    <div
+      class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center mb-4 gap-3">
       <div>
         <p class="text-muted text-uppercase mb-1 small">Requests</p>
         <h2 class="fw-bold mb-0">Certificate Center</h2>
@@ -238,8 +239,8 @@ onMounted(() => {
           <div class="col-lg-4 text-lg-end text-md-start">
             <p class="text-muted small mb-1">Filter by Status</p>
             <div class="d-flex flex-wrap gap-2">
-              <FormCheckboxInput v-for="status in activeStatusFilters" :key="status"
-                :id="`filter-${status}`" :label="status.toUpperCase()" :model-value="selectedStatusFilter === status"
+              <FormCheckboxInput v-for="status in activeStatusFilters" :key="status" :id="`filter-${status}`"
+                :label="status.toUpperCase()" :model-value="selectedStatusFilter === status"
                 :disabled="!!selectedStatusFilter && selectedStatusFilter !== status"
                 @change="(checked) => filterCertificateRequests(status, checked)" />
             </div>
@@ -265,8 +266,8 @@ onMounted(() => {
               <small class="text-muted">{{ formatDateToHuman(request.created_at) || '—' }}</small>
             </div>
             <p class="text-muted text-uppercase small mt-2 mb-1">{{ formatCaseId(request.id) }}</p>
-            <h5 class="card-title text-dark">{{ request.cert_request_type }}</h5>
-            <p class="text-secondary small mb-2" v-if="!useSession.isRoleResident()">
+            <h5 class="card-title text-dark text-capitalize">{{ request.cert_request_type }}</h5>
+            <p class="text-secondary small mb-2 text-capitalize" v-if="!useSession.isRoleResident()">
               {{ formatName(request.profile.first_name, request.profile.middle_name, request.profile.last_name) }}
             </p>
             <p class="text-muted flex-grow-1">{{ truncatedPurpose(request.cert_request_reason) }}</p>
@@ -274,7 +275,8 @@ onMounted(() => {
               <div class="text-secondary small">
                 <span>Requested: {{ formatDateToHuman(request.created_at) || '—' }}</span>
                 <span class="mx-2 d-none d-md-inline">•</span>
-                <span v-if="!useSession.isRoleResident()">Residency: {{ request.is_current ? 'Present' : formatDateToHuman(request.start_residency_date || '') || '—' }}</span>
+                <span v-if="!useSession.isRoleResident()">Residency: {{ request.is_current ? 'Present' :
+                  formatDateToHuman(request.start_residency_date || '') || '—' }}</span>
               </div>
               <router-link class="btn btn-sm btn-outline-primary"
                 :to="{ name: 'ViewCertificateRequest', params: { role, id: request.id } }">

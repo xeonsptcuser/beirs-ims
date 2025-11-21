@@ -171,6 +171,12 @@ const isProfileOwner = computed(() => {
   return responseData.value?.id === useSession.id
 })
 
+const toTitleCase = (value?: string | null) => {
+  if (!value) return ''
+  const lower = value.toLowerCase()
+  return lower.replace(/\b\w/g, (char) => char.toUpperCase())
+}
+
 const fullName = computed(() => {
   if (!responseData.value) return ''
   const profile = responseData.value.profile
@@ -188,7 +194,9 @@ const profileStatusLabel = computed(() => {
 const formattedAddress = computed(() => {
   const profile = responseData.value?.profile
   if (!profile) return 'No address on file'
-  const parts = [profile.street_address, profile.address_line].filter(Boolean)
+  const parts = [profile.street_address, profile.address_line]
+    .filter(Boolean)
+    .map((part) => toTitleCase(part as string))
   return parts.length ? parts.join(', ') : 'No address on file'
 })
 
