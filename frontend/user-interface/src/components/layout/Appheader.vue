@@ -242,8 +242,11 @@ watch(isLoggedIn, (loggedIn) => {
                     <ul v-else-if="notifications.length" class="list-group list-group-flush">
                       <li v-for="notification in notifications" :key="notification.id"
                         class="list-group-item d-flex justify-content-between align-items-start gap-3">
-                        <router-link to="#" class="me-2 w-100 text-decoration-none"
-                          @click="handleMarkAsRead(notification)">
+                        <router-link
+                          :to="notification.type?.includes('BlotterReportStatusUpdated') ?
+                            { name: 'ViewBlotterReport', params: { role: session.role, id: notification.data.certificate_id.toString() } } :
+                            { name: 'ViewCertificateRequest', params: { role: session.role, id: notification.data.certificate_id.toString() } }"
+                          class="me-2 w-100 text-decoration-none" @click="handleMarkAsRead(notification)">
                           <div class="d-flex align-items-center justify-content-between mb-1">
                             <span class="fw-semibold">
                               {{ formatCaseId(notification.data.certificate_id, notification.type) ?? 'Notification' }}
