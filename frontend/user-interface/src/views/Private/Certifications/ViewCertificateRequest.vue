@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import { fetchCertificateInfo, updateCertificateRequest } from '@/Utils/certificateServices';
 import { computeAge, formatDateToHuman, formatName } from '@/Utils/helpers/formatters';
@@ -17,6 +18,7 @@ const props = defineProps<{
 }>()
 
 const navigation = useGlobalLoadingStore();
+const router = useRouter();
 
 const certificateInfo = ref<CertificateRequestsResponse | null>()
 const useSession = useSessionStore();
@@ -113,6 +115,22 @@ const handleApproveRejectReleaseCertRequest = async (status: StatusOptions) => {
     }
 
     hasError.value = true;
+  } finally {
+    navigation.endNavigation();
+  }
+}
+
+const previewCertificateRequest = async () => {
+  if (!certificateInfo.value?.id) return;
+  navigation.startNavigation();
+  try {
+    await router.push({
+      name: 'CertificatePreview',
+      params: {
+        role: props.role,
+        id: certificateInfo.value.id,
+      },
+    });
   } finally {
     navigation.endNavigation();
   }
@@ -331,7 +349,7 @@ onMounted(() => {
               <button v-if="showCancelButton" class="btn btn-outline-secondary w-100"
                 @click="() => handleApproveRejectReleaseCertRequest('cancelled')">Cancel Request</button>
               <button v-if="showPreviewButton" class="btn btn-outline-danger btn-sm" type="button"
-                @click="fetchOpenCertificatePreview(certificateInfo?.id.toString() ?? '')">
+                @click="previewCertificateRequest">
                 Preview PDF
               </button>
             </div>

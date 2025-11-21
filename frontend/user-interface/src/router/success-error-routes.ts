@@ -1,3 +1,4 @@
+import PdfPreviewCertificateRequest from '@/views/Private/Certifications/components/PdfPreviewCertificateRequest.vue'
 import SuccessTransactionPage from '@/views/Private/Certifications/components/SuccessTransactionPage/SuccessTransactionPage.vue'
 import SuccessResidentCreationPage from '@/views/Private/Residents/components/SuccessResidentCreationPage/SuccessResidentCreationPage.vue'
 import type { RouteRecordRaw } from 'vue-router'

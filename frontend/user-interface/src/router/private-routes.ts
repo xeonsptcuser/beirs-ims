@@ -4,6 +4,8 @@ import ViewBlotterReports from '@/views/Private/BlotterReports/ViewBlotterReport
 import CreateCertification from '@/views/Private/Certifications/CreateCertification.vue'
 import ViewAllCertifications from '@/views/Private/Certifications/ViewAllCertifications.vue'
 import ViewCertificateRequest from '@/views/Private/Certifications/ViewCertificateRequest.vue'
+import PdfPreviewCertificateRequest from '@/views/Private/Certifications/components/PdfPreviewCertificateRequest.vue'
+import PdfPreviewBlotterReport from '@/views/Private/BlotterReports/components/PdfPreviewBlotterReport.vue'
 import UserDashboard from '@/views/Private/Dashboard/UserDashboard.vue'
 import HeatMaps from '@/views/Private/HeatMaps/HeatMaps.vue'
 import CreateUserProfile from '@/views/Private/Residents/CreateUserProfile.vue'
@@ -89,6 +91,16 @@ export const privateRoutes: RouteRecordRaw[] = [
         },
       },
       {
+        path: 'certifications/:id/preview',
+        name: 'CertificatePreview',
+        component: PdfPreviewCertificateRequest,
+        props: (route) => ({ certificateId: route.params.id as string }),
+        meta: {
+          title: 'Certificate Preview',
+          requiresAuth: true,
+        },
+      },
+      {
         path: 'blotter-reports',
         name: 'BlotterReports',
         component: ViewBlotterReports,
@@ -115,6 +127,16 @@ export const privateRoutes: RouteRecordRaw[] = [
         props: (route) => ({ role: route.params.role as string, id: route.params.id as string }),
         meta: {
           title: 'File Blotter Report',
+          requiresAuth: true,
+        },
+      },
+      {
+        path: 'blotter-reports/report/:id/preview',
+        name: 'BlotterPreview',
+        component: PdfPreviewBlotterReport,
+        props: (route) => ({ blotterId: route.params.id as string }),
+        meta: {
+          title: 'Blotter Report Preview',
           requiresAuth: true,
         },
       },
