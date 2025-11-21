@@ -14,7 +14,7 @@ import type {
 } from '@/Types';
 import type { AxiosError } from 'axios';
 import { computed, onMounted, ref, watch } from 'vue';
-import { fetchOpenBlotterReportPreview } from '@/Utils/pdfServices';
+import { useRouter } from 'vue-router';
 
 const props = defineProps<{
   role: string,
@@ -23,6 +23,7 @@ const props = defineProps<{
 
 const navigation = useGlobalLoadingStore();
 const session = useSessionStore();
+const router = useRouter();
 
 const blotterReport = ref<BlotterReportResponse | null>(null);
 const hasError = ref<boolean>(false);
@@ -116,6 +117,24 @@ const fetchReport = async () => {
     navigation.endNavigation();
   }
 };
+
+const previewBlotterReport = async () => {
+  if (!blotterReport.value?.id) return;
+  navigation.startNavigation();
+  try {
+    await router.push({
+      name: 'BlotterPreview',
+      params: {
+        role: props.role,
+        id: blotterReport.value.id,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  } finally {
+    navigation.endNavigation();
+  }
+}
 
 const statusActions = computed<BlotterReportStatus[]>(() => {
   const reportStatus = blotterReport.value?.status;
@@ -403,7 +422,7 @@ watch(() => props.id, (newVal, oldVal) => {
             <h5 class="card-title fw-semibold mb-3">Update Report Status</h5>
             <div class="d-flex flex-wrap gap-2">
               <button v-if="showBlotterPreviewButton" class="btn btn-outline-danger w-100" type="button"
-                @click="fetchOpenBlotterReportPreview(blotterReport?.id.toString() ?? '')">
+                @click="previewBlotterReport">
                 Preview PDF
               </button>
               <button v-else v-for="status in statusActions" :key="status" type="button"
