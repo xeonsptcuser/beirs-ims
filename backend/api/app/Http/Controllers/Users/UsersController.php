@@ -4,9 +4,13 @@ namespace App\Http\Controllers\Users;
 
 use App\Http\Controllers\Controller;
 use App\Interfaces\UsersRepositoryInterface;
+use App\Models\Users\UserProfile;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class UsersController extends Controller
@@ -20,7 +24,7 @@ class UsersController extends Controller
     {
         $perPage = $request->integer('per_page');
         $search = $this->resolveSearch($request);
-        $users = $this->users->all(['profile.governmentIdDocument'], $perPage, $search);
+        $users = $this->users->all(['profile.governmentIdentity'], $perPage, $search);
 
         return response()->json([
             'status' => 'success',
@@ -31,7 +35,7 @@ class UsersController extends Controller
     // GET /api/auth/users/{id}
     public function show(int $userId)
     {
-        $user = $this->users->findById($userId, ['profile.governmentIdDocument']);
+        $user = $this->users->findById($userId, ['profile.governmentIdentity']);
 
         return response()->json([
             'status' => 'success',
@@ -55,8 +59,6 @@ class UsersController extends Controller
             'street_address' => ['required', 'string', 'max:255'],
             'address_line' => ['nullable', 'string', 'max:255'],
             'mobile_number' => ['nullable', 'string', 'max:20'],
-            'government_id' => ['sometimes', 'array'],
-            'government_id.*' => ['file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ]);
 
         $user = $this->users->createWithProfile(
@@ -77,23 +79,6 @@ class UsersController extends Controller
 
             ]
         );
-
-        $governmentIdFiles = $request->file('government_id', []);
-
-        if (!empty($governmentIdFiles)) {
-            foreach ($governmentIdFiles as $file) {
-                $path = $file->store("government-ids/{$user->profile->id}", 'public');
-
-                $user->profile->governmentIdDocument()->create([
-                    'storage_path' => $path,
-                    'original_name' => $file->getClientOriginalName(),
-                    'mime_type' => $file->getClientMimeType(),
-                    'size' => $file->getSize(),
-                ]);
-            }
-            $user->load('profile.governmentIdDocument');
-        }
-
         return response()->json([
             'status' => 'success',
             'message' => 'User created successfully.',
@@ -104,7 +89,7 @@ class UsersController extends Controller
     // PUT /api/auth/users/{id}
     public function update(Request $request, $id)
     {
-        $user = $this->users->findById($id, ['profile.governmentIdDocument']);
+        $user = $this->users->findById($id, ['profile.governmentIdentity']);
 
         if (!$user) {
             throw new ModelNotFoundException("User {$id} not found");
@@ -124,8 +109,19 @@ class UsersController extends Controller
             'mobile_number' => ['sometimes', 'nullable', 'string', 'max:20'],
             'date_of_birth' => ['sometimes', 'date', "before_or_equal:{$legalAgeDate}"],
             'is_active' => ['sometimes', 'boolean'],
-            'government_id' => ['sometimes', 'array'],
-            'government_id.*' => ['file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+            'government_identity' => ['sometimes', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+        ]);
+
+        Log::info('gov-id.update.request', [
+            'has_file' => $request->hasFile('government_identity'),
+            'files' => collect(Arr::wrap($request->file('government_identity')))->map(fn($f) => [
+                'name' => $f?->getClientOriginalName(),
+                'mime' => $f?->getClientMimeType(),
+                'size' => $f?->getSize(),
+            ]),
+        ]);
+        Log::info('request.payload', [
+            'request' => $request->files->keys()
         ]);
 
         $userData = collect($validated)
@@ -138,23 +134,10 @@ class UsersController extends Controller
             ->filter(fn($value) => !is_null($value))
             ->toArray();
 
-        $governmentIdFiles = $request->file('government_id', []);
         $updated = $this->users->updateWithProfile($user, $userData, $profileData);
 
-        if (!empty($governmentIdFiles)) {
-            foreach ($governmentIdFiles as $file) {
-                $path = $file->store("government-ids/{$updated->profile->id}", 'public');
-
-                $updated->profile->governmentIdDocument()->create([
-                    'storage_path' => $path,
-                    'original_name' => $file->getClientOriginalName(),
-                    'mime_type' => $file->getClientMimeType(),
-                    'size' => $file->getSize(),
-                ]);
-            }
-            $updated->load('profile.governmentIdDocument');
-        }
-        $updated->loadMissing('profile.governmentIdDocument');
+        $governmentIdentityFiles = Arr::wrap($request->file('government_identity'));
+        $this->storeGovernmentIdentity($governmentIdentityFiles, $updated->profile);
 
         return response()->json([
             'status' => 'success',
@@ -188,5 +171,28 @@ class UsersController extends Controller
         }
 
         return !empty($search) ? $search : null;
+    }
+
+    private function storeGovernmentIdentity($files, UserProfile $userProfile): void
+    {
+        foreach ($files as $file) {
+            if (!$file) {
+                Log::warning('gov-id.update.null-file');
+                continue;
+            }
+            $path = $file->store("government-ids/{$userProfile->id}", 'public'); // keep disk consistent
+            Log::info('gov-id.update.saved', ['path' => $path]);
+
+            $userProfile->governmentIdentity()->updateOrCreate(
+                [],
+                [
+                    'storage_path' => $path,
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getClientMimeType(),
+                    'size' => $file->getSize(),
+                ]
+            );
+        }
+        $userProfile->loadMissing('governmentIdentity');
     }
 }

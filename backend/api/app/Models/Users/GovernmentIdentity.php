@@ -5,10 +5,10 @@ namespace App\Models\Users;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class GovernmentIdDocument extends Model
+class GovernmentIdentity extends Model
 {
     // Explicit table name to match migration
-    protected $table = 'government_id_document';
+    protected $table = 'government_identity';
 
     protected $fillable = [
         'user_profile_id',

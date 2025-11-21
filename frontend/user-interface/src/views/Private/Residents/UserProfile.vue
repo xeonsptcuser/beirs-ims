@@ -47,7 +47,7 @@ const storageBaseUrl =
   (apiBaseUrl ? `${apiBaseUrl}/storage` : '/storage');
 
 const governmentIdUrl = computed(() => {
-  const doc = responseData.value?.profile?.government_id_document;
+  const doc = responseData.value?.profile?.government_identity;
   if (!doc?.storage_path) return '';
   const normalizedBase = storageBaseUrl.endsWith('/') ? storageBaseUrl.slice(0, -1) : storageBaseUrl;
   return `${normalizedBase}/${doc.storage_path}`.replace(/([^:]\/)\/+/g, '$1');
@@ -74,7 +74,7 @@ const handleUpdateUserAccount = async () => {
         address_line: form.addressLine,
         mobile_number: form.mobileNumber,
         date_of_birth: form.date_of_birth,
-        governmentId: form.governmentId,
+        government_identity: form.governmentIdentity,
       }
 
       const trimmedPassword = form.password.trim()
@@ -87,6 +87,7 @@ const handleUpdateUserAccount = async () => {
 
       const response = await updateUserAccount(props.id, requestPayload)
       responseData.value = response.data
+      hasGovernmentId.value = !!responseData.value?.profile?.government_identity
 
       setSuccessResponse({
         status: response.status ?? 'success',
@@ -128,8 +129,7 @@ const fetchUserProfile = async () => {
     }
 
     responseData.value = response.data
-    hasGovernmentId.value = !!responseData.value.profile?.government_id_document;
-
+    hasGovernmentId.value = !!responseData.value.profile?.government_identity;
     form.name.firstName = responseData.value.profile.first_name
     form.name.middleName = responseData.value.profile.middle_name
     form.name.lastName = responseData.value.profile.last_name
@@ -201,7 +201,8 @@ watchEffect(() => {
 </script>
 <template>
   <div class="my-5">
-    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center mb-4 gap-3">
+    <div
+      class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center mb-4 gap-3">
       <div>
         <p class="text-muted text-uppercase small mb-1">Resident Profile</p>
         <h2 class="fw-bold mb-1">{{ fullName || 'Resident Profile' }}</h2>
@@ -254,24 +255,26 @@ watchEffect(() => {
             </div>
             <div class="mt-3" v-if="isProfileOwner">
               <button class="btn btn-outline-secondary w-100" type="button" @click="handleShowPasswordChange">
-                <i class="bi bi-shield-lock me-2"></i> {{ isPasswordChangeable ? 'Cancel Password Update' : 'Change Password' }}
+                <i class="bi bi-shield-lock me-2"></i>
+                {{ isPasswordChangeable ? 'Cancel Password Update' : 'Change Password' }}
               </button>
             </div>
           </div>
         </div>
 
         <div class="card shadow-sm border-0">
+          <!-- inside the Government ID card -->
           <div class="card-body">
             <h6 class="fw-semibold mb-3">Government ID</h6>
-            <div v-if="hasGovernmentId" class="border rounded text-center p-3">
+
+            <div v-if="hasGovernmentId" class="border rounded text-center p-3 mb-3">
               <img :src="governmentIdUrl || nationalId" alt="Government ID" class="img-fluid" />
+              <p class="text-muted small mb-0 mt-2">Uploading a new file will replace the existing ID.</p>
             </div>
-            <div v-else class="text-center text-muted">
-              <p class="mb-3">No government ID on file.</p>
-              <UploadFiles v-model="form.governmentId" :has-error="hasError"
-                :error-message="errorMessages.governmentId.error" :is-disabled="isNotEditableUser.governmentId"
-                accept=".png,.jpg,.jpeg" :multiple="false" />
-            </div>
+
+            <UploadFiles v-model="form.governmentIdentity" :has-error="errors.governmentIdentity"
+              :error-message="errorMessages.governmentIdentity.error"
+              :is-disabled="isNotEditableUser.governmentIdentity" accept=".png,.jpg,.jpeg,.pdf" :multiple="false" />
           </div>
         </div>
       </div>

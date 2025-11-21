@@ -25,7 +25,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean; requi
     streetAddress: '',
     addressLine: '',
     mobileNumber: '',
-    governmentId: [],
+    governmentIdentity: [],
   })
 
   const errors = ref<Record<keyof CreateUserAccountRequest, boolean>>({
@@ -38,7 +38,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean; requi
     streetAddress: false,
     addressLine: false,
     mobileNumber: false,
-    governmentId: false,
+    governmentIdentity: false,
   })
 
   const errorMessages = ref<Record<keyof CreateUserAccountRequest, { error: string }>>({
@@ -51,7 +51,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean; requi
     streetAddress: { error: '' },
     addressLine: { error: '' },
     mobileNumber: { error: '' },
-    governmentId: { error: '' },
+    governmentIdentity: { error: '' },
   })
 
   const roleOptions = ['admin', 'resident', 'staff']
@@ -136,9 +136,9 @@ export function useCreateUserAccount(options?: { requirePassword: boolean; requi
       isValid = false
     }
 
-    if (requireGovernmentId && form.governmentId.length === 0) {
-      errors.value.governmentId = true
-      errorMessages.value.governmentId = {
+    if (requireGovernmentId && form.governmentIdentity.length === 0) {
+      errors.value.governmentIdentity = true
+      errorMessages.value.governmentIdentity = {
         error:
           'Please upload image of your Id (e.g Nationall ID, Drivers License, Postal Id, Passport etc...)',
       }
@@ -160,6 +160,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean; requi
       date_of_birth: 'date_of_birth',
       street_address: 'streetAddress',
       mobile_number: 'mobileNumber',
+      government_identity: 'governmentIdentity',
     }
 
     if (!apiErrors || Object.keys(apiErrors).length === 0) {

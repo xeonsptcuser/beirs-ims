@@ -29,18 +29,21 @@ export class ApiService implements IApiService {
   }
 
   async post<T>(url: string, data?: any): Promise<T> {
-    const config = data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : undefined
+    const config =
+      data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : undefined
     const response = await this.axiosInstance.post<T>(url, data, config)
     return response.data ? response.data : (response as any).response?.data
   }
 
   async put<T>(url: string, data?: any): Promise<T> {
-    const config = data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : undefined
+    const config =
+      data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : undefined
     const response = await this.axiosInstance.put<T>(url, data, config)
     return response.data ? response.data : (response as any).response?.data
   }
   async patch<T>(url: string, data?: any): Promise<T> {
-    const config = data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : undefined
+    const config =
+      data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : undefined
     const response = await this.axiosInstance.patch<T>(url, data, config)
     return response.data
   }

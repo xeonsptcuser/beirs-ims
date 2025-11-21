@@ -57,7 +57,6 @@ const handleCreateUserAccount = async () => {
         date_of_birth: form.date_of_birth,
         street_address: form.streetAddress,
         mobile_number: form.mobileNumber,
-        governmentId: form.governmentId
       }
       const response = await userAccountCreation(requestPayload);
 

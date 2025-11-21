@@ -35,7 +35,6 @@ const fetchCertificateRequestInfo = async () => {
   try {
     const response = await fetchCertificateInfo(props.id);
     certificateInfo.value = response.data;
-    console.log(certificateInfo.value)
 
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
@@ -211,7 +210,8 @@ onMounted(() => {
 </script>
 <template>
   <div class="my-5">
-    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center mb-4 gap-3">
+    <div
+      class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center mb-4 gap-3">
       <div>
         <p class="text-muted text-uppercase small mb-1">Case Reference</p>
         <h2 class="fw-bold mb-1">{{ certificateCaseId }}</h2>
@@ -221,7 +221,8 @@ onMounted(() => {
         <span class="badge px-3 py-2" :class="statusBadgeClass(certificateInfo?.status as StatusOptions)">
           {{ statusLabelMap[certificateInfo?.status as StatusOptions] || certificateInfo?.status }}
         </span>
-        <p class="text-secondary small mt-2 mb-0">Filed on {{ formatDateToHuman(certificateInfo?.created_at ?? '') || '—' }}</p>
+        <p class="text-secondary small mt-2 mb-0">Filed on {{ formatDateToHuman(certificateInfo?.created_at ?? '') ||
+          '—' }}</p>
       </div>
     </div>
 
@@ -308,7 +309,8 @@ onMounted(() => {
           </div>
         </div>
 
-        <div class="card shadow-sm border-0 mb-4" v-if="showApproveRejectBtn || showCancelButton || showReleaseButton || showDoneButton">
+        <div class="card shadow-sm border-0 mb-4"
+          v-if="showApproveRejectBtn || showCancelButton || showReleaseButton || showDoneButton">
           <div class="card-body">
             <h5 class="fw-semibold mb-3">Actions</h5>
             <div class="d-flex flex-column gap-2">

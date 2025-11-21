@@ -26,8 +26,8 @@ export class UserRelatedService {
   }
 
   async createUserAccount(
-    data: CreateAccountRequestPayload,
-    url: string
+    url: string,
+    data: CreateAccountRequestPayload | FormData
   ): Promise<ApiResponse<User>> {
     return this.apiService.post<ApiResponse<User>>(url, data)
   }
@@ -44,6 +44,11 @@ export class UserRelatedService {
     url: string,
     data: UpdateAccountRequestPayload | FormData
   ): Promise<ApiResponse<User>> {
+    if (data instanceof FormData) {
+      data.append('_method', 'PATCH') // PHP populates $_FILES only on POST
+      return this.apiService.post(url, data)
+    }
+
     return this.apiService.patch(url, data)
   }
 }

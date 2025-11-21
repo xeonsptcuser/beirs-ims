@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('government_id_document', function (Blueprint $table) {
+        Schema::create('government_identity', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_profile_id')->constrained('user_profiles')->cascadeOnDelete(); // foreign key to user profile
             $table->string('storage_path');      // e.g., storage/app/evidences/...
@@ -26,6 +26,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('government_id_document');
+        Schema::dropIfExists('government_identities');
     }
 };

@@ -18,7 +18,7 @@ export interface UserProfile extends ProfileCore {
   email_verification_at: string | null
   is_active: boolean
   user?: User
-  government_id_document?: GovernmentIdDocument | null
+  government_identity?: GovernmentIdentity | null
 }
 
 export interface User {
@@ -49,7 +49,7 @@ export type CreateUserAccountRequest = UiName &
     password: string
     passwordConfirmation: string
     date_of_birth: string
-    governmentId: File[]
+    governmentIdentity: File[]
   }
 
 export type UpdateUserAccountRequest = Partial<CreateUserAccountRequest>
@@ -62,18 +62,17 @@ type PayloadBase = ProfileCore & {
 export interface CreateAccountRequestPayload extends PayloadBase {
   password: string
   password_confirmation: string
-  governmentId: File[]
 }
 
 export type UpdateAccountRequestPayload = Partial<
   PayloadBase & {
     password: string
     password_confirmation: string
-    governmentId: File[]
+    government_identity: File[] | FileList | null
   }
 >
 
-export interface GovernmentIdDocument {
+export interface GovernmentIdentity {
   id: number
   user_profile_id: number
   storage_path: string
@@ -94,6 +93,6 @@ type EditableFields =
   | 'streetAddress'
   | 'addressLine'
   | 'mobileNumber'
-  | 'governmentId'
+  | 'governmentIdentity'
 
 export type UserProfileEditStatus = Record<EditableFields, boolean>

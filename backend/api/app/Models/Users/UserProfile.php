@@ -31,6 +31,13 @@ class UserProfile extends Model
     ];
 
     /**
+     * Guard the primary key so it can be read but not mass-assigned.
+     *
+     * @var list<string>
+     */
+    protected $guarded = ['id'];
+
+    /**
      * The attributes enables hasOne relationship.
      *
      * @var list<string>
@@ -49,9 +56,9 @@ class UserProfile extends Model
         return $this->hasMany(BlotterReport::class, 'user_profile_id');
     }
 
-    public function governmentIdDocument(): HasOne
+    public function governmentIdentity(): HasOne
     {
-        return $this->hasOne(GovernmentIdDocument::class, 'user_profile_id');
+        return $this->hasOne(GovernmentIdentity::class, 'user_profile_id');
     }
 
     public function routeNotificationForItextmo(): ?string

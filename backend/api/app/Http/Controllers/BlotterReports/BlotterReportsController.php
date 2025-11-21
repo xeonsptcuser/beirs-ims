@@ -125,7 +125,6 @@ class BlotterReportsController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        // update this so that when the staff approves or rejects, the resident is notified via sms
         $blotterReport = $this->blotter_report->getById($id, []);
 
         $user = $request->user()->loadMissing('profile');

@@ -65,7 +65,7 @@ class UsersRepositoryImpl implements UsersRepositoryInterface
             // Let the User model hash the password via its mutator
             $user->update($userData);
 
-            return $user->load('profile.governmentIdDocument');
+            return $user->load('profile.governmentIdentity');
         });
     }
 
