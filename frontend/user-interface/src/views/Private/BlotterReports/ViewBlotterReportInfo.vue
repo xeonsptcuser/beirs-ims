@@ -14,6 +14,7 @@ import type {
 } from '@/Types';
 import type { AxiosError } from 'axios';
 import { computed, onMounted, ref, watch } from 'vue';
+import { openBlotterPdf } from '@/services/api/http/generate-pdf-service';
 
 const props = defineProps<{
   role: string,
@@ -217,6 +218,10 @@ const formattedWitnesses = computed(() => {
   return (blotterReport.value?.witnesses ?? []).filter((person) => !!person?.trim());
 });
 
+const showBlotterPreviewButton = computed(() => {
+  return blotterReport.value?.status === 'approved' && isOwner && session.isRoleResident();
+})
+
 onMounted(fetchReport);
 
 watch(() => props.id, (newVal, oldVal) => {
@@ -239,7 +244,7 @@ watch(() => props.id, (newVal, oldVal) => {
           {{ blotterReport?.status }}
         </span>
         <p class="text-secondary small mt-2 mb-0">Filed on {{ formatDateToHuman(blotterReport?.created_at ?? '') || '—'
-        }}</p>
+          }}</p>
       </div>
     </div>
 
@@ -397,10 +402,15 @@ watch(() => props.id, (newVal, oldVal) => {
           <div class="card-body">
             <h5 class="card-title fw-semibold mb-3">Update Report Status</h5>
             <div class="d-flex flex-wrap gap-2">
+              <button v-if="showBlotterPreviewButton" class="btn btn-outline-primary" type="button"
+                @click="openBlotterPdf(blotterReport?.id.toString() ?? '')">
+                Preview PDF
+              </button>
               <button v-for="status in statusActions" :key="status" type="button" :class="actionButtonClass(status)"
                 @click="() => handleStatusChange(status)">
                 {{ statusLabels[status] || status }}
               </button>
+
             </div>
           </div>
         </div>
