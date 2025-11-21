@@ -2,8 +2,8 @@
 
 namespace App\Notifications\Channels;
 
-use App\Notifications\CertificateRequestStatusUpdated;
 use App\Services\ItextmoClient;
+use Illuminate\Notifications\Notification;
 
 class ItextmoChannel
 {
@@ -11,7 +11,11 @@ class ItextmoChannel
     {
     }
 
-    public function send(object $notifiable, CertificateRequestStatusUpdated $notification): void
+    /**
+     * @param object $notifiable The notifiable entity (e.g., UserProfile)
+     * @param Notification $notification Any notification that implements toItextMo($notifiable)
+     */
+    public function send(object $notifiable, Notification $notification): void
     {
         if (!method_exists($notification, 'toItextMo')) {
             return;
@@ -23,4 +27,3 @@ class ItextmoChannel
         }
     }
 }
-
