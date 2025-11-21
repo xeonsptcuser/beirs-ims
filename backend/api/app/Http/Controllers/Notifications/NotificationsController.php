@@ -10,7 +10,9 @@ class NotificationsController extends Controller
     public function index(Request $request)
     {
         $profile = $request->user()->profile;
-
+        if (!$profile) {
+            abort(404, 'Profile not found');
+        }
         return response()->json([
             'status' => 'success',
             'data' => $profile

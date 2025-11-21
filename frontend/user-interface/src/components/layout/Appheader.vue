@@ -57,6 +57,20 @@ const primaryActionRoute = computed(() => {
   return `/${role}/dashboard`;
 });
 
+const formatCaseId = (id: number, type: string) => {
+  const isBlotter = type?.includes('BlotterReportStatusUpdated');
+  const prefix = isBlotter ? 'BR' : 'CERT';
+  const pad = isBlotter ? 5 : 4;
+  return `${prefix}-${id.toString().padStart(pad, '0')}`;
+};
+
+const readStatus = (stringIso: string | null) => {
+  if (!stringIso) {
+    return 'Unread'
+  }
+  return 'read'
+}
+
 const primaryActionLabel = computed(() => (isLoggedIn.value ? 'Dashboard' : 'Login'));
 
 const handleLogout = async () => {
@@ -74,6 +88,14 @@ const userDropdownRef = ref<HTMLElement | null>(null);
 
 const unreadCount = computed(() => notifications.value.filter((notification) => !notification.read_at).length);
 
+const sortNotifications = (items: UserNotification[]) => {
+  const byDateDesc = (a: UserNotification, b: UserNotification) =>
+    new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  const unread = items.filter((item) => !item.read_at).sort(byDateDesc);
+  const read = items.filter((item) => !!item.read_at).sort(byDateDesc);
+  return [...unread, ...read];
+};
+
 const loadNotifications = async () => {
   if (!isLoggedIn.value) {
     notifications.value = [];
@@ -82,7 +104,8 @@ const loadNotifications = async () => {
   isLoadingNotifications.value = true;
   notificationError.value = '';
   try {
-    notifications.value = await fetchNotifications();
+    const fetched = await fetchNotifications();
+    notifications.value = sortNotifications(fetched);
   } catch (error: any) {
     notificationError.value = error?.message ?? 'Failed to load notifications.';
   } finally {
@@ -97,9 +120,10 @@ const handleMarkAsRead = async (notification: UserNotification) => {
 
   try {
     await markNotificationAsRead(notification.id);
-    notifications.value = notifications.value.map((item) =>
+    const updated = notifications.value.map((item) =>
       item.id === notification.id ? { ...item, read_at: new Date().toISOString() } : item
     );
+    notifications.value = sortNotifications(updated);
   } catch (error) {
     console.error('Failed to mark notification as read', error);
   }
@@ -218,17 +242,25 @@ watch(isLoggedIn, (loggedIn) => {
                     <ul v-else-if="notifications.length" class="list-group list-group-flush">
                       <li v-for="notification in notifications" :key="notification.id"
                         class="list-group-item d-flex justify-content-between align-items-start gap-3">
-                        <div class="me-2">
-                          <p class="fw-semibold mb-1">{{ notification.data?.title ?? 'Notification' }}</p>
+                        <router-link
+                          :to="notification.type?.includes('BlotterReportStatusUpdated') ?
+                            { name: 'ViewBlotterReport', params: { role: session.role, id: notification.data.certificate_id.toString() } } :
+                            { name: 'ViewCertificateRequest', params: { role: session.role, id: notification.data.certificate_id.toString() } }"
+                          class="me-2 w-100 text-decoration-none" @click="handleMarkAsRead(notification)">
+                          <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="fw-semibold">
+                              {{ formatCaseId(notification.data.certificate_id, notification.type) ?? 'Notification' }}
+                            </span>
+                            <span class="badge rounded-pill"
+                              :class="notification.read_at ? 'bg-light text-dark' : 'bg-primary text-white'">
+                              {{ readStatus(notification.read_at) }}
+                            </span>
+                          </div>
                           <p class="text-muted small mb-1">
                             {{ notification.data?.message ?? 'View details in your dashboard.' }}
                           </p>
                           <small class="text-muted">{{ formatDateToHuman(notification.created_at) || '' }}</small>
-                        </div>
-                        <button v-if="!notification.read_at" class="btn btn-link btn-sm text-decoration-none p-0"
-                          type="button" @click="handleMarkAsRead(notification)">
-                          Mark as read
-                        </button>
+                        </router-link>
                       </li>
                     </ul>
                     <p v-else class="text-muted small px-3 py-2 mb-0">No notifications yet.</p>

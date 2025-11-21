@@ -10,7 +10,7 @@ export function useCreateCertificate() {
     certificateRequestReason: '',
   })
 
-  const certificateOptions = ref<string[]>(['clearance', 'indigency', 'marriage', 'residency'])
+  const certificateOptions = ref<string[]>(['clearance', 'indigency', 'residency'])
 
   const errors = ref<Record<keyof CreateCertificateFormRequest, boolean>>({
     certificateRequestType: false,

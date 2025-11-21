@@ -14,7 +14,6 @@ class CertificateRequestFactory extends Factory
         return [
             'cert_request_type' => fake()->randomElement([
                 'indigency',
-                'marriage',
                 'clearance',
                 'residency',
             ]),

@@ -13,7 +13,7 @@ const features = [
   },
   {
     title: "Certifications",
-    items: ["Marriage", "Residency", "Clearance", "Indigency"],
+    items: ["Residency", "Clearance", "Indigency"],
   },
   {
     title: "Real-time Monitoring",

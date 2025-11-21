@@ -174,13 +174,14 @@ watchEffect(() => {
         <div class="row gx-2 gy-2">
           <div class="col-12 col-md-5 ">
             <FormFloatingInput type="date" label="Start Residency Date" :optional="true" id="start-residency-date"
-              v-model="form.startResidencyDate" :max="maxDate()" />
+              v-model="form.startResidencyDate" :max="maxDate()" :is-capitalized="false" />
           </div>
           <div class="col-12 col-md-7 ">
             <div class="row align-items-center">
               <div class="col-12 col-md-8">
                 <FormFloatingInput type="date" label="End Residency Date" :optional="true" id="end-residency-date"
-                  v-model="form.endResidencyDate" :is-disabled="form.isCurrent" :max="maxDate()" />
+                  v-model="form.endResidencyDate" :is-disabled="form.isCurrent" :max="maxDate()"
+                  :is-capitalized="false" />
               </div>
               <div class="col-4 ms-auto">
                 <FormCheckboxInput id="check-resident-present" label="Present" v-model="form.isCurrent" />
