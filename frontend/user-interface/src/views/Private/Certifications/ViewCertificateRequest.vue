@@ -9,6 +9,7 @@ import SuccessLabel from '@/components/common/SuccessLabel/SuccessLabel.vue';
 import type { AxiosError } from 'axios';
 import type { ApiErrorResponse, CertificateRequestsResponse, CommonResponse, StatusOptions, UpdateCertificateRequestPayload } from '@/Types';
 import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
+import { openCertificatePdf } from '@/services/api/http/generate-pdf-service';
 
 const props = defineProps<{
   role: string,
@@ -139,6 +140,10 @@ const showApproveRejectBtn = computed(() => {
 
 const showCancelButton = computed(() => {
   return showIfCertificateRequestOwner.value && isPending.value
+})
+
+const showPreviewButton = computed(() => {
+  return showIfCertificateRequestOwner.value && isApproved.value || isReleased.value
 })
 
 const showReleaseButton = computed(() => {
@@ -311,7 +316,7 @@ onMounted(() => {
         </div>
 
         <div class="card shadow-sm border-0 mb-4"
-          v-if="showApproveRejectBtn || showCancelButton || showReleaseButton || showDoneButton">
+          v-if="showApproveRejectBtn || showCancelButton || showReleaseButton || showDoneButton || showPreviewButton">
           <div class="card-body">
             <h5 class="fw-semibold mb-3">Actions</h5>
             <div class="d-flex flex-column gap-2">
@@ -325,6 +330,10 @@ onMounted(() => {
                 @click="() => handleApproveRejectReleaseCertRequest('done')">Mark as Done</button>
               <button v-if="showCancelButton" class="btn btn-outline-secondary w-100"
                 @click="() => handleApproveRejectReleaseCertRequest('cancelled')">Cancel Request</button>
+              <button v-if="showPreviewButton" class="btn btn-outline-danger btn-sm" type="button"
+                @click="openCertificatePdf(certificateInfo?.id.toString() ?? '')">
+                Preview PDF
+              </button>
             </div>
           </div>
         </div>

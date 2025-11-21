@@ -118,9 +118,11 @@ onMounted(() => {
             <SuccessLabel :is-success="!!isSuccessResponse?.status" :message="isSuccessResponse?.message" />
             <form class="d-flex flex-column gap-3" @submit.prevent="handleLogin">
               <FormFloatingInput type="text" label="Email Address" placeholder="Email Address" id="userName" autofocus
-                v-model="form.email" :has-error="errors.email" :error-message="errorMessages.email.error" />
+                v-model="form.email" :has-error="errors.email" :error-message="errorMessages.email.error"
+                :is-capitalized="false" />
               <FormFloatingInput type="password" label="Password" placeholder="Password" id="passWord"
-                v-model="form.password" :has-error="errors.password" :error-message="errorMessages.password.error" />
+                v-model="form.password" :has-error="errors.password" :error-message="errorMessages.password.error"
+                :is-capitalized="false" />
               <FormButton label="Sign In" class="w-100" />
               <div class="text-center">
                 <small class="text-muted">Forgot password? Contact your barangay staff.</small>

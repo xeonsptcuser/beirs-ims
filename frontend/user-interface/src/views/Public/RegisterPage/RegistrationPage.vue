@@ -115,45 +115,48 @@ const filteredErrors = computed(() => {
               <div class="row g-3">
                 <div class="col-md-4 col-sm-12">
                   <FormFloatingInput type="text" label="First Name" placeholder="First Name" id="first_name"
-                    v-model="form.name.firstName" :has-error="errors.name" :error-message="errorMessages.name.error" />
+                    v-model="form.name.firstName" :has-error="errors.name" :error-message="errorMessages.name.error"
+                    :is-capitalized="false" />
                 </div>
                 <div class="col-md-4 col-sm-12">
                   <FormFloatingInput type="text" label="Last Name" placeholder="Last Name" id="last_name"
-                    v-model="form.name.lastName" :has-error="errors.name" :error-message="errorMessages.name.error" />
+                    v-model="form.name.lastName" :has-error="errors.name" :error-message="errorMessages.name.error"
+                    :is-capitalized="false" />
                 </div>
                 <div class="col-md-4 col-sm-12">
                   <FormFloatingInput type="text" label="Middle Name" :optional="true" id="middle_name"
-                    v-model="form.name.middleName" />
+                    v-model="form.name.middleName" :is-capitalized="false" />
                 </div>
               </div>
               <div class="row g-3">
                 <div class="col-md-6 col-sm-12">
                   <FormFloatingInput type="email" label="Email Address" placeholder="beirs@test.com" id="email"
-                    v-model="form.email" :has-error="errors.email" :error-message="errorMessages.email.error" />
+                    v-model="form.email" :has-error="errors.email" :error-message="errorMessages.email.error"
+                    :is-capitalized="false" />
                 </div>
                 <div class="col-md-6 col-sm-12">
                   <FormFloatingInput type="date" label="Date Of Birth" id="birthday" v-model="form.date_of_birth"
                     :has-error="errors.date_of_birth" :max="maxDate()"
-                    :error-message="errorMessages.date_of_birth.error" />
+                    :error-message="errorMessages.date_of_birth.error" :is-capitalized="false" />
                 </div>
               </div>
               <div class="row g-3">
                 <div class="col-md-6 col-sm-12">
                   <FormFloatingInput type="password" label="Password" placeholder="Password" id="password"
-                    v-model="form.password" :has-error="errors.password"
-                    :error-message="errorMessages.password.error" />
+                    v-model="form.password" :has-error="errors.password" :error-message="errorMessages.password.error"
+                    :is-capitalized="false" />
                 </div>
                 <div class="col-md-6 col-sm-12">
                   <FormFloatingInput type="password" label="Confirm Password" placeholder="Password Confirmation"
                     id="passwordConfirm" v-model="form.passwordConfirmation" :has-error="errors.passwordConfirmation"
-                    :error-message="errorMessages.passwordConfirmation.error" />
+                    :error-message="errorMessages.passwordConfirmation.error" :is-capitalized="false" />
                 </div>
               </div>
               <div class="row g-3">
                 <div class="col-md-6 col-sm-12">
                   <FormFloatingInput type="text" label="Mobile Number" placeholder="09..." id="mobile-number"
                     v-model="form.mobileNumber" :has-error="errors.mobileNumber"
-                    :error-message="errorMessages.mobileNumber.error" />
+                    :error-message="errorMessages.mobileNumber.error" :is-capitalized="false" />
                 </div>
                 <div class="col-md-6 col-sm-12">
                   <DropdownInput :options="barangayAddressOptions" label="Street Address" id="street-address"
