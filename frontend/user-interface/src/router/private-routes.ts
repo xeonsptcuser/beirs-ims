@@ -1,10 +1,10 @@
 import CreateBlotterReport from '@/views/Private/BlotterReports/CreateBlotterReport.vue'
 import ViewBlotterReportInfo from '@/views/Private/BlotterReports/ViewBlotterReportInfo.vue'
 import ViewBlotterReports from '@/views/Private/BlotterReports/ViewBlotterReports.vue'
-import Certifications from '@/views/Private/Certifications/Certifications.vue'
 import CreateCertification from '@/views/Private/Certifications/CreateCertification.vue'
+import ViewAllCertifications from '@/views/Private/Certifications/ViewAllCertifications.vue'
 import ViewCertificateRequest from '@/views/Private/Certifications/ViewCertificateRequest.vue'
-import Dashboard from '@/views/Private/Dashboard/Dashboard.vue'
+import UserDashboard from '@/views/Private/Dashboard/UserDashboard.vue'
 import HeatMaps from '@/views/Private/HeatMaps/HeatMaps.vue'
 import CreateUserProfile from '@/views/Private/Residents/CreateUserProfile.vue'
 import Residents from '@/views/Private/Residents/Residents.vue'
@@ -21,7 +21,7 @@ export const privateRoutes: RouteRecordRaw[] = [
       {
         path: 'dashboard',
         name: 'Dashboard',
-        component: Dashboard,
+        component: UserDashboard,
         props: (route) => ({ role: route.params.role as string }),
         meta: {
           title: 'Dashboard',
@@ -61,7 +61,7 @@ export const privateRoutes: RouteRecordRaw[] = [
       {
         path: 'certifications',
         name: 'Certifications',
-        component: Certifications,
+        component: ViewAllCertifications,
         props: (route) => ({ role: route.params.role as string }),
         meta: {
           title: 'Certification Requests',

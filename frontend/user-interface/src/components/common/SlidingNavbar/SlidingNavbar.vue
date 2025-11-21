@@ -115,7 +115,7 @@ const handleNavClick = () => {
       </ul>
       <ul class="list-group-flush ms-auto" v-else>
         <div class="d-md-flex align-items-center pt-2 d-none">
-          <li class="list-group-item px-2" v-for="navItem in filteredRoles">
+          <li class="list-group-item px-2" v-for="navItem in filteredRoles" :key="navItem.name">
             <router-link :to="{ name: `${navItem.name}`, params: { role: useSession.role } }"
               class="text-light text-decoration-none" @click="handleNavClick">
               {{ navItem.label }}
@@ -131,17 +131,6 @@ const handleNavClick = () => {
                 </span>
                 <i class="bi bi-bell-fill fs-5"></i>
               </a>
-              <!--
-                Update the list of notifications
-                things to show:
-                  case_id: e.g BLRPT-001, CERT-001 small
-                  record status e.g pending, approved etc...
-                  message: e.g new update to your request
-                  notification_status: read or unread
-
-                behaviour:
-                  should navigate to blotter reports view page on click
-              -->
               <div class="dropdown-menu dropdown-menu-end notification-dropdown shadow border-0"
                 aria-labelledby="notification">
                 <div class="notification-dropdown__header border-bottom">
@@ -221,10 +210,10 @@ const handleNavClick = () => {
                   <span class="text-md text-nowrap px-3">{{ useSession.name }}</span>
                 </li>
                 <li>
-            <router-link :to="{ name: 'UserProfile', params: { role: useSession.role, id: useSession.id } }"
-              class="dropdown-item" @click="handleNavClick"><i class="bi bi-person"></i> Profile
-            </router-link>
-          </li>
+                  <router-link :to="{ name: 'UserProfile', params: { role: useSession.role, id: useSession.id } }"
+                    class="dropdown-item" @click="handleNavClick"><i class="bi bi-person"></i> Profile
+                  </router-link>
+                </li>
                 <li><a class="dropdown-item disabled" href="#"><i class="bi bi-gear"></i> Settings</a></li>
                 <li>
                   <hr class="dropdown-divider" />

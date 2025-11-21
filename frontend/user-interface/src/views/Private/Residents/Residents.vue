@@ -68,9 +68,9 @@ const handleToggleUserStatus = async (resident: User) => {
   try {
     await toggleUserAccountStatus(resident.id, targetStatus);
     await fetchResidentUsers(pagination.current);
-  } catch (error) {
+  } catch (error: any) {
     hasError.value = true;
-    errorMessage.value = 'Failed to update user status.';
+    errorMessage.value = error.message ?? 'Failed to update user status.';
   } finally {
     navigation.endNavigation();
   }
@@ -94,11 +94,13 @@ onMounted(() => {
 
 <template>
   <div class="my-5">
-    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center mb-4 gap-3">
+    <div
+      class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center mb-4 gap-3">
       <div>
         <p class="text-uppercase text-muted mb-1">Community Directory</p>
         <h2 class="fw-bold mb-0">Resident Profiles</h2>
-        <p class="text-secondary small mb-0">Monitor household records, manage access, and keep resident data up-to-date.</p>
+        <p class="text-secondary small mb-0">Monitor household records, manage access, and keep resident data
+          up-to-date.</p>
       </div>
       <router-link v-if="isAdmin" :to="{ name: 'CreateUserProfile' }" class="btn btn-primary text-nowrap">
         <i class="bi bi-person-plus me-2"></i> Add Resident
@@ -160,31 +162,39 @@ onMounted(() => {
           <div class="card-body d-flex flex-column">
             <div class="d-flex justify-content-between align-items-start mb-2">
               <div>
-                <router-link class="text-decoration-none text-dark fw-bold" :to="{ name: 'UserProfile', params: { id: resident.id } }">
-                  {{ formatName(resident.profile.first_name, resident.profile.middle_name, resident.profile.last_name) }}
+                <router-link class="text-decoration-none text-dark fw-bold"
+                  :to="{ name: 'UserProfile', params: { id: resident.id } }">
+                  {{ formatName(resident.profile.first_name, resident.profile.middle_name, resident.profile.last_name)
+                  }}
                 </router-link>
                 <p class="text-muted small mb-0">{{ resident.email }}</p>
               </div>
-              <span class="badge text-uppercase" :class="resident.profile.is_active ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-muted'">
+              <span class="badge text-uppercase"
+                :class="resident.profile.is_active ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-muted'">
                 {{ resident.role }}
               </span>
             </div>
             <div class="text-secondary small mb-3">
-              <p class="mb-1"><i class="bi bi-geo-alt me-2 text-primary"></i>{{ resident.profile?.street_address || 'No address provided' }}</p>
-              <p class="mb-1"><i class="bi bi-telephone me-2 text-primary"></i>{{ resident.profile?.mobile_number || 'No contact info' }}</p>
+              <p class="mb-1"><i class="bi bi-geo-alt me-2 text-primary"></i>{{ resident.profile?.street_address ||
+                'Noaddress provided' }}</p>
+              <p class="mb-1"><i class="bi bi-telephone me-2 text-primary"></i>{{ resident.profile?.mobile_number ||
+                'Nocontact info' }}</p>
             </div>
             <div class="mt-auto d-flex flex-column gap-2">
               <div class="d-flex align-items-center justify-content-between">
                 <span class="fw-semibold">
-                  <i class="bi" :class="resident.profile.is_active ? 'bi-check-circle text-success' : 'bi-slash-circle text-danger'"></i>
+                  <i class="bi"
+                    :class="resident.profile.is_active ? 'bi-check-circle text-success' : 'bi-slash-circle text-danger'"></i>
                   {{ resident.profile.is_active ? 'Active' : 'Inactive' }}
                 </span>
-                <router-link class="btn btn-sm btn-outline-primary" :to="{ name: 'UserProfile', params: { id: resident.id } }">
+                <router-link class="btn btn-sm btn-outline-primary"
+                  :to="{ name: 'UserProfile', params: { id: resident.id } }">
                   View Profile
                 </router-link>
               </div>
-              <button v-if="isAdmin" class="btn btn-sm" :class="resident.profile.is_active ? 'btn-outline-danger' : 'btn-outline-success'"
-                type="button" @click="handleToggleUserStatus(resident)">
+              <button v-if="isAdmin" class="btn btn-sm"
+                :class="resident.profile.is_active ? 'btn-outline-danger' : 'btn-outline-success'" type="button"
+                @click="handleToggleUserStatus(resident)">
                 <span v-if="resident.profile.is_active"><i class="bi bi-slash-circle me-1"></i>Deactivate</span>
                 <span v-else><i class="bi bi-check-circle me-1"></i>Activate</span>
               </button>
