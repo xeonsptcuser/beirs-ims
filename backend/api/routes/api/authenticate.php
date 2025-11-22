@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\OtpController;
 
 
 /*
@@ -10,6 +11,8 @@ use App\Http\Controllers\Auth\AuthController;
  */
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::post('register', [AuthController::class, 'register'])->name('register');
+Route::post('request-otp', [OtpController::class, 'request'])->name('otp.request');
+Route::post('verify-otp', [OtpController::class, 'verify'])->name('otp.verify');
 
 /*
  * Protected Routes
