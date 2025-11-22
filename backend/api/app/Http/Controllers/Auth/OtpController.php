@@ -26,6 +26,14 @@ class OtpController extends Controller
             return response()->json(['message' => 'Incorrect email address or password...'], 401);
         }
 
+        if (!$this->otpService->isEnabled()) {
+            return response()->json([
+                'status' => 'disabled',
+                'user_id' => $user->id,
+                'message' => 'OTP is not enabled.',
+            ], 400);
+        }
+
         $otpResponse = $this->otpService->requestForUser($user);
 
         return response()->json(
@@ -63,6 +71,12 @@ class OtpController extends Controller
                 $verification['status_code'] ?? 400
             );
         }
+
+        if ($user->profile && !$user->profile->mobile_verified_at) {
+            $user->profile->update(['mobile_verified_at' => now()]);
+        }
+
+        $user->load('profile');
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

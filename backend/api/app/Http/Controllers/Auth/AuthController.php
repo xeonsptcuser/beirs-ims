@@ -34,7 +34,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Incorrect email address or password...'], 401);
         }
 
-        if ($this->otpService->isEnabled()) {
+        if ($this->otpService->requiresMobileVerification($user)) {
             $otpResponse = $this->otpService->requestForUser($user);
 
             return response()->json(

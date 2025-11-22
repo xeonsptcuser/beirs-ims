@@ -43,6 +43,15 @@ class OtpService
             ];
         }
 
+        if (!$this->requiresMobileVerification($user)) {
+            return [
+                'ok' => false,
+                'status' => 'already_verified',
+                'message' => 'Mobile number already verified; no OTP required.',
+                'status_code' => 200,
+            ];
+        }
+
         $recipient = $user->profile?->routeNotificationForItextmo();
         if (!$recipient) {
             return [
@@ -139,6 +148,13 @@ class OtpService
             'message' => 'OTP verified successfully.',
             'otp' => $otp,
         ];
+    }
+
+    public function requiresMobileVerification(User $user): bool
+    {
+        return $this->isEnabled()
+            && $user->role === 'resident'
+            && !$user->profile?->mobile_verified_at;
     }
 
     /**
