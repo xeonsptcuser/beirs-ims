@@ -40,4 +40,12 @@ return [
         'password' => env('ITEXTMO_API_PASSWORD'),
         'sender' => env('ITEXTMO_SENDER_ID'),
     ],
+
+    'otp' => [
+        'enabled' => env('OTP_ENABLED', false),
+        'length' => env('OTP_CODE_LENGTH', 6),
+        'ttl' => env('OTP_TTL_MINUTES', 5),
+        'request_cooldown' => env('OTP_REQUEST_COOLDOWN', 60),
+        'max_attempts' => env('OTP_MAX_ATTEMPTS', 5),
+    ],
 ];

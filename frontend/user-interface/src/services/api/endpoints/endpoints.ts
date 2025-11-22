@@ -19,6 +19,8 @@ const AUTH_ADDRESSES_ROUTE = `${AUTH_BASE}/addresses`
 export const endpoints = {
   // PUBLIC ENDPOINTS
   LOGIN: `${COMMON_BASE}/login`,
+  REQUEST_OTP: `${COMMON_BASE}/request-otp`,
+  VERIFY_OTP: `${COMMON_BASE}/verify-otp`,
   REGISTRATION: `${COMMON_BASE}/register`,
 
   // AUTHENTICATED ENDPOINTS

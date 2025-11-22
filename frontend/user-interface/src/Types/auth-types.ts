@@ -10,11 +10,19 @@ export interface LoginRequestPayload {
   password: string
 }
 
-export interface LoginResponse {
-  status: string
+export interface LoginSuccessResponse {
+  status: 'success'
   user: UserSessionInfo
   token: string
 }
+
+export interface OtpRequiredResponse {
+  status: 'otp_required'
+  user_id: number
+  message: string
+}
+
+export type LoginResponse = LoginSuccessResponse | OtpRequiredResponse
 
 export interface RegisterRequest {
   name: Fullname
@@ -53,4 +61,9 @@ export interface ApiErrorResponse {
   message?: string
   status?: number
   errors?: Record<string, string[]>
+}
+
+export interface VerifyOtpPayload {
+  user_id: number
+  otp_code: string
 }
