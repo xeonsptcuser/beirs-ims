@@ -66,8 +66,10 @@ const isProfileIncomplete = computed(() => {
   const missingMobile = !profile.mobile_number || !profile.mobile_number.trim();
   const missingAddress = !profile.street_address || !profile.street_address.trim();
   const unverifiedMobile = !profile.mobile_verified_at;
+  const hasNoGovtId = !profile.government_identity;
+  const isInactive = profile.is_active === false;
 
-  return missingMobile || missingAddress || unverifiedMobile;
+  return missingMobile || missingAddress || unverifiedMobile || hasNoGovtId || isInactive;
 });
 
 const shouldBlockActions = computed(
@@ -100,7 +102,8 @@ const profileCompletionMessage = computed(() => {
           <div class="card-body">
             <p class="text-muted small mb-1">Resident Overview</p>
             <h4 class="fw-bold mb-2">
-              {{ residentUser?.profile ? residentUser?.profile?.first_name + ' ' + (residentUser?.profile?.last_name || '') : 'Welcome' }}
+              {{ residentUser?.profile ? residentUser?.profile?.first_name + ' ' + (residentUser?.profile?.last_name ||
+                '') : 'Welcome' }}
             </h4>
             <p class="text-secondary mb-3">{{ profileCompletionMessage }}</p>
             <router-link v-if="shouldBlockActions" class="btn btn-primary btn-sm"
@@ -118,9 +121,11 @@ const profileCompletionMessage = computed(() => {
           <div class="card-body">
             <p class="text-muted small mb-1">Quick Snapshot</p>
             <ul class="list-unstyled mb-0 text-secondary small">
-              <li class="mb-2"><i class="bi bi-patch-check me-2 text-success"></i>Track certificate releases online.</li>
+              <li class="mb-2"><i class="bi bi-patch-check me-2 text-success"></i>Track certificate releases online.
+              </li>
               <li class="mb-2"><i class="bi bi-bell me-2 text-primary"></i>Receive updates when statuses change.</li>
-              <li><i class="bi bi-shield-check me-2 text-danger"></i>Reports stay private between you and the barangay.</li>
+              <li><i class="bi bi-shield-check me-2 text-danger"></i>Reports stay private between you and the barangay.
+              </li>
             </ul>
           </div>
         </div>
@@ -131,8 +136,8 @@ const profileCompletionMessage = computed(() => {
       <div class="col-md-6" v-for="navItem of navItems" :key="navItem.name">
         <router-link :to="{ name: navItem.name, params: { role: props.role, id: props.userId } }"
           class="action-card btn d-flex flex-column gap-2 h-100"
-          :class="[{ disabled: shouldBlockActions }, navItem.btnType]"
-          :aria-disabled="shouldBlockActions" @click="handleBlockedNavigation">
+          :class="[{ disabled: shouldBlockActions }, navItem.btnType]" :aria-disabled="shouldBlockActions"
+          @click="handleBlockedNavigation">
           <div class="d-flex align-items-center gap-3">
             <div class="icon-circle">
               <i class="bi" :class="navItem.icon"></i>
