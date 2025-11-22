@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import FormContainer from "@/components/common/FormContainer/FormContainer.vue";
 import { useLoginAccount } from "./composable/useLoginAccount";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import WarningLabel from "@/components/common/WarningLabel/WarningLabel.vue";
 import SuccessLabel from "@/components/common/SuccessLabel/SuccessLabel.vue";
-import type { ApiErrorResponse, LoginRequestPayload } from "@/Types";
-import { userLogin } from "@/Utils/loginServices";
+import type { ApiErrorResponse, LoginRequestPayload, LoginSuccessResponse } from "@/Types";
+import { requestOtp, userLogin, verifyOtp } from "@/Utils/loginServices";
 import { useRouter } from "vue-router";
 import { useSessionStore } from "@/Utils/store/useSessionStore";
 import FormButton from "@/components/common/FormButton/FormButton.vue";
 import { useGlobalLoadingStore } from "@/Utils/store/useGlobalLoadingStore";
 import FormFloatingInput from "@/components/common/FormFloatingInput/FormFloatingInput.vue";
+import { useOtpForm } from "./composable/useOtpForm";
 
 const {
   form,
@@ -21,15 +22,44 @@ const {
   clearSuccessResponse
 } = useLoginAccount();
 
+const {
+  form: otpForm,
+  errors: otpErrors,
+  errorMessages: otpErrorMessages,
+  validateForm: validateOtpForm,
+  resetForm: resetOtpForm,
+} = useOtpForm();
+
 const hasError = ref(false);
 const apiErrorMessage = ref('');
+const successMessage = ref('');
+const authStage = ref<'credentials' | 'otp'>('credentials');
+const otpUserId = ref<number | null>(null);
+const cachedCredentials = reactive<LoginRequestPayload>({ email: '', password: '' });
+
 const router = useRouter();
 const useSession = useSessionStore();
 const navigation = useGlobalLoadingStore();
 
+const handleLoginSuccess = (response: LoginSuccessResponse) => {
+  hasError.value = false;
+  apiErrorMessage.value = '';
+  successMessage.value = '';
+
+  useSession.setSession(response);
+
+  router.push({
+    name: 'Dashboard',
+    params: {
+      role: response.user.role
+    }
+  });
+};
+
 const handleLogin = async () => {
   clearSuccessResponse();
   apiErrorMessage.value = '';
+  successMessage.value = '';
   navigation.startNavigation();
   try {
     const isValid = validateForm()
@@ -41,22 +71,21 @@ const handleLogin = async () => {
 
       const response = await userLogin(requestPayload)
 
+      if (response.status === 'otp_required') {
+        cachedCredentials.email = form.email
+        cachedCredentials.password = form.password
+        hasError.value = false;
+        authStage.value = 'otp';
+        otpUserId.value = response.user_id;
+        successMessage.value = response.message ?? 'OTP sent.';
+        return;
+      }
+
       if (response.status !== 'success') {
         throw response;
       }
 
-
-      hasError.value = false;
-      apiErrorMessage.value = '';
-
-      useSession.setSession(response);
-
-      router.push({
-        name: 'Dashboard',
-        params: {
-          role: response.user.role
-        }
-      });
+      handleLoginSuccess(response)
 
     } else {
       hasError.value = true;
@@ -78,8 +107,83 @@ const handleLogin = async () => {
   }
 }
 
+const handleVerifyOtp = async () => {
+  hasError.value = false;
+  apiErrorMessage.value = '';
+  successMessage.value = '';
+
+  if (!validateOtpForm()) {
+    hasError.value = true;
+    return;
+  }
+
+  if (!otpUserId.value) {
+    apiErrorMessage.value = 'Missing user reference for OTP verification.'
+    hasError.value = true;
+    return;
+  }
+
+  navigation.startNavigation();
+  try {
+    const response = await verifyOtp({
+      user_id: otpUserId.value,
+      otp_code: otpForm.otp_code,
+    })
+
+    resetOtpForm()
+    handleLoginSuccess(response)
+  } catch (error) {
+    hasError.value = true;
+    const apiError = error as { response?: { data?: ApiErrorResponse } }
+    const messageFromResponse =
+      apiError?.response?.data?.message ||
+      Object.values(apiError?.response?.data?.errors ?? {})
+        .flat()
+        .find(msg => !!msg)
+
+    const fallbackMessage =
+      error instanceof Error && error.message ? error.message : 'Failed to verify OTP. Please try again.'
+    apiErrorMessage.value = messageFromResponse ?? fallbackMessage
+  } finally {
+    navigation.endNavigation()
+  }
+}
+
+const handleResendOtp = async () => {
+  hasError.value = false;
+  apiErrorMessage.value = '';
+  successMessage.value = '';
+
+  navigation.startNavigation();
+  try {
+    const response = await requestOtp(cachedCredentials)
+    if (response.status === 'otp_required') {
+      otpUserId.value = response.user_id
+      successMessage.value = response.message ?? 'A new OTP has been sent.'
+    }
+  } catch (error) {
+    hasError.value = true;
+    const apiError = error as { response?: { data?: ApiErrorResponse } }
+    const messageFromResponse =
+      apiError?.response?.data?.message ||
+      Object.values(apiError?.response?.data?.errors ?? {})
+        .flat()
+        .find(msg => !!msg)
+
+    const fallbackMessage =
+      error instanceof Error && error.message ? error.message : 'Failed to resend OTP. Please try again.'
+    apiErrorMessage.value = messageFromResponse ?? fallbackMessage
+  } finally {
+    navigation.endNavigation()
+  }
+}
+
 const filteredErrors = computed(() => {
-  const fieldErrors = Object.values(errorMessages.value).filter(msg => msg.error && msg.error.trim() !== '')
+  const activeErrors = authStage.value === 'otp'
+    ? Object.values(otpErrorMessages.value)
+    : Object.values(errorMessages.value)
+
+  const fieldErrors = activeErrors.filter(msg => msg.error && msg.error.trim() !== '')
   if (apiErrorMessage.value.trim()) {
     fieldErrors.unshift({ error: apiErrorMessage.value })
   }
@@ -115,15 +219,33 @@ onMounted(() => {
         <div class="col-lg-5 ms-auto">
           <FormContainer :has-error="hasError" title="Account Login">
             <WarningLabel :has-error="hasError" :errors="filteredErrors" />
-            <SuccessLabel :is-success="!!isSuccessResponse?.status" :message="isSuccessResponse?.message" />
-            <form class="d-flex flex-column gap-3" @submit.prevent="handleLogin">
+            <SuccessLabel :is-success="!!(successMessage || isSuccessResponse?.status)"
+              :message="successMessage || isSuccessResponse?.message" />
+            <form class="d-flex flex-column gap-3"
+              @submit.prevent="authStage === 'otp' ? handleVerifyOtp() : handleLogin()">
               <FormFloatingInput type="text" label="Email Address" placeholder="Email Address" id="userName" autofocus
                 v-model="form.email" :has-error="errors.email" :error-message="errorMessages.email.error"
-                :is-capitalized="false" />
+                :is-capitalized="false" :disabled="authStage === 'otp'" />
               <FormFloatingInput type="password" label="Password" placeholder="Password" id="passWord"
                 v-model="form.password" :has-error="errors.password" :error-message="errorMessages.password.error"
-                :is-capitalized="false" />
-              <FormButton label="Sign In" class="w-100" />
+                :is-capitalized="false" :disabled="authStage === 'otp'" />
+
+              <FormFloatingInput v-if="authStage === 'otp'" type="text" label="One-Time Password"
+                placeholder="Enter OTP" id="otp"
+                v-model="otpForm.otp_code" :has-error="otpErrors.otp_code"
+                :error-message="otpErrorMessages.otp_code.error" :is-capitalized="false" />
+
+              <FormButton :label="authStage === 'otp' ? 'Verify OTP' : 'Sign In'" class="w-100" />
+
+              <button v-if="authStage === 'otp'" type="button" class="btn btn-outline-primary w-100"
+                @click="handleResendOtp">
+                Resend OTP
+              </button>
+
+              <div class="text-center" v-if="authStage === 'otp'">
+                <small class="text-muted">Enter the 6-digit code sent to your registered mobile number.</small>
+              </div>
+
               <div class="text-center">
                 <small class="text-muted">Forgot password? Contact your barangay staff.</small>
               </div>

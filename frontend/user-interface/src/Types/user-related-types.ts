@@ -16,6 +16,7 @@ type ProfileCore = NameFields &
 export interface UserProfile extends ProfileCore {
   id: number
   email_verification_at: string | null
+  mobile_verified_at?: string | null
   is_active: boolean
   user?: User
   government_identity?: GovernmentIdentity | null

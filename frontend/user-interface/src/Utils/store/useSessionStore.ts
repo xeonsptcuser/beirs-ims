@@ -1,4 +1,4 @@
-import type { LoginResponse } from '@/Types'
+import type { LoginSuccessResponse } from '@/Types'
 import { defineStore } from 'pinia'
 import { userLogout } from '@/Utils/loginServices'
 
@@ -14,7 +14,7 @@ export const useSessionStore = defineStore('session', {
   }),
 
   actions: {
-    setSession(data: LoginResponse) {
+    setSession(data: LoginSuccessResponse) {
       const user = data.user
       const token = data.token
 

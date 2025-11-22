@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Interfaces\UsersRepositoryInterface;
 use App\Models\Users\UserProfile;
+use App\Services\OtpService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -12,7 +13,10 @@ use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller
 {
 
-    public function __construct(private readonly UsersRepositoryInterface $users)
+    public function __construct(
+        private readonly UsersRepositoryInterface $users,
+        private readonly OtpService $otpService,
+    )
     {
     }
 
@@ -28,6 +32,19 @@ class AuthController extends Controller
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Incorrect email address or password...'], 401);
+        }
+
+        if ($this->otpService->requiresMobileVerification($user)) {
+            $otpResponse = $this->otpService->requestForUser($user);
+
+            return response()->json(
+                [
+                    'status' => $otpResponse['status'],
+                    'user_id' => $user->id,
+                    'message' => $otpResponse['message'],
+                ],
+                $otpResponse['status_code'] ?? 200
+            );
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
