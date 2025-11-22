@@ -47,7 +47,7 @@ class UsersRepositoryImpl implements UsersRepositoryInterface
     public function createWithProfile(array $userData, array $profileData): User
     {
         return DB::transaction(function () use ($userData, $profileData) {
-            $profileData['is_active'] ??= true;
+            $profileData['is_active'] ??= false;
             $profile = UserProfile::create($profileData);
 
             $user = $profile->user()->create([

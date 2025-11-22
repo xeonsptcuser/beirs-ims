@@ -112,18 +112,6 @@ class UsersController extends Controller
             'government_identity' => ['sometimes', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ]);
 
-        Log::info('gov-id.update.request', [
-            'has_file' => $request->hasFile('government_identity'),
-            'files' => collect(Arr::wrap($request->file('government_identity')))->map(fn($f) => [
-                'name' => $f?->getClientOriginalName(),
-                'mime' => $f?->getClientMimeType(),
-                'size' => $f?->getSize(),
-            ]),
-        ]);
-        Log::info('request.payload', [
-            'request' => $request->files->keys()
-        ]);
-
         $userData = collect($validated)
             ->only(['email', 'password', 'role'])
             ->filter(fn($value) => !is_null($value))
