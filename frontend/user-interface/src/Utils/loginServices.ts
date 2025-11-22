@@ -1,18 +1,43 @@
 import { endpoints } from '@/services/api/endpoints'
 import { LoginRegisterService } from '@/services/api/http/login-register-service'
+import { OtpService } from '@/services/api/http/otp-service'
 import type {
   LoginRequestPayload,
   LoginResponse,
   RegisterRequestPayload,
   CommonResponse,
+  LoginSuccessResponse,
+  VerifyOtpPayload,
 } from '@/Types'
 
 export const userLogin = async (data: LoginRequestPayload): Promise<LoginResponse> => {
   const loginRegisterService = LoginRegisterService.getInstance()
   const response = await loginRegisterService.postRequestLogin(data, endpoints.LOGIN)
 
-  if (!response?.status || response.status !== 'success') {
+  if (!response?.status || (response.status !== 'success' && response.status !== 'otp_required')) {
     throw new Error('Failed to login user...')
+  }
+
+  return response
+}
+
+export const requestOtp = async (data: LoginRequestPayload): Promise<LoginResponse> => {
+  const otpService = OtpService.getInstance()
+  const response = await otpService.requestOtp(data, endpoints.REQUEST_OTP)
+
+  if (!response?.status || (response.status !== 'otp_required' && response.status !== 'success')) {
+    throw new Error('Failed to request OTP...')
+  }
+
+  return response
+}
+
+export const verifyOtp = async (data: VerifyOtpPayload): Promise<LoginSuccessResponse> => {
+  const otpService = OtpService.getInstance()
+  const response = await otpService.verifyOtp(data, endpoints.VERIFY_OTP)
+
+  if (!response?.status || response.status !== 'success') {
+    throw new Error('Invalid OTP code...')
   }
 
   return response
