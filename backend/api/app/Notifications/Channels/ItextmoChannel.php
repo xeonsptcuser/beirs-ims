@@ -2,6 +2,7 @@
 
 namespace App\Notifications\Channels;
 
+use App\Notifications\Contracts\ItextmoMessage;
 use App\Services\ItextmoClient;
 use Illuminate\Notifications\Notification;
 
@@ -13,11 +14,11 @@ class ItextmoChannel
 
     /**
      * @param object $notifiable The notifiable entity (e.g., UserProfile)
-     * @param Notification $notification Any notification that implements toItextMo($notifiable)
+     * @param Notification&ItextmoMessage $notification Notification that can format an iTextMo payload
      */
     public function send(object $notifiable, Notification $notification): void
     {
-        if (!method_exists($notification, 'toItextMo')) {
+        if (!$notification instanceof ItextmoMessage) {
             return;
         }
 

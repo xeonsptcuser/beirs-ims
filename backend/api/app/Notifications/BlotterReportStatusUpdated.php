@@ -5,14 +5,16 @@ namespace App\Notifications;
 use App\Models\BlotterReport\BlotterReport;
 use App\Models\Users\User;
 use App\Notifications\Channels\ItextmoChannel;
+use App\Notifications\Contracts\ItextmoMessage;
+use App\Notifications\Traits\FormatItextMoMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class BlotterReportStatusUpdated extends Notification implements ShouldQueue
+class BlotterReportStatusUpdated extends Notification implements ShouldQueue, ItextmoMessage
 {
-    use Queueable;
+    use Queueable, FormatItextMoMessage;
 
     /**
      * Create a new notification instance.
@@ -70,18 +72,11 @@ class BlotterReportStatusUpdated extends Notification implements ShouldQueue
     // Update the name
     public function toItextMo(object $notifiable): array
     {
-        return [
-            'to' => $notifiable->mobile_number,
-            'message' => sprintf(
-                'Hi %s, your %s request is now %s. %s',
-                $this->blotterReport->profile?->first_name ?? 'Resident',
-                $this->blotterReport->cert_request_type,
-                strtoupper($this->blotterReport->status),
-                $this->blotterReport->status === BlotterReport::STATUS_RELEASED
-                ? 'Pick it up at the barangay hall.'
-                : 'Check the app for details.'
-            ),
-        ];
+        return $this->buildItextMoMessage(
+            model: $this->blotterReport,
+            notifiable: $notifiable,
+            releasedStatus: BlotterReport::STATUS_RELEASED
+        );
     }
 
 }
