@@ -65,7 +65,9 @@ const isProfileIncomplete = computed(() => {
 
   const missingMobile = !profile.mobile_number || !profile.mobile_number.trim();
   const missingAddress = !profile.street_address || !profile.street_address.trim();
-  return missingMobile || missingAddress;
+  const unverifiedMobile = !profile.mobile_verified_at;
+
+  return missingMobile || missingAddress || unverifiedMobile;
 });
 
 const shouldBlockActions = computed(
