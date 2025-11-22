@@ -19,7 +19,7 @@
         <div class="col-md-4">
           <h6 class="text-uppercase fw-semibold mb-3">Contact Details</h6>
           <ul class="list-unstyled text-white-50 small mb-0">
-            <li class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i>Brgy. Alang-Alang, Leyte</li>
+            <li class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i>Brgy. Alang-Alang, Mandaue City</li>
             <li class="mb-2"><i class="bi bi-telephone-fill me-2"></i>+63 975 123 1234</li>
             <li><i class="bi bi-envelope-fill me-2"></i>barangay@alang-alang.gov</li>
           </ul>

@@ -5,14 +5,16 @@ namespace App\Notifications;
 use App\Models\Certificates\CertificateRequest;
 use App\Models\Users\User;
 use App\Notifications\Channels\ItextmoChannel;
+use App\Notifications\Contracts\ItextmoMessage;
+use App\Notifications\Traits\FormatItextMoMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class CertificateRequestStatusUpdated extends Notification implements ShouldQueue
+class CertificateRequestStatusUpdated extends Notification implements ShouldQueue, ItextmoMessage
 {
-    use Queueable;
+    use Queueable, FormatItextMoMessage;
 
     /**
      * Create a new notification instance.
@@ -71,18 +73,11 @@ class CertificateRequestStatusUpdated extends Notification implements ShouldQueu
     // Update the name
     public function toItextMo(object $notifiable): array
     {
-        return [
-            'to' => $notifiable->mobile_number,
-            'message' => sprintf(
-                'Hi %s, your %s request is now %s. %s',
-                $this->certificate->profile?->first_name ?? 'Resident',
-                $this->certificate->cert_request_type,
-                strtoupper($this->certificate->status),
-                $this->certificate->status === CertificateRequest::STATUS_RELEASED
-                ? 'Pick it up at the barangay hall.'
-                : 'Check the app for details.'
-            ),
-        ];
+        return $this->buildItextMoMessage(
+            model: $this->certificate,
+            notifiable: $notifiable,
+            releasedStatus: CertificateRequest::STATUS_RELEASED
+        );
     }
 
 }
