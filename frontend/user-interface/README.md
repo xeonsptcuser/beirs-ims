@@ -1,54 +1,39 @@
-# user-interface
+# BEIRS User Interface
 
-This template should help get you started developing with Vue 3 in Vite.
+Vue 3 + Vite single-page application for the Barangay E-Information & Reporting System (BEIRS).
 
-## Recommended IDE Setup
+## What the UI offers
+- **Residents:** register/login, manage profiles, submit blotter reports with attachments, request certificates, and monitor case statuses with notifications.
+- **Barangay staff:** review reports, inspect resident details, and approve or reject blotter and certificate requests.
+- **Administrators:** manage user accounts, oversee approvals, and view analytical summaries such as heatmap-style incident distributions.
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Tech stack
+- Vue 3 with TypeScript
+- Vite dev/build tooling
+- Vue Router & state management (Pinia)
+- Vitest for unit testing
 
-## Recommended Browser Setup
-
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
+## Project setup
 ```sh
 npm install
 ```
 
-### Compile and Hot-Reload for Development
-
+### Compile and hot-reload for development
 ```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
-
+### Type-check, compile, and minify for production
 ```sh
 npm run build
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
+### Run unit tests with [Vitest](https://vitest.dev/)
 ```sh
 npm run test:unit
 ```
 
 ### Lint with [ESLint](https://eslint.org/)
-
 ```sh
 npm run lint
 ```

@@ -1,53 +1,40 @@
 # BEIRS_IMS_APP
 
-- ROLE BASED AUTHENTICATION /  AUTHORIZATION
-- STATUS NOTIFICATION via sms/app notification
-- LOG INTERACTION HISTORY for MONITORING purposes
+Barangay E-Information & Reporting System (BEIRS) is a role-based platform for handling community reports, certificate requests, and notifications between residents, barangay staff, and administrators.
 
-## RESIDENT 
-- REGISTER, LOGIN, LOGOUT UPDATE PROFILE , 
-- SUBMIT CASE/REPORTS (FILE BLOTTER) FORM (no update once submitted),
-- REQUEST CERTIFICATIONS, 
-- TRACK CASE STATUS, 
-- Upload Media Files (e.g video, images)
+## Core capabilities
+- **Role-based authentication and authorization** to secure resident, staff, and admin experiences.
+- **Status notifications** delivered through SMS/app channels so users stay informed about case progress and approvals.
+- **Audit trails** that log key interactions for monitoring and accountability.
 
-## BRGY STAFF 
-- REVIEW SUBMITTED CASE/ BLOTTER REPORT
-- VIEW MULTIPLE SUBMITTED CASE/ BLOTTER REPORT 
-- VIEW REQUESTOR RESIDENT INFO
-- APPROVE/REJECT BLOTTER REPORT/CASE ( reject if unsatisfying evidences) 
-- APPROVE/REJECT CERTIFICATIONS (brgy.clearance, kasal, etc. indigency, residency)
+## Resident features
+- Register, log in/out, and maintain a personal profile.
+- Submit blotter/case reports (with media uploads) and track their status.
+- Request barangay certifications (clearance, indigency, residency, etc.).
 
-## ADMIN
-- LOGIN/LOGOUT 
-- CREATE ACCOUNT (CRUD) FOR RESIDENTS & STAFF
-- VIEW ACCOUNTS (VIEW ALL USERS)
-- VIEW ONE RECORD (USER)
-- GENERATE HEATMAP REPORT - SUMMARY OF THE DANGER AREA based on number of submitted case(location mentioned) graph/chart
-- REVIEW SUBMITTED CASE/ BLOTTER REPORT - APPROVE/REJECT 
-- VIEW MULTIPLE SUBMITTED CASE/ BLOTTER REPORT
-- REVIEW CERTIFICATES (brgy.clearance, kasal, etc. indigency, residency) APPROVE/REJECT
+## Barangay staff features
+- Review and triage submitted blotter reports with evidence review.
+- Access resident details tied to a report.
+- Approve or reject blotter cases and certificate requests.
 
-## 
-### Steps in pushing your changes into github.
-##
+## Admin features
+- Manage user accounts (create/update residents and staff, view all users and individual records).
+- Approve or reject blotter reports and certificate requests.
+- Generate heatmap-style summaries that surface hotspots based on reported incident locations.
 
-This is to ensure that code that are merged into the develop branch are bug-free and working as intended.
+---
 
-## Git Commands 
- - git checkout develop - This will be the main branch
- - git pull - This is to ensure that our main branch is up-to-date in our local environment
- - git checkout -b feat/<your_assigned_role (e.g admin, resident, staff)>/<figma_screen_name (e.g register, login, admin-dashboard)>-001
-   - example: git checkout -b feat/admin/login-001
-       - This is for uniform git names.
- - git add . - This will add all changes into staged changes.
-    - Note: be careful when using the dot(.) directive. check your changes before you commit, there might be some changes that should not be pushed.
- - git commit -m "<your_commit_message>" - This will commit your changes with your custom message
- - git push - this will push your changes.
-   - Tip: After you use this command there will be a warning and a command you can use to push changes. copy that git command and paste it.
+## Contributing workflow
+To keep the `develop` branch stable, follow this workflow when pushing changes:
 
-## Creating a Pull Request
-- Go to github.com/beirs_ims.git
-- At the top of the folder explorer you will see a message with a button showing "Pull Request" click the button to create Pull Request(PR)
-- Anyone can merge as long as some one has reviewed it.
-- Please double check your changes before you merge it, so that the main branch does not break.
+1. `git checkout develop` to start from the main branch.
+2. `git pull` to ensure your local branch is up to date.
+3. Create a feature branch: `git checkout -b feat/<role>/<figma_screen>-001` (e.g., `git checkout -b feat/admin/login-001`).
+4. Stage only the intended changes: `git add .` (verify the diff before committing).
+5. Commit with a clear message: `git commit -m "<your_commit_message>"`.
+6. Push and follow the suggested command if Git shows a remote tip.
+
+### Creating a Pull Request
+1. Open the repository in GitHub.
+2. Use the **Pull Request** button to start a PR from your feature branch.
+3. Request a review and double-check the diff before merging to keep `develop` healthy.
