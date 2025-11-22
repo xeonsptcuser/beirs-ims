@@ -97,6 +97,10 @@ class CertificateRequestsController extends Controller
         // update this so that when the staff approves or rejects, the resident is notified via sms
         $certificateRequest = $this->certificate->getById($id, []);
 
+        if (is_null($certificateRequest)) {
+            abort(404);
+        }
+
         $user = $request->user()->loadMissing('profile');
         $handlerProfileId = $user->profile?->id;
 
@@ -104,10 +108,6 @@ class CertificateRequestsController extends Controller
             $certificateRequest->profile->notify(
                 new CertificateRequestStatusUpdated($certificateRequest, $user)
             );
-        }
-
-        if (is_null($certificateRequest)) {
-            abort(404);
         }
 
         $validated = $request->validate([
