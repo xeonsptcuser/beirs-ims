@@ -4,7 +4,7 @@ import DropdownInput from '@/components/common/DropdownInput/DropdownInput.vue';
 import FormButton from '@/components/common/FormButton/FormButton.vue';
 import { fetchSingleUserProfile, updateUserAccount } from '@/Utils/userServices';
 import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue';
-import { Tooltip } from 'bootstrap';
+import { Collapse, Tooltip } from 'bootstrap';
 import type { AxiosError } from 'axios';
 import type { ApiErrorResponse, CommonResponse, UpdateAccountRequestPayload, User } from '@/Types';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
@@ -43,7 +43,9 @@ const isPasswordChangeable = ref<boolean>(false);
 const localErrorMsg = ref<string>('')
 const hasGovernmentId = ref<boolean>(false)
 const govtIdTooltipButton = ref<HTMLElement | null>(null)
+const govtIdCollapseRef = ref<HTMLElement | null>(null)
 let govtIdTooltipInstance: Tooltip | null = null
+let govtIdCollapseInstance: Collapse | null = null
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '');
 const storageBaseUrl =
   (import.meta.env.VITE_STORAGE_URL as string | undefined) ||
@@ -79,6 +81,7 @@ const secondaryGovernmentIds = [
 ]
 
 const govtIdCollapseId = 'govt-id-accepted-list'
+const isGovtIdListOpen = ref(false)
 
 const govtIdentityTypeOption = ['National Identification', 'Philippine Passport', 'UMID', 'Drivers License']
 
@@ -198,6 +201,10 @@ const handleShowPasswordChange = () => {
   isEditableSubmit.value = !isEditableSubmit.value
 }
 
+const toggleGovtIdList = () => {
+  govtIdCollapseInstance?.toggle();
+}
+
 const age = computed(() => {
   return computeAge(form.date_of_birth)
 });
@@ -246,11 +253,34 @@ onMounted(() => {
   if (govtIdTooltipButton.value) {
     govtIdTooltipInstance = new Tooltip(govtIdTooltipButton.value);
   }
+
+  if (govtIdCollapseRef.value) {
+    const handleGovtIdShown = () => {
+      isGovtIdListOpen.value = true
+    }
+
+    const handleGovtIdHidden = () => {
+      isGovtIdListOpen.value = false
+    }
+
+    govtIdCollapseRef.value.addEventListener('shown.bs.collapse', handleGovtIdShown)
+    govtIdCollapseRef.value.addEventListener('hidden.bs.collapse', handleGovtIdHidden)
+
+    govtIdCollapseInstance = new Collapse(govtIdCollapseRef.value, { toggle: false })
+
+    onBeforeUnmount(() => {
+      govtIdCollapseRef.value?.removeEventListener('shown.bs.collapse', handleGovtIdShown)
+      govtIdCollapseRef.value?.removeEventListener('hidden.bs.collapse', handleGovtIdHidden)
+    })
+  }
 })
 
 onBeforeUnmount(() => {
   govtIdTooltipInstance?.dispose();
   govtIdTooltipInstance = null;
+
+  govtIdCollapseInstance?.dispose();
+  govtIdCollapseInstance = null;
 })
 </script>
 <template>
@@ -335,13 +365,12 @@ onBeforeUnmount(() => {
                   <p class="text-muted small mb-0">Tap to view the full list of options.</p>
                 </div>
                 <button class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1" type="button"
-                  data-bs-toggle="collapse" :data-bs-target="`#${govtIdCollapseId}`" aria-expanded="false"
-                  :aria-controls="govtIdCollapseId">
-                  <i class="bi bi-chevron-down small"></i>
-                  <span>View list</span>
+                  :aria-expanded="isGovtIdListOpen" :aria-controls="govtIdCollapseId" @click="toggleGovtIdList">
+                  <i class="bi" :class="isGovtIdListOpen ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                  <span>{{ isGovtIdListOpen ? 'Hide list' : 'View list' }}</span>
                 </button>
               </div>
-              <div class="collapse mt-2" :id="govtIdCollapseId">
+              <div class="collapse mt-2" :id="govtIdCollapseId" ref="govtIdCollapseRef">
                 <div class="bg-light border rounded p-3">
                   <p class="text-muted small mb-1">List of acceptable Primary IDs</p>
                   <ul class="small mb-3 ps-3">
