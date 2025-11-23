@@ -50,6 +50,7 @@ export type CreateUserAccountRequest = UiName &
     password: string
     passwordConfirmation: string
     date_of_birth: string
+    govtIdentityType: string
     governmentIdentity: File[]
   }
 
@@ -69,6 +70,7 @@ export type UpdateAccountRequestPayload = Partial<
   PayloadBase & {
     password: string
     password_confirmation: string
+    government_identity_type: string
     government_identity: File[] | FileList | null
   }
 >

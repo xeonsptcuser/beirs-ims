@@ -3,7 +3,8 @@ import { useEditUserAccount } from './composable/useEditUserAccount';
 import DropdownInput from '@/components/common/DropdownInput/DropdownInput.vue';
 import FormButton from '@/components/common/FormButton/FormButton.vue';
 import { fetchSingleUserProfile, updateUserAccount } from '@/Utils/userServices';
-import { computed, ref, watchEffect } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue';
+import { Collapse, Tooltip } from 'bootstrap';
 import type { AxiosError } from 'axios';
 import type { ApiErrorResponse, CommonResponse, UpdateAccountRequestPayload, User } from '@/Types';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
@@ -41,10 +42,45 @@ const navigation = useGlobalLoadingStore();
 const isPasswordChangeable = ref<boolean>(false);
 const localErrorMsg = ref<string>('')
 const hasGovernmentId = ref<boolean>(false)
+const govtIdTooltipButton = ref<HTMLElement | null>(null)
+const govtIdCollapseRef = ref<HTMLElement | null>(null)
+let govtIdTooltipInstance: Tooltip | null = null
+let govtIdCollapseInstance: Collapse | null = null
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '');
 const storageBaseUrl =
   (import.meta.env.VITE_STORAGE_URL as string | undefined) ||
   (apiBaseUrl ? `${apiBaseUrl}/storage` : '/storage');
+
+const primaryGovernmentIds = [
+  'Valid Philippine Passport',
+  'PhilSys ID / ePhilID',
+  "Driver's License",
+  'SSS ID / Unified Multi-Purpose ID (UMID)',
+  'GSIS eCard',
+  'Professional Regulation Commission (PRC) ID',
+  'Integrated Bar of the Philippines (IBP) ID',
+  "COMELEC Voter's ID",
+  'Postal ID',
+  'PWD ID',
+  'Senior Citizen ID',
+  "OFW/Seafarer's ID",
+  'Firearms License ID (issued by PNP-FEO)',
+  'National Bureau of Investigation (NBI) Clearance (with photo)',
+]
+
+const secondaryGovernmentIds = [
+  'Birth Certificate (issued by PSA or LCR)',
+  'Marriage Certificate (PSA)',
+  'PhilHealth ID',
+  'Pag-IBIG Loyalty Card',
+  'Police Clearance',
+  'Company ID (current employer, with signature of employer or authorized representative)',
+]
+
+const govtIdCollapseId = 'govt-id-accepted-list'
+const isGovtIdListOpen = ref(false)
+
+const govtIdentityTypeOption = [...primaryGovernmentIds, '...', ...secondaryGovernmentIds]
 
 const governmentIdUrl = computed(() => {
   const doc = responseData.value?.profile?.government_identity;
@@ -52,7 +88,6 @@ const governmentIdUrl = computed(() => {
   const normalizedBase = storageBaseUrl.endsWith('/') ? storageBaseUrl.slice(0, -1) : storageBaseUrl;
   return `${normalizedBase}/${doc.storage_path}`.replace(/([^:]\/)\/+/g, '$1');
 });
-
 
 const handleUpdateUserAccount = async () => {
   navigation.startNavigation();
@@ -74,6 +109,7 @@ const handleUpdateUserAccount = async () => {
         address_line: form.addressLine,
         mobile_number: form.mobileNumber,
         date_of_birth: form.date_of_birth,
+        government_identity_type: form.govtIdentityType,
         government_identity: form.governmentIdentity,
       }
 
@@ -163,6 +199,10 @@ const handleShowPasswordChange = () => {
   isEditableSubmit.value = !isEditableSubmit.value
 }
 
+const toggleGovtIdList = () => {
+  govtIdCollapseInstance?.toggle();
+}
+
 const age = computed(() => {
   return computeAge(form.date_of_birth)
 });
@@ -205,6 +245,40 @@ watchEffect(() => {
   setTimeout(() => {
     setSuccessResponse(null);
   }, 3000);
+})
+
+onMounted(() => {
+  if (govtIdTooltipButton.value) {
+    govtIdTooltipInstance = new Tooltip(govtIdTooltipButton.value);
+  }
+
+  if (govtIdCollapseRef.value) {
+    const handleGovtIdShown = () => {
+      isGovtIdListOpen.value = true
+    }
+
+    const handleGovtIdHidden = () => {
+      isGovtIdListOpen.value = false
+    }
+
+    govtIdCollapseRef.value.addEventListener('shown.bs.collapse', handleGovtIdShown)
+    govtIdCollapseRef.value.addEventListener('hidden.bs.collapse', handleGovtIdHidden)
+
+    govtIdCollapseInstance = new Collapse(govtIdCollapseRef.value, { toggle: false })
+
+    onBeforeUnmount(() => {
+      govtIdCollapseRef.value?.removeEventListener('shown.bs.collapse', handleGovtIdShown)
+      govtIdCollapseRef.value?.removeEventListener('hidden.bs.collapse', handleGovtIdHidden)
+    })
+  }
+})
+
+onBeforeUnmount(() => {
+  govtIdTooltipInstance?.dispose();
+  govtIdTooltipInstance = null;
+
+  govtIdCollapseInstance?.dispose();
+  govtIdCollapseInstance = null;
 })
 </script>
 <template>
@@ -273,14 +347,53 @@ watchEffect(() => {
         <div class="card shadow-sm border-0">
           <!-- inside the Government ID card -->
           <div class="card-body">
-            <h6 class="fw-semibold mb-3">Government ID</h6>
-
-            <div v-if="hasGovernmentId" class="border rounded text-center p-3 mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h6 class="fw-semibold mb-3 mb-lg-0">Government ID</h6>
+              <button ref="govtIdTooltipButton" type="button" class="btn btn-link text-muted p-0"
+                data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true"
+                data-bs-title="Upload a clear photo or scan of your valid government ID.<br>Accepted files: PNG, JPG, JPEG, PDF.<br>Uploading a new file will replace the existing ID.">
+                <i class="bi bi-info-circle-fill"></i>
+                <span class="visually-hidden">Government ID upload instructions</span>
+              </button>
+            </div>
+            <div class="mb-3">
+              <div class="d-flex align-items-center justify-content-between gap-2">
+                <div>
+                  <p class="text-muted small mb-0">Accepted IDs</p>
+                  <p class="text-muted small mb-0">Tap to view the full list of options.</p>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1" type="button"
+                  :aria-expanded="isGovtIdListOpen" :aria-controls="govtIdCollapseId" @click="toggleGovtIdList">
+                  <i class="bi" :class="isGovtIdListOpen ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                  <span>{{ isGovtIdListOpen ? 'Hide' : 'View' }}</span>
+                </button>
+              </div>
+              <div class="collapse mt-2" :id="govtIdCollapseId" ref="govtIdCollapseRef">
+                <div class="bg-light border rounded p-3">
+                  <p class="text-muted text-sm mb-1">List of acceptable Primary IDs</p>
+                  <ul class="small mb-3 ps-3">
+                    <li v-for="(id, index) in primaryGovernmentIds" :key="`primary-id-${index}`">{{ id }}</li>
+                  </ul>
+                  <p class="text-muted text-sm mb-1">(If no primary ID is available, At least one with photo and
+                    signature, must be presented)</p>
+                  <ul class="small mb-0 ps-3">
+                    <li v-for="(id, index) in secondaryGovernmentIds" :key="`secondary-id-${index}`">{{ id }}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div v-if="hasGovernmentId" class="border rounded text-center p-3 mb-2">
               <img :src="governmentIdUrl || nationalId" alt="Government ID" class="img-fluid" />
               <p class="text-muted small mb-0 mt-2">Uploading a new file will replace the existing ID.</p>
             </div>
-
-            <UploadFiles v-model="form.governmentIdentity" :has-error="errors.governmentIdentity"
+            <div class="mb-2" v-if="isProfileOwner">
+              <DropdownInput :options="govtIdentityTypeOption" label="Type" id="govt-id-type"
+                v-model="form.govtIdentityType" :error-message="errorMessages.govtIdentityType.error"
+                :has-error="errors.govtIdentityType" :is-capitalized="false" />
+            </div>
+            <UploadFiles
+              v-if="form.govtIdentityType && form.govtIdentityType !== '...' && [...primaryGovernmentIds, ...secondaryGovernmentIds].includes(form.govtIdentityType)"
+              v-model="form.governmentIdentity" :has-error="errors.governmentIdentity"
               :error-message="errorMessages.governmentIdentity.error"
               :is-disabled="isNotEditableUser.governmentIdentity" accept=".png,.jpg,.jpeg,.pdf" :multiple="false" />
           </div>

@@ -2,7 +2,7 @@
 import FormSearchInput from '@/components/common/FormSearchInput/FormSearchInput.vue';
 import Pagination from '@/components/common/Pagination/Pagination.vue';
 import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
-import type { PaginationLink, User } from '@/Types';
+import type { PageInfo, PaginationLink, User } from '@/Types';
 import { formatName } from '@/Utils/helpers/formatters';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
@@ -18,6 +18,7 @@ const isAdmin = computed(() => session.isRoleAdmin());
 const searchByNameKeyWord = ref<string>('');
 const hasError = ref<boolean>(false);
 const errorMessage = ref<string>('');
+const sortMode = ref<'default' | 'address'>('default');
 
 const pagination = reactive({
   current: 1,
@@ -31,7 +32,18 @@ const fetchResidentUsers = async (page: number = pagination.current, search?: st
   navigation.startNavigation();
   hasError.value = false;
   try {
-    const response = await fetchAllUsers({ page, per_page: pagination.perPage, search });
+    const params: PageInfo = { page, per_page: pagination.perPage };
+    const keyword = (search ?? searchByNameKeyWord.value.trim()) || undefined;
+
+    if (keyword) {
+      params.search = keyword;
+    }
+
+    if (sortMode.value === 'address') {
+      params.sort = 'address';
+    }
+
+    const response = await fetchAllUsers(params);
 
     if (response.status !== 'success') {
       throw response;
@@ -85,6 +97,12 @@ const resetSearch = () => {
   searchByNameKeyWord.value = '';
   pagination.current = 1;
   fetchResidentUsers();
+};
+
+const toggleAddressSort = () => {
+  sortMode.value = sortMode.value === 'address' ? 'default' : 'address';
+  pagination.current = 1;
+  fetchResidentUsers(pagination.current, searchByNameKeyWord.value.trim() || undefined);
 };
 
 onMounted(() => {
@@ -146,6 +164,13 @@ onMounted(() => {
             <button class="btn btn-primary w-100" type="submit">Search</button>
             <button class="btn btn-outline-secondary w-100" type="button" @click="resetSearch">Reset</button>
           </div>
+          <div class="col-12 col-lg-4 d-flex justify-content-lg-end">
+            <button class="btn" :class="sortMode === 'address' ? 'btn-outline-secondary' : 'btn-outline-primary'"
+              type="button" @click="toggleAddressSort">
+              <i class="bi" :class="sortMode === 'address' ? 'bi-clock-history' : 'bi-sort-alpha-down'"></i>
+              <span class="ms-2">{{ sortMode === 'address' ? 'Sort by Newest' : 'Sort by Address (A–Z)' }}</span>
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -175,9 +200,11 @@ onMounted(() => {
               </span>
             </div>
             <div class="text-secondary small mb-3">
-              <p class="mb-1"><i class="bi bi-geo-alt me-2 text-primary"></i>{{ resident.profile?.street_address ||
+              <p class="mb-1 text-capitalize"><i class="bi bi-geo-alt me-2 text-primary"></i>{{
+                resident.profile?.street_address ||
                 'Noaddress provided' }}</p>
-              <p class="mb-1"><i class="bi bi-telephone me-2 text-primary"></i>{{ resident.profile?.mobile_number ||
+              <p class="mb-1"><i class="bi bi-telephone me-2 text-primary"></i>{{
+                resident.profile?.mobile_number ||
                 'Nocontact info' }}</p>
             </div>
             <div class="mt-auto d-flex flex-column gap-2">

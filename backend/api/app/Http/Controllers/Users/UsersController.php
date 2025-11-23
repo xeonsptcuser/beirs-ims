@@ -24,7 +24,8 @@ class UsersController extends Controller
     {
         $perPage = $request->integer('per_page');
         $search = $this->resolveSearch($request);
-        $users = $this->users->all(['profile.governmentIdentity'], $perPage, $search);
+        $sort = $request->filled('sort') ? $request->string('sort')->lower()->value() : null;
+        $users = $this->users->all(['profile.governmentIdentity'], $perPage, $search, $sort);
 
         return response()->json([
             'status' => 'success',

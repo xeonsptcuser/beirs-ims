@@ -12,15 +12,21 @@ use Illuminate\Support\Str;
 
 class UsersRepositoryImpl implements UsersRepositoryInterface
 {
-    public function all(array $relations = [], ?int $perPage = null, ?string $search = null): Collection|LengthAwarePaginator
+    public function all(array $relations = [], ?int $perPage = null, ?string $search = null, ?string $sort = null): Collection|LengthAwarePaginator
     {
         $query = User::with($relations)
-            ->whereIn('role', ['resident', 'staff'])
-            ->orderBy(
+            ->whereIn('role', ['resident', 'staff']);
+
+        $sort = $sort ? Str::lower($sort) : null;
+
+        if ($sort === 'address') {
+            $query->orderBy(
                 UserProfile::select(DB::raw("LOWER(COALESCE(street_address, ''))"))
                     ->whereColumn('user_profiles.id', 'users.user_profile_id')
             );
-        // ->orderBy('created_at', 'desc');
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
 
         $search = $search ? Str::lower($search) : null;
         if (!empty($search)) {

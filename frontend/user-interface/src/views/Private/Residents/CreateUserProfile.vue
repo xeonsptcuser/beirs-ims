@@ -142,7 +142,7 @@ const filteredErrors = computed(() => {
                   :has-error="errors.mobileNumber" :error-message="errorMessages.mobileNumber.error" :optional="true" />
               </div>
               <div class="col-md-6 col-sm-12">
-                <DropdownInput :options="addressOptions" label="Street Address" id="streetAddress"
+                <DropdownInput :options="addressOptions" label="Home Address" id="streetAddress"
                   v-model="form.streetAddress" :has-error="errors.streetAddress"
                   :error-message="errorMessages.streetAddress.error" />
               </div>

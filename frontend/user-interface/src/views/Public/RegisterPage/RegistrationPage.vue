@@ -63,7 +63,7 @@ const handleRegisterAccount = async () => {
       });
 
       hasError.value = false;
-      router.push({ name: 'LoginPage' });
+      router.replace({ name: 'LoginPage' });
     } else {
       hasError.value = true;
     }
@@ -159,7 +159,7 @@ const filteredErrors = computed(() => {
                     :error-message="errorMessages.mobileNumber.error" :is-capitalized="false" />
                 </div>
                 <div class="col-md-6 col-sm-12">
-                  <DropdownInput :options="barangayAddressOptions" label="Street Address" id="street-address"
+                  <DropdownInput :options="barangayAddressOptions" label="Home Address" id="street-address"
                     v-model="form.streetAddress" :has-error="errors.streetAddress"
                     :error-message="errorMessages.streetAddress.error" :is-disabled="isLoadingAddresses" />
                 </div>
