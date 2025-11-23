@@ -49,6 +49,37 @@ const storageBaseUrl =
   (import.meta.env.VITE_STORAGE_URL as string | undefined) ||
   (apiBaseUrl ? `${apiBaseUrl}/storage` : '/storage');
 
+const primaryGovernmentIds = [
+  'Valid Philippine Passport',
+  'PhilSys ID / ePhilID',
+  "Driver's License",
+  'SSS ID / Unified Multi-Purpose ID (UMID)',
+  'GSIS eCard',
+  'Professional Regulation Commission (PRC) ID',
+  'Integrated Bar of the Philippines (IBP) ID',
+  "COMELEC Voter's ID",
+  'Postal ID',
+  'PWD ID',
+  'Senior Citizen ID',
+  "OFW/Seafarer's ID",
+  'Firearms License ID (issued by PNP-FEO)',
+  'National Bureau of Investigation (NBI) Clearance (with photo)',
+]
+
+const secondaryGovernmentIds = [
+  'Birth Certificate (issued by PSA or LCR)',
+  'Marriage Certificate (PSA)',
+  'PhilHealth ID',
+  'Pag-IBIG Loyalty Card',
+  'Police Clearance',
+  'Company ID (current employer, with signature of employer or authorized representative)',
+  'School ID (for students, signed by school head or registrar)',
+  'School Records (Transcript of Records, Report Card, Enrollment Form with photo)',
+  "Baptismal Certificate (for minors without government-issued IDs)",
+]
+
+const govtIdCollapseId = 'govt-id-accepted-list'
+
 const govtIdentityTypeOption = ['National Identification', 'Philippine Passport', 'UMID', 'Drivers License']
 
 const governmentIdUrl = computed(() => {
@@ -298,35 +329,30 @@ onBeforeUnmount(() => {
               </button>
             </div>
             <div class="mb-3">
-              <p class="text-muted small mb-1">List of acceptable Primary IDs</p>
-              <ul class="small mb-2 ps-3">
-                <li>Valid Philippine Passport</li>
-                <li>PhilSys ID / ePhilID</li>
-                <li>Driver's License</li>
-                <li>SSS ID / Unified Multi-Purpose ID (UMID)</li>
-                <li>GSIS eCard</li>
-                <li>Professional Regulation Commission (PRC) ID</li>
-                <li>Integrated Bar of the Philippines (IBP) ID</li>
-                <li>COMELEC Voter's ID</li>
-                <li>Postal ID</li>
-                <li>PWD ID</li>
-                <li>Senior Citizen ID</li>
-                <li>OFW/Seafarer's ID</li>
-                <li>Firearms License ID (issued by PNP-FEO)</li>
-                <li>National Bureau of Investigation (NBI) Clearance (with photo)</li>
-              </ul>
-              <p class="text-muted small mb-1">(If no primary ID is available, two secondary IDs, at least one with photo and signature, must be presented)</p>
-              <ul class="small mb-0 ps-3">
-                <li>Birth Certificate (issued by PSA or LCR)</li>
-                <li>Marriage Certificate (PSA)</li>
-                <li>PhilHealth ID</li>
-                <li>Pag-IBIG Loyalty Card</li>
-                <li>Police Clearance</li>
-                <li>Company ID (current employer, with signature of employer or authorized representative)</li>
-                <li>School ID (for students, signed by school head or registrar)</li>
-                <li>School Records (Transcript of Records, Report Card, Enrollment Form with photo)</li>
-                <li>Baptismal Certificate (for minors without government-issued IDs)</li>
-              </ul>
+              <div class="d-flex align-items-center justify-content-between gap-2">
+                <div>
+                  <p class="text-muted small mb-0">Accepted IDs</p>
+                  <p class="text-muted small mb-0">Tap to view the full list of options.</p>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1" type="button"
+                  data-bs-toggle="collapse" :data-bs-target="`#${govtIdCollapseId}`" aria-expanded="false"
+                  :aria-controls="govtIdCollapseId">
+                  <i class="bi bi-chevron-down small"></i>
+                  <span>View list</span>
+                </button>
+              </div>
+              <div class="collapse mt-2" :id="govtIdCollapseId">
+                <div class="bg-light border rounded p-3">
+                  <p class="text-muted small mb-1">List of acceptable Primary IDs</p>
+                  <ul class="small mb-3 ps-3">
+                    <li v-for="(id, index) in primaryGovernmentIds" :key="`primary-id-${index}`">{{ id }}</li>
+                  </ul>
+                  <p class="text-muted small mb-1">(If no primary ID is available, two secondary IDs, at least one with photo and signature, must be presented)</p>
+                  <ul class="small mb-0 ps-3">
+                    <li v-for="(id, index) in secondaryGovernmentIds" :key="`secondary-id-${index}`">{{ id }}</li>
+                  </ul>
+                </div>
+              </div>
             </div>
             <div v-if="hasGovernmentId" class="border rounded text-center p-3 mb-2">
               <img :src="governmentIdUrl || nationalId" alt="Government ID" class="img-fluid" />
