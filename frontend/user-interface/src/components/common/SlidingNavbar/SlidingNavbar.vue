@@ -100,7 +100,7 @@ const handleNavClick = () => {
     </div>
     <div class="offcanvas-body">
       <ul class="list-group-flush ms-auto" v-if="!useSession.isLoggedIn()">
-        <div class="d-md-flex gap-md-3 align-items-center pt-2">
+        <div class="d-md-flex gap-md-5 align-items-center pt-2">
           <li v-for="item in navLinks" :key="item.path" class="list-group-item">
             <router-link class="nav-link py-2 text-responsive" :to="item.path" @click="handleNavClick">
               {{ item.label }}
