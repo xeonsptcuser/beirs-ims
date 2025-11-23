@@ -18,6 +18,7 @@ const isAdmin = computed(() => session.isRoleAdmin());
 const searchByNameKeyWord = ref<string>('');
 const hasError = ref<boolean>(false);
 const errorMessage = ref<string>('');
+const sortMode = ref<'default' | 'address'>('default');
 
 const pagination = reactive({
   current: 1,
@@ -31,7 +32,18 @@ const fetchResidentUsers = async (page: number = pagination.current, search?: st
   navigation.startNavigation();
   hasError.value = false;
   try {
-    const response = await fetchAllUsers({ page, per_page: pagination.perPage, search });
+    const params: Record<string, unknown> = { page, per_page: pagination.perPage };
+    const keyword = search ?? searchByNameKeyWord.value.trim() || undefined;
+
+    if (keyword) {
+      params.search = keyword;
+    }
+
+    if (sortMode.value === 'address') {
+      params.sort = 'address';
+    }
+
+    const response = await fetchAllUsers(params);
 
     if (response.status !== 'success') {
       throw response;
@@ -85,6 +97,12 @@ const resetSearch = () => {
   searchByNameKeyWord.value = '';
   pagination.current = 1;
   fetchResidentUsers();
+};
+
+const toggleAddressSort = () => {
+  sortMode.value = sortMode.value === 'address' ? 'default' : 'address';
+  pagination.current = 1;
+  fetchResidentUsers(pagination.current, searchByNameKeyWord.value.trim() || undefined);
 };
 
 onMounted(() => {
@@ -145,6 +163,13 @@ onMounted(() => {
           <div class="col-md-6 col-lg-4 d-flex gap-2">
             <button class="btn btn-primary w-100" type="submit">Search</button>
             <button class="btn btn-outline-secondary w-100" type="button" @click="resetSearch">Reset</button>
+          </div>
+          <div class="col-12 col-lg-4 d-flex justify-content-lg-end">
+            <button class="btn" :class="sortMode === 'address' ? 'btn-outline-primary' : 'btn-outline-secondary'"
+              type="button" @click="toggleAddressSort">
+              <i class="bi" :class="sortMode === 'address' ? 'bi-sort-alpha-down' : 'bi-clock-history'"></i>
+              <span class="ms-2">{{ sortMode === 'address' ? 'Sort by Address (A–Z)' : 'Sort by Newest' }}</span>
+            </button>
           </div>
         </form>
       </div>

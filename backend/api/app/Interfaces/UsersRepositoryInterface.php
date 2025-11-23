@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 interface UsersRepositoryInterface
 {
-    public function all(array $relations = [], ?int $perPage = null, ?string $search = null): Collection|LengthAwarePaginator;
+    public function all(array $relations = [], ?int $perPage = null, ?string $search = null, ?string $sort = null): Collection|LengthAwarePaginator;
     public function findById(int $id, array $relations = []): ?User;
     public function findByEmail(string $email, array $relations = []): ?User;
     public function createWithProfile(array $userData, array $profileData): User;
