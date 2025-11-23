@@ -10,8 +10,10 @@ const props = withDefaults(defineProps<{
   hasError?: boolean
   isDisabled?: boolean
   isOptional?: boolean
+  isCapitalized?: boolean
 }>(), {
-  isOptional: false
+  isOptional: false,
+  isCapitalized: true
 })
 
 const model = defineModel<string>()
@@ -29,7 +31,7 @@ const formatOptionalLabel = computed(() => {
 const formattedOptions = computed(() =>
   props.options.map((option) => ({
     value: option,
-    label: capitalizeWords(option),
+    label: props.isCapitalized ? capitalizeWords(option) : option
   }))
 )
 </script>

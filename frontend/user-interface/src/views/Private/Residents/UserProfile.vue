@@ -75,15 +75,12 @@ const secondaryGovernmentIds = [
   'Pag-IBIG Loyalty Card',
   'Police Clearance',
   'Company ID (current employer, with signature of employer or authorized representative)',
-  'School ID (for students, signed by school head or registrar)',
-  'School Records (Transcript of Records, Report Card, Enrollment Form with photo)',
-  "Baptismal Certificate (for minors without government-issued IDs)",
 ]
 
 const govtIdCollapseId = 'govt-id-accepted-list'
 const isGovtIdListOpen = ref(false)
 
-const govtIdentityTypeOption = ['National Identification', 'Philippine Passport', 'UMID', 'Drivers License']
+const govtIdentityTypeOption = [...primaryGovernmentIds, '...', ...secondaryGovernmentIds]
 
 const governmentIdUrl = computed(() => {
   const doc = responseData.value?.profile?.government_identity;
@@ -112,6 +109,7 @@ const handleUpdateUserAccount = async () => {
         address_line: form.addressLine,
         mobile_number: form.mobileNumber,
         date_of_birth: form.date_of_birth,
+        government_identity_type: form.govtIdentityType,
         government_identity: form.governmentIdentity,
       }
 
@@ -367,16 +365,18 @@ onBeforeUnmount(() => {
                 <button class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1" type="button"
                   :aria-expanded="isGovtIdListOpen" :aria-controls="govtIdCollapseId" @click="toggleGovtIdList">
                   <i class="bi" :class="isGovtIdListOpen ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
-                  <span>{{ isGovtIdListOpen ? 'Hide list' : 'View list' }}</span>
+                  <span>{{ isGovtIdListOpen ? 'Hide' : 'View' }}</span>
                 </button>
               </div>
               <div class="collapse mt-2" :id="govtIdCollapseId" ref="govtIdCollapseRef">
                 <div class="bg-light border rounded p-3">
-                  <p class="text-muted small mb-1">List of acceptable Primary IDs</p>
+                  <p class="text-muted text-sm mb-1">List of acceptable Primary IDs</p>
                   <ul class="small mb-3 ps-3">
                     <li v-for="(id, index) in primaryGovernmentIds" :key="`primary-id-${index}`">{{ id }}</li>
                   </ul>
-                  <p class="text-muted small mb-1">(If no primary ID is available, two secondary IDs, at least one with photo and signature, must be presented)</p>
+                  <p class="text-muted text-sm mb-1">(If no primary ID is available, two secondary IDs, at least one
+                    with
+                    photo and signature, must be presented)</p>
                   <ul class="small mb-0 ps-3">
                     <li v-for="(id, index) in secondaryGovernmentIds" :key="`secondary-id-${index}`">{{ id }}</li>
                   </ul>
@@ -390,10 +390,12 @@ onBeforeUnmount(() => {
             <div class="mb-2">
               <DropdownInput :options="govtIdentityTypeOption" label="Type" id="govt-id-type"
                 v-model="form.govtIdentityType" :error-message="errorMessages.govtIdentityType.error"
-                :has-error="errors.govtIdentityType" />
+                :has-error="errors.govtIdentityType" :is-capitalized="false" />
             </div>
-            <UploadFiles v-if="form.govtIdentityType" v-model="form.governmentIdentity"
-              :has-error="errors.governmentIdentity" :error-message="errorMessages.governmentIdentity.error"
+            <UploadFiles
+              v-if="form.govtIdentityType && form.govtIdentityType !== '...' && [...primaryGovernmentIds, ...secondaryGovernmentIds].includes(form.govtIdentityType)"
+              v-model="form.governmentIdentity" :has-error="errors.governmentIdentity"
+              :error-message="errorMessages.governmentIdentity.error"
               :is-disabled="isNotEditableUser.governmentIdentity" accept=".png,.jpg,.jpeg,.pdf" :multiple="false" />
           </div>
         </div>
