@@ -219,7 +219,7 @@ watch(isLoggedIn, (loggedIn) => {
             <div class="d-flex align-items-center gap-3" v-if="isLoggedIn">
               <div class="dropdown" ref="notificationDropdownRef" :class="{ show: showNotifications }">
                 <button class="btn btn-outline-light btn-sm position-relative" type="button"
-                  @click="toggleNotifications">
+                  @click="toggleNotifications" v-if="session.isRoleResident()">
                   <i class="bi bi-bell"></i>
                   <span v-if="unreadCount"
                     class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">

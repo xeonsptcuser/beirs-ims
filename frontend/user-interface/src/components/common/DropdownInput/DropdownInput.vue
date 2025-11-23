@@ -5,7 +5,7 @@ import { computed } from 'vue';
 const props = withDefaults(defineProps<{
   id: string
   options: Array<string>
-  label: string
+  label?: string
   errorMessage?: string
   hasError?: boolean
   isDisabled?: boolean
@@ -38,7 +38,8 @@ const formattedOptions = computed(() =>
 <template>
   <slot v-if="$slots.default" />
   <div class="form-floating">
-    <select class="form-select" :class="{ 'is-invalid': hasError }" v-model="model" :disabled="isDisabled">
+    <select :id :name="id" class="form-select" :class="{ 'is-invalid': hasError }" v-model="model"
+      :disabled="isDisabled">
       <option value="" selected>...</option>
       <option :value="option.value" v-for="option in formattedOptions" :key="option.value">
         {{ option.label }}

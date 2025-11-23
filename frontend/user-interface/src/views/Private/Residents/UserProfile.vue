@@ -433,7 +433,7 @@ onBeforeUnmount(() => {
 
               <div>
                 <p class="text-muted text-uppercase small mb-2">Account Details</p>
-                <div class="row g-2 align-items-end">
+                <div class="row g-2 align-items-center">
                   <div class="col-md-6">
                     <FormFloatingInput type="email" label="Email Address" id="email" v-model="form.email"
                       :has-error="errors.email" :error-message="errorMessages.email.error"
@@ -446,7 +446,7 @@ onBeforeUnmount(() => {
                     <FormFloatingInput v-else type="text" label="Age" id="user-age" v-model="age"
                       :is-disabled="isNotEditableUser.dateOfBirth" />
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-3" style="margin-top: -1%;">
                     <DropdownInput :options="roleOptions" label="Role" id="select-roles" v-model="form.role"
                       :error-message="errorMessages.role.error" :has-error="errors.role"
                       :is-disabled="isNotEditableUser.role" />
