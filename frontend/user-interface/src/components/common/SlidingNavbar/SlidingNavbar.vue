@@ -46,7 +46,7 @@ const navItems = [
   },
   {
     name: 'HeatMaps',
-    label: 'Heat-Map',
+    label: 'Heat Map',
     roles: ['admin']
   },
   {
@@ -115,12 +115,14 @@ const handleNavClick = () => {
       </ul>
       <ul class="list-group-flush ms-auto" v-else>
         <div class="d-md-flex align-items-center pt-2 d-none">
+          <!-- NAVIGATIONS FILTERED BY ROLES -->
           <li class="list-group-item px-2" v-for="navItem in filteredRoles" :key="navItem.name">
             <router-link :to="{ name: `${navItem.name}`, params: { role: useSession.role } }"
               class="text-light text-decoration-none" @click="handleNavClick">
               {{ navItem.label }}
             </router-link>
           </li>
+          <!-- NOTIFICATION LIST -->
           <li class="list-group-item ps-2 me-3">
             <div class="dropdown">
               <a href="#" class="me-3 dropdown-toggle hidden-arrow text-light position-relative" id="notification"
@@ -199,6 +201,7 @@ const handleNavClick = () => {
               </div>
             </div>
           </li>
+          <!-- USER PROFILE DROPDOWN -->
           <li class="list-group-item ms-md-3 mt-3 mt-md-0">
             <div class="dropdown ">
               <a class="text-decoration-none text-md-dark dropdown-toggle" href="#" id="navProfileDesktop"
