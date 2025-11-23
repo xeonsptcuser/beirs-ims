@@ -4,7 +4,7 @@ import DropdownInput from '@/components/common/DropdownInput/DropdownInput.vue';
 import FormButton from '@/components/common/FormButton/FormButton.vue';
 import { fetchSingleUserProfile, updateUserAccount } from '@/Utils/userServices';
 import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue';
-import { Tooltip } from 'bootstrap';
+import { Collapse, Tooltip } from 'bootstrap';
 import type { AxiosError } from 'axios';
 import type { ApiErrorResponse, CommonResponse, UpdateAccountRequestPayload, User } from '@/Types';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
@@ -43,11 +43,45 @@ const isPasswordChangeable = ref<boolean>(false);
 const localErrorMsg = ref<string>('')
 const hasGovernmentId = ref<boolean>(false)
 const govtIdTooltipButton = ref<HTMLElement | null>(null)
+const govtIdCollapseRef = ref<HTMLElement | null>(null)
 let govtIdTooltipInstance: Tooltip | null = null
+let govtIdCollapseInstance: Collapse | null = null
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '');
 const storageBaseUrl =
   (import.meta.env.VITE_STORAGE_URL as string | undefined) ||
   (apiBaseUrl ? `${apiBaseUrl}/storage` : '/storage');
+
+const primaryGovernmentIds = [
+  'Valid Philippine Passport',
+  'PhilSys ID / ePhilID',
+  "Driver's License",
+  'SSS ID / Unified Multi-Purpose ID (UMID)',
+  'GSIS eCard',
+  'Professional Regulation Commission (PRC) ID',
+  'Integrated Bar of the Philippines (IBP) ID',
+  "COMELEC Voter's ID",
+  'Postal ID',
+  'PWD ID',
+  'Senior Citizen ID',
+  "OFW/Seafarer's ID",
+  'Firearms License ID (issued by PNP-FEO)',
+  'National Bureau of Investigation (NBI) Clearance (with photo)',
+]
+
+const secondaryGovernmentIds = [
+  'Birth Certificate (issued by PSA or LCR)',
+  'Marriage Certificate (PSA)',
+  'PhilHealth ID',
+  'Pag-IBIG Loyalty Card',
+  'Police Clearance',
+  'Company ID (current employer, with signature of employer or authorized representative)',
+  'School ID (for students, signed by school head or registrar)',
+  'School Records (Transcript of Records, Report Card, Enrollment Form with photo)',
+  "Baptismal Certificate (for minors without government-issued IDs)",
+]
+
+const govtIdCollapseId = 'govt-id-accepted-list'
+const isGovtIdListOpen = ref(false)
 
 const govtIdentityTypeOption = ['National Identification', 'Philippine Passport', 'UMID', 'Drivers License']
 
@@ -167,6 +201,10 @@ const handleShowPasswordChange = () => {
   isEditableSubmit.value = !isEditableSubmit.value
 }
 
+const toggleGovtIdList = () => {
+  govtIdCollapseInstance?.toggle();
+}
+
 const age = computed(() => {
   return computeAge(form.date_of_birth)
 });
@@ -215,11 +253,34 @@ onMounted(() => {
   if (govtIdTooltipButton.value) {
     govtIdTooltipInstance = new Tooltip(govtIdTooltipButton.value);
   }
+
+  if (govtIdCollapseRef.value) {
+    const handleGovtIdShown = () => {
+      isGovtIdListOpen.value = true
+    }
+
+    const handleGovtIdHidden = () => {
+      isGovtIdListOpen.value = false
+    }
+
+    govtIdCollapseRef.value.addEventListener('shown.bs.collapse', handleGovtIdShown)
+    govtIdCollapseRef.value.addEventListener('hidden.bs.collapse', handleGovtIdHidden)
+
+    govtIdCollapseInstance = new Collapse(govtIdCollapseRef.value, { toggle: false })
+
+    onBeforeUnmount(() => {
+      govtIdCollapseRef.value?.removeEventListener('shown.bs.collapse', handleGovtIdShown)
+      govtIdCollapseRef.value?.removeEventListener('hidden.bs.collapse', handleGovtIdHidden)
+    })
+  }
 })
 
 onBeforeUnmount(() => {
   govtIdTooltipInstance?.dispose();
   govtIdTooltipInstance = null;
+
+  govtIdCollapseInstance?.dispose();
+  govtIdCollapseInstance = null;
 })
 </script>
 <template>
@@ -298,35 +359,29 @@ onBeforeUnmount(() => {
               </button>
             </div>
             <div class="mb-3">
-              <p class="text-muted small mb-1">List of acceptable Primary IDs</p>
-              <ul class="small mb-2 ps-3">
-                <li>Valid Philippine Passport</li>
-                <li>PhilSys ID / ePhilID</li>
-                <li>Driver's License</li>
-                <li>SSS ID / Unified Multi-Purpose ID (UMID)</li>
-                <li>GSIS eCard</li>
-                <li>Professional Regulation Commission (PRC) ID</li>
-                <li>Integrated Bar of the Philippines (IBP) ID</li>
-                <li>COMELEC Voter's ID</li>
-                <li>Postal ID</li>
-                <li>PWD ID</li>
-                <li>Senior Citizen ID</li>
-                <li>OFW/Seafarer's ID</li>
-                <li>Firearms License ID (issued by PNP-FEO)</li>
-                <li>National Bureau of Investigation (NBI) Clearance (with photo)</li>
-              </ul>
-              <p class="text-muted small mb-1">(If no primary ID is available, two secondary IDs, at least one with photo and signature, must be presented)</p>
-              <ul class="small mb-0 ps-3">
-                <li>Birth Certificate (issued by PSA or LCR)</li>
-                <li>Marriage Certificate (PSA)</li>
-                <li>PhilHealth ID</li>
-                <li>Pag-IBIG Loyalty Card</li>
-                <li>Police Clearance</li>
-                <li>Company ID (current employer, with signature of employer or authorized representative)</li>
-                <li>School ID (for students, signed by school head or registrar)</li>
-                <li>School Records (Transcript of Records, Report Card, Enrollment Form with photo)</li>
-                <li>Baptismal Certificate (for minors without government-issued IDs)</li>
-              </ul>
+              <div class="d-flex align-items-center justify-content-between gap-2">
+                <div>
+                  <p class="text-muted small mb-0">Accepted IDs</p>
+                  <p class="text-muted small mb-0">Tap to view the full list of options.</p>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1" type="button"
+                  :aria-expanded="isGovtIdListOpen" :aria-controls="govtIdCollapseId" @click="toggleGovtIdList">
+                  <i class="bi" :class="isGovtIdListOpen ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                  <span>{{ isGovtIdListOpen ? 'Hide list' : 'View list' }}</span>
+                </button>
+              </div>
+              <div class="collapse mt-2" :id="govtIdCollapseId" ref="govtIdCollapseRef">
+                <div class="bg-light border rounded p-3">
+                  <p class="text-muted small mb-1">List of acceptable Primary IDs</p>
+                  <ul class="small mb-3 ps-3">
+                    <li v-for="(id, index) in primaryGovernmentIds" :key="`primary-id-${index}`">{{ id }}</li>
+                  </ul>
+                  <p class="text-muted small mb-1">(If no primary ID is available, two secondary IDs, at least one with photo and signature, must be presented)</p>
+                  <ul class="small mb-0 ps-3">
+                    <li v-for="(id, index) in secondaryGovernmentIds" :key="`secondary-id-${index}`">{{ id }}</li>
+                  </ul>
+                </div>
+              </div>
             </div>
             <div v-if="hasGovernmentId" class="border rounded text-center p-3 mb-2">
               <img :src="governmentIdUrl || nationalId" alt="Government ID" class="img-fluid" />
