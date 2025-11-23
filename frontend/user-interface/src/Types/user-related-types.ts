@@ -50,6 +50,7 @@ export type CreateUserAccountRequest = UiName &
     password: string
     passwordConfirmation: string
     date_of_birth: string
+    govtIdentityType: string
     governmentIdentity: File[]
   }
 

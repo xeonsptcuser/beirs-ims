@@ -16,8 +16,7 @@ class AuthController extends Controller
     public function __construct(
         private readonly UsersRepositoryInterface $users,
         private readonly OtpService $otpService,
-    )
-    {
+    ) {
     }
 
     // POST /api/login
@@ -65,13 +64,13 @@ class AuthController extends Controller
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'middle_name' => 'required|string|max:100',
+            'middle_name' => 'nullable|string|max:100',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'date_of_birth' => ['required', 'date', "before_or_equal:{$legalAgeDate}"],
             'role' => 'in:admin,staff,resident',
-            'street_address' => 'nullable|string|max:255',
-            'mobile_number' => 'nullable|string|max:20',
+            'street_address' => 'required|string|max:255',
+            'mobile_number' => 'required|string|max:20',
         ]);
 
         $this->users->createWithProfile(

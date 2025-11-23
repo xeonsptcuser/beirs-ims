@@ -3,7 +3,10 @@ import { useBarangayAddresses } from '@/composables/useBarangayAddresses'
 import type { CreateUserAccountRequest } from '@/Types'
 import { reactive, ref } from 'vue'
 
-export function useCreateUserAccount(options?: { requirePassword: boolean; requireGovernmentId?: boolean }) {
+export function useCreateUserAccount(options?: {
+  requirePassword: boolean
+  requireGovernmentId?: boolean
+}) {
   const requiredPassword = options?.requirePassword ?? true
   const requireGovernmentId = options?.requireGovernmentId ?? true
   const { successResponse, setSuccessResponse } = useSharedAuthResponse()
@@ -25,6 +28,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean; requi
     streetAddress: '',
     addressLine: '',
     mobileNumber: '',
+    govtIdentityType: '',
     governmentIdentity: [],
   })
 
@@ -38,6 +42,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean; requi
     streetAddress: false,
     addressLine: false,
     mobileNumber: false,
+    govtIdentityType: false,
     governmentIdentity: false,
   })
 
@@ -51,6 +56,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean; requi
     streetAddress: { error: '' },
     addressLine: { error: '' },
     mobileNumber: { error: '' },
+    govtIdentityType: { error: '' },
     governmentIdentity: { error: '' },
   })
 
@@ -131,7 +137,7 @@ export function useCreateUserAccount(options?: { requirePassword: boolean; requi
     if (!form.streetAddress.trim()) {
       errors.value.streetAddress = true
       errorMessages.value.streetAddress = {
-        error: 'Please select your street address',
+        error: 'Please select your home address',
       }
       isValid = false
     }

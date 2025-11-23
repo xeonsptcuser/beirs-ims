@@ -3,7 +3,8 @@ import { useEditUserAccount } from './composable/useEditUserAccount';
 import DropdownInput from '@/components/common/DropdownInput/DropdownInput.vue';
 import FormButton from '@/components/common/FormButton/FormButton.vue';
 import { fetchSingleUserProfile, updateUserAccount } from '@/Utils/userServices';
-import { computed, ref, watchEffect } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue';
+import { Tooltip } from 'bootstrap';
 import type { AxiosError } from 'axios';
 import type { ApiErrorResponse, CommonResponse, UpdateAccountRequestPayload, User } from '@/Types';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
@@ -41,10 +42,14 @@ const navigation = useGlobalLoadingStore();
 const isPasswordChangeable = ref<boolean>(false);
 const localErrorMsg = ref<string>('')
 const hasGovernmentId = ref<boolean>(false)
+const govtIdTooltipButton = ref<HTMLElement | null>(null)
+let govtIdTooltipInstance: Tooltip | null = null
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '');
 const storageBaseUrl =
   (import.meta.env.VITE_STORAGE_URL as string | undefined) ||
   (apiBaseUrl ? `${apiBaseUrl}/storage` : '/storage');
+
+const govtIdentityTypeOption = ['National Identification', 'Philippine Passport', 'UMID', 'Drivers License']
 
 const governmentIdUrl = computed(() => {
   const doc = responseData.value?.profile?.government_identity;
@@ -52,7 +57,6 @@ const governmentIdUrl = computed(() => {
   const normalizedBase = storageBaseUrl.endsWith('/') ? storageBaseUrl.slice(0, -1) : storageBaseUrl;
   return `${normalizedBase}/${doc.storage_path}`.replace(/([^:]\/)\/+/g, '$1');
 });
-
 
 const handleUpdateUserAccount = async () => {
   navigation.startNavigation();
@@ -206,6 +210,17 @@ watchEffect(() => {
     setSuccessResponse(null);
   }, 3000);
 })
+
+onMounted(() => {
+  if (govtIdTooltipButton.value) {
+    govtIdTooltipInstance = new Tooltip(govtIdTooltipButton.value);
+  }
+})
+
+onBeforeUnmount(() => {
+  govtIdTooltipInstance?.dispose();
+  govtIdTooltipInstance = null;
+})
 </script>
 <template>
   <div class="my-5">
@@ -273,15 +288,57 @@ watchEffect(() => {
         <div class="card shadow-sm border-0">
           <!-- inside the Government ID card -->
           <div class="card-body">
-            <h6 class="fw-semibold mb-3">Government ID</h6>
-
-            <div v-if="hasGovernmentId" class="border rounded text-center p-3 mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h6 class="fw-semibold mb-3 mb-lg-0">Government ID</h6>
+              <button ref="govtIdTooltipButton" type="button" class="btn btn-link text-muted p-0"
+                data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true"
+                data-bs-title="Upload a clear photo or scan of your valid government ID.<br>Accepted files: PNG, JPG, JPEG, PDF.<br>Uploading a new file will replace the existing ID.">
+                <i class="bi bi-info-circle-fill"></i>
+                <span class="visually-hidden">Government ID upload instructions</span>
+              </button>
+            </div>
+            <div class="mb-3">
+              <p class="text-muted small mb-1">List of acceptable Primary IDs</p>
+              <ul class="small mb-2 ps-3">
+                <li>Valid Philippine Passport</li>
+                <li>PhilSys ID / ePhilID</li>
+                <li>Driver's License</li>
+                <li>SSS ID / Unified Multi-Purpose ID (UMID)</li>
+                <li>GSIS eCard</li>
+                <li>Professional Regulation Commission (PRC) ID</li>
+                <li>Integrated Bar of the Philippines (IBP) ID</li>
+                <li>COMELEC Voter's ID</li>
+                <li>Postal ID</li>
+                <li>PWD ID</li>
+                <li>Senior Citizen ID</li>
+                <li>OFW/Seafarer's ID</li>
+                <li>Firearms License ID (issued by PNP-FEO)</li>
+                <li>National Bureau of Investigation (NBI) Clearance (with photo)</li>
+              </ul>
+              <p class="text-muted small mb-1">(If no primary ID is available, two secondary IDs, at least one with photo and signature, must be presented)</p>
+              <ul class="small mb-0 ps-3">
+                <li>Birth Certificate (issued by PSA or LCR)</li>
+                <li>Marriage Certificate (PSA)</li>
+                <li>PhilHealth ID</li>
+                <li>Pag-IBIG Loyalty Card</li>
+                <li>Police Clearance</li>
+                <li>Company ID (current employer, with signature of employer or authorized representative)</li>
+                <li>School ID (for students, signed by school head or registrar)</li>
+                <li>School Records (Transcript of Records, Report Card, Enrollment Form with photo)</li>
+                <li>Baptismal Certificate (for minors without government-issued IDs)</li>
+              </ul>
+            </div>
+            <div v-if="hasGovernmentId" class="border rounded text-center p-3 mb-2">
               <img :src="governmentIdUrl || nationalId" alt="Government ID" class="img-fluid" />
               <p class="text-muted small mb-0 mt-2">Uploading a new file will replace the existing ID.</p>
             </div>
-
-            <UploadFiles v-model="form.governmentIdentity" :has-error="errors.governmentIdentity"
-              :error-message="errorMessages.governmentIdentity.error"
+            <div class="mb-2">
+              <DropdownInput :options="govtIdentityTypeOption" label="Type" id="govt-id-type"
+                v-model="form.govtIdentityType" :error-message="errorMessages.govtIdentityType.error"
+                :has-error="errors.govtIdentityType" />
+            </div>
+            <UploadFiles v-if="form.govtIdentityType" v-model="form.governmentIdentity"
+              :has-error="errors.governmentIdentity" :error-message="errorMessages.governmentIdentity.error"
               :is-disabled="isNotEditableUser.governmentIdentity" accept=".png,.jpg,.jpeg,.pdf" :multiple="false" />
           </div>
         </div>
