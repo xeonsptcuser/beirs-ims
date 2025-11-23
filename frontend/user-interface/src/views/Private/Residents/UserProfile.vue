@@ -374,9 +374,8 @@ onBeforeUnmount(() => {
                   <ul class="small mb-3 ps-3">
                     <li v-for="(id, index) in primaryGovernmentIds" :key="`primary-id-${index}`">{{ id }}</li>
                   </ul>
-                  <p class="text-muted text-sm mb-1">(If no primary ID is available, two secondary IDs, at least one
-                    with
-                    photo and signature, must be presented)</p>
+                  <p class="text-muted text-sm mb-1">(If no primary ID is available, At least one with photo and
+                    signature, must be presented)</p>
                   <ul class="small mb-0 ps-3">
                     <li v-for="(id, index) in secondaryGovernmentIds" :key="`secondary-id-${index}`">{{ id }}</li>
                   </ul>
@@ -387,7 +386,7 @@ onBeforeUnmount(() => {
               <img :src="governmentIdUrl || nationalId" alt="Government ID" class="img-fluid" />
               <p class="text-muted small mb-0 mt-2">Uploading a new file will replace the existing ID.</p>
             </div>
-            <div class="mb-2">
+            <div class="mb-2" v-if="isProfileOwner">
               <DropdownInput :options="govtIdentityTypeOption" label="Type" id="govt-id-type"
                 v-model="form.govtIdentityType" :error-message="errorMessages.govtIdentityType.error"
                 :has-error="errors.govtIdentityType" :is-capitalized="false" />

@@ -2,7 +2,7 @@
 import FormSearchInput from '@/components/common/FormSearchInput/FormSearchInput.vue';
 import Pagination from '@/components/common/Pagination/Pagination.vue';
 import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
-import type { PaginationLink, User } from '@/Types';
+import type { PageInfo, PaginationLink, User } from '@/Types';
 import { formatName } from '@/Utils/helpers/formatters';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
@@ -32,8 +32,8 @@ const fetchResidentUsers = async (page: number = pagination.current, search?: st
   navigation.startNavigation();
   hasError.value = false;
   try {
-    const params: Record<string, unknown> = { page, per_page: pagination.perPage };
-    const keyword = search ?? searchByNameKeyWord.value.trim() || undefined;
+    const params: PageInfo = { page, per_page: pagination.perPage };
+    const keyword = (search ?? searchByNameKeyWord.value.trim()) || undefined;
 
     if (keyword) {
       params.search = keyword;
@@ -165,10 +165,10 @@ onMounted(() => {
             <button class="btn btn-outline-secondary w-100" type="button" @click="resetSearch">Reset</button>
           </div>
           <div class="col-12 col-lg-4 d-flex justify-content-lg-end">
-            <button class="btn" :class="sortMode === 'address' ? 'btn-outline-primary' : 'btn-outline-secondary'"
+            <button class="btn" :class="sortMode === 'address' ? 'btn-outline-secondary' : 'btn-outline-primary'"
               type="button" @click="toggleAddressSort">
-              <i class="bi" :class="sortMode === 'address' ? 'bi-sort-alpha-down' : 'bi-clock-history'"></i>
-              <span class="ms-2">{{ sortMode === 'address' ? 'Sort by Address (A–Z)' : 'Sort by Newest' }}</span>
+              <i class="bi" :class="sortMode === 'address' ? 'bi-clock-history' : 'bi-sort-alpha-down'"></i>
+              <span class="ms-2">{{ sortMode === 'address' ? 'Sort by Newest' : 'Sort by Address (A–Z)' }}</span>
             </button>
           </div>
         </form>
@@ -200,9 +200,11 @@ onMounted(() => {
               </span>
             </div>
             <div class="text-secondary small mb-3">
-              <p class="mb-1"><i class="bi bi-geo-alt me-2 text-primary"></i>{{ resident.profile?.street_address ||
+              <p class="mb-1 text-capitalize"><i class="bi bi-geo-alt me-2 text-primary"></i>{{
+                resident.profile?.street_address ||
                 'Noaddress provided' }}</p>
-              <p class="mb-1"><i class="bi bi-telephone me-2 text-primary"></i>{{ resident.profile?.mobile_number ||
+              <p class="mb-1"><i class="bi bi-telephone me-2 text-primary"></i>{{
+                resident.profile?.mobile_number ||
                 'Nocontact info' }}</p>
             </div>
             <div class="mt-auto d-flex flex-column gap-2">

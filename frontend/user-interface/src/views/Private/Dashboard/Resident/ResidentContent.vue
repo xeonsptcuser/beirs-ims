@@ -87,7 +87,7 @@ const profileCompletionMessage = computed(() => {
     return profileErrorMessage.value;
   }
   if (shouldBlockActions.value) {
-    return 'Update your contact number and home address to unlock all features.';
+    return 'Update your contact number, home address, government identification and get verified by our admin to unlock all features.';
   }
   return 'Your profile is ready. Start by choosing an action below.';
 });
