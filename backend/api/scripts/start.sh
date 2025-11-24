@@ -14,7 +14,7 @@ echo "Running migrations..."
 php artisan migrate --force
 
 echo "Seeding database..."
-php artisan migrate:fresh --seed --seeder=BarangayAddressSeeder
+php artisan db:seed --force --class=BarangayAddressSeeder
 
 echo "Starting Nginx..."
 nginx -g "daemon off;"
