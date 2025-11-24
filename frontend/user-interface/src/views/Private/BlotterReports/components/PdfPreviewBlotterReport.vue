@@ -11,7 +11,7 @@ const props = defineProps<{
 const pdfService = PdfRelatedService.getInstance()
 
 // Static PDF template
-const pdfTemplateUrl = new URL('@/assets/pdf/affidavit.pdf', import.meta.url).href
+const pdfTemplateUrl = new URL('@/assets/images/certs/blotter1.pdf', import.meta.url).href
 
 const pdfUrl = ref<string | null>(null)
 const isLoading = ref<boolean>(false)
@@ -29,6 +29,7 @@ const positions = {
   incident_datetime: { x: 140, y: 570, size: 12 },
   location: { x: 140, y: 550, size: 12 },
   landmark: { x: 140, y: 530, size: 12 },
+  description: { x: 140, y: 300, size: 12 },
 }
 
 const drawText = (
@@ -61,6 +62,7 @@ const buildPdfWithData = async (data: BlotterData) => {
   drawText(page, font, 'incident_datetime', data.incident_datetime)
   drawText(page, font, 'location', data.location)
   drawText(page, font, 'landmark', data.landmark)
+  drawText(page, font, 'description', data.description)
 
   const pdfBytes = await pdfDoc.save()
   if (pdfUrl.value) {
