@@ -64,16 +64,13 @@ class UsersSeeders extends Seeder
             ],
         );
 
-        User::factory()->staff()->count(3)->create();
-        User::factory()->count(10)->create();
-
     }
 
     private function ensureUser(string $email, string $role, string $password, array $profile): void
     {
         $user = User::firstWhere('email', $email);
 
-        if (! $user) {
+        if (!$user) {
             $profile = UserProfile::create($profile);
 
             User::create([
