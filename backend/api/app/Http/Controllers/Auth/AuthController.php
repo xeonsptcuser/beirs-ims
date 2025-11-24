@@ -69,8 +69,8 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'date_of_birth' => ['required', 'date', "before_or_equal:{$legalAgeDate}"],
             'role' => 'in:admin,staff,resident',
-            'street_address' => 'required|string|max:255',
-            'mobile_number' => 'required|string|max:20',
+            'street_address' => 'nullable|string|max:255',
+            'mobile_number' => 'nullable|string|max:20',
         ]);
 
         $this->users->createWithProfile(

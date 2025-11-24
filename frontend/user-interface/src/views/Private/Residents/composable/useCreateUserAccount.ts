@@ -112,7 +112,11 @@ export function useCreateUserAccount(options?: {
           error: 'Please confirm your password.',
         }
         isValid = false
-      } else if (passwordVal && passwordConfirmationVal && passwordVal !== passwordConfirmationVal) {
+      } else if (
+        passwordVal &&
+        passwordConfirmationVal &&
+        passwordVal !== passwordConfirmationVal
+      ) {
         errors.value.password = true
         errors.value.passwordConfirmation = true
         const message = { error: 'Passwords do not match.' }
@@ -141,14 +145,6 @@ export function useCreateUserAccount(options?: {
       errors.value.date_of_birth = true
       errorMessages.value.date_of_birth = {
         error: 'Please enter your birthday.',
-      }
-      isValid = false
-    }
-
-    if (!form.streetAddress.trim()) {
-      errors.value.streetAddress = true
-      errorMessages.value.streetAddress = {
-        error: 'Please select your home address',
       }
       isValid = false
     }
