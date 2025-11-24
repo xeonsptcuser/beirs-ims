@@ -7,6 +7,7 @@ use App\Models\Users\User;
 use App\Notifications\OtpCodeNotification;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class OtpService
 {
@@ -18,15 +19,15 @@ class OtpService
     public function __construct()
     {
         $config = config('services.otp');
-        $this->length = (int)($config['length'] ?? 6);
-        $this->ttlMinutes = (int)($config['ttl'] ?? 5);
-        $this->requestCooldown = (int)($config['request_cooldown'] ?? 60);
-        $this->maxAttempts = (int)($config['max_attempts'] ?? 5);
+        $this->length = (int) ($config['length'] ?? 6);
+        $this->ttlMinutes = (int) ($config['ttl'] ?? 5);
+        $this->requestCooldown = (int) ($config['request_cooldown'] ?? 60);
+        $this->maxAttempts = (int) ($config['max_attempts'] ?? 5);
     }
 
     public function isEnabled(): bool
     {
-        return (bool)config('services.otp.enabled', false);
+        return (bool) config('services.otp.enabled', false);
     }
 
     /**
@@ -167,7 +168,8 @@ class OtpService
             ->whereNull('consumed_at')
             ->update(['consumed_at' => CarbonImmutable::now()]);
 
-        $code = str_pad((string)random_int(0, (10 ** $this->length) - 1), $this->length, '0', STR_PAD_LEFT);
+        $code = str_pad((string) random_int(0, (10 ** $this->length) - 1), $this->length, '0', STR_PAD_LEFT);
+        Log::info('generated.otp.code', ['otp_code' => $code]);
 
         $otp = OtpCode::create([
             'user_id' => $user->id,
