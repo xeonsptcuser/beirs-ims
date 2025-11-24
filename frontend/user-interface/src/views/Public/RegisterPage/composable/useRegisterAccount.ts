@@ -2,6 +2,8 @@ import { useSharedAuthResponse } from '@/composables/useSharedAuthResponse'
 import type { RegisterRequest } from '@/Types'
 import { reactive, ref } from 'vue'
 
+type RegisterErrorKey = keyof RegisterRequest | 'general'
+
 export function useRegisterAccount() {
   const { successResponse, setSuccessResponse, clearSuccessResponse } = useSharedAuthResponse()
   const form = reactive<RegisterRequest>({
@@ -18,7 +20,7 @@ export function useRegisterAccount() {
     mobileNumber: '',
   })
 
-  const errors = ref<Record<keyof RegisterRequest, boolean>>({
+  const errors = ref<Record<RegisterErrorKey, boolean>>({
     name: false,
     email: false,
     password: false,
@@ -26,9 +28,10 @@ export function useRegisterAccount() {
     date_of_birth: false,
     streetAddress: false,
     mobileNumber: false,
+    general: false,
   })
 
-  const errorMessages = ref<Record<keyof RegisterRequest, { error: string }>>({
+  const errorMessages = ref<Record<RegisterErrorKey, { error: string }>>({
     name: { error: '' },
     email: { error: '' },
     password: { error: '' },
@@ -36,10 +39,11 @@ export function useRegisterAccount() {
     date_of_birth: { error: '' },
     streetAddress: { error: '' },
     mobileNumber: { error: '' },
+    general: { error: '' },
   })
 
   const resetErrors = () => {
-    for (const key of Object.keys(errors.value) as (keyof RegisterRequest)[]) {
+    for (const key of Object.keys(errors.value) as RegisterErrorKey[]) {
       errors.value[key] = false
       errorMessages.value[key] = { error: '' }
     }
@@ -58,7 +62,10 @@ export function useRegisterAccount() {
       isValid = false
     }
 
-    if (!form.password.trim()) {
+    const passwordVal = form.password.trim()
+    const passwordConfirmationVal = form.passwordConfirmation.trim()
+
+    if (!passwordVal) {
       errors.value.password = true
       errorMessages.value.password = {
         error: 'Please enter your password.',
@@ -66,11 +73,20 @@ export function useRegisterAccount() {
       isValid = false
     }
 
-    if (form.password.trim() !== form.passwordConfirmation.trim()) {
-      errors.value.password = true
-      errorMessages.value.password = {
-        error: 'Password and Confirmation Password does not match..',
+    if (!passwordConfirmationVal) {
+      errors.value.passwordConfirmation = true
+      errorMessages.value.passwordConfirmation = {
+        error: 'Please confirm your password.',
       }
+      isValid = false
+    }
+
+    if (passwordVal && passwordConfirmationVal && passwordVal !== passwordConfirmationVal) {
+      errors.value.password = true
+      errors.value.passwordConfirmation = true
+      const message = { error: 'Passwords do not match.' }
+      errorMessages.value.password = message
+      errorMessages.value.passwordConfirmation = message
       isValid = false
     }
 
@@ -124,8 +140,8 @@ export function useRegisterAccount() {
 
     if (!apiErrors || Object.keys(apiErrors).length === 0) {
       if (fallbackMessage) {
-        errorMessages.value.email = { error: fallbackMessage }
-        errors.value.email = true
+        errorMessages.value.general = { error: fallbackMessage }
+        errors.value.general = true
       }
       return
     }
