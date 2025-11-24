@@ -13,8 +13,8 @@ php artisan route:cache
 echo "Running migrations..."
 php artisan migrate --force
 
-echo "Starting PHP-FPM..."
-php-fpm -D
+echo "Running seeder for addresses..."
+php artisan db:seed --class=BarangayAddressSeeder
 
 echo "Starting Nginx..."
 nginx -g "daemon off;"
