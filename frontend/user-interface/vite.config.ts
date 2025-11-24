@@ -25,7 +25,7 @@ export default defineConfig({
           vue: ['vue', 'vue-router', 'pinia'],
 
           // PDF libraries (usually heavy!)
-          pdf: ['jspdf', 'html2canvas', 'pdf-lib'],
+          pdf: ['pdf-lib'],
 
           // Any frequently used libraries
           utils: ['axios'],
