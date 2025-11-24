@@ -10,8 +10,8 @@ php artisan config:cache
 echo "Caching routes..."
 php artisan route:cache
 
-echo "Running migrations..."
+echo "Running migrations"
 php artisan migrate --force
 
-echo "Starting Nginx..."
-nginx -g "daemon off;"
+echo "Running Server"
+php artisan serve --host=0.0.0.0 --port=$PORT
