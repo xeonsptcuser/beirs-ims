@@ -145,6 +145,7 @@ const fetchCertificateRequests = async (page: number = pagination.current, searc
     pagination.total = paginator.total ?? 0;
     pagination.links = paginator.links ?? [];
 
+    console.log(paginator.data);
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
     const fallbackResponse = error as CommonResponse;
@@ -274,7 +275,8 @@ onMounted(() => {
             <i class="bi bi-file-earmark-plus me-2"></i> Request Certificate
           </router-link>
         </div>
-        <p v-if="shouldBlockActions" class="text-danger small fw-semibold mb-0">Complete your profile verification to request
+        <p v-if="shouldBlockActions" class="text-danger small fw-semibold mb-0">Complete your profile verification to
+          request
           a certificate.</p>
       </div>
     </div>
@@ -324,8 +326,8 @@ onMounted(() => {
                 <p class="text-muted small mb-1">Showing</p>
                 <p class="fw-bold mb-0">Page {{ pagination.current }} of {{ pagination.last }}</p>
               </div>
-              <Pagination :links="pagination.links" :current-page="pagination.current" @change="(page) => fetchCertificateRequests(page)"
-                v-if="pagination.links.length > 1" />
+              <Pagination :links="pagination.links" :current-page="pagination.current"
+                @change="(page) => fetchCertificateRequests(page)" v-if="pagination.links.length > 1" />
             </div>
 
             <div v-if="!certificationRequestItems.length && !hasError" class="text-center py-5 bg-light rounded">
@@ -333,8 +335,8 @@ onMounted(() => {
               <p class="mt-3 mb-1 fw-semibold">No certificate requests found.</p>
               <p class="text-secondary mb-3">Request a new certificate or adjust filters to view past submissions.</p>
               <router-link v-if="createCertificateRoute" :to="createCertificateRoute" class="btn btn-primary"
-                :class="{ disabled: shouldBlockActions }" :aria-disabled="shouldBlockActions" :tabindex="shouldBlockActions ? -1 : 0"
-                @click="handleBlockedNavigation">
+                :class="{ disabled: shouldBlockActions }" :aria-disabled="shouldBlockActions"
+                :tabindex="shouldBlockActions ? -1 : 0" @click="handleBlockedNavigation">
                 Request Certificate
               </router-link>
             </div>
@@ -352,9 +354,10 @@ onMounted(() => {
                           <small class="text-muted">{{ formatDateToHuman(request.created_at) || '—' }}</small>
                         </div>
                         <h5 class="card-title mb-1">{{ request.cert_request_type || 'Certificate Request' }}</h5>
-                        <p class="text-secondary mb-2">Purpose: {{ truncatedPurpose(request.purpose) }}</p>
-                        <p class="text-muted small mb-0" v-if="request.created_by">
-                          Requested by: {{ formatName(request.created_by.profile) }}
+                        <p class="text-secondary mb-2">Purpose: {{ truncatedPurpose(request.cert_request_reason) }}</p>
+                        <p class="text-muted small mb-0" v-if="request.profile">
+                          Requested by: {{ formatName(request.profile.first_name, request.profile.middle_name,
+                          request.profile.last_name) }}
                         </p>
                       </div>
                       <div class="text-end">

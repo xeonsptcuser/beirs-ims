@@ -1,18 +1,3 @@
-import CreateBlotterReport from '@/views/Private/BlotterReports/CreateBlotterReport.vue'
-import ViewBlotterReportInfo from '@/views/Private/BlotterReports/ViewBlotterReportInfo.vue'
-import ViewBlotterReports from '@/views/Private/BlotterReports/ViewBlotterReports.vue'
-import CreateCertification from '@/views/Private/Certifications/CreateCertification.vue'
-import ViewAllCertifications from '@/views/Private/Certifications/ViewAllCertifications.vue'
-import ViewCertificateRequest from '@/views/Private/Certifications/ViewCertificateRequest.vue'
-import PdfPreviewCertificateRequest from '@/views/Private/Certifications/components/PdfPreviewCertificateRequest.vue'
-import PdfPreviewBlotterReport from '@/views/Private/BlotterReports/components/PdfPreviewBlotterReport.vue'
-import UserDashboard from '@/views/Private/Dashboard/UserDashboard.vue'
-import HeatMaps from '@/views/Private/HeatMaps/HeatMaps.vue'
-import CreateUserProfile from '@/views/Private/Residents/CreateUserProfile.vue'
-import Residents from '@/views/Private/Residents/Residents.vue'
-import UserProfile from '@/views/Private/Residents/UserProfile.vue'
-import ManageAddresses from '@/views/Private/Settings/ManageAddresses.vue'
-
 import type { RouteRecordRaw } from 'vue-router'
 
 export const privateRoutes: RouteRecordRaw[] = [
@@ -23,7 +8,7 @@ export const privateRoutes: RouteRecordRaw[] = [
       {
         path: 'dashboard',
         name: 'Dashboard',
-        component: UserDashboard,
+        component: () => import('@/views/Private/Dashboard/UserDashboard.vue'),
         props: (route) => ({ role: route.params.role as string }),
         meta: {
           title: 'Dashboard',
@@ -33,7 +18,7 @@ export const privateRoutes: RouteRecordRaw[] = [
       {
         path: 'residents',
         name: 'Residents',
-        component: Residents,
+        component: () => import('@/views/Private/Residents/Residents.vue'),
         props: (route) => ({ role: route.params.role as string }),
         meta: {
           title: 'View Residents',
@@ -43,7 +28,7 @@ export const privateRoutes: RouteRecordRaw[] = [
       {
         path: 'residents/profile/:id',
         name: 'UserProfile',
-        component: UserProfile,
+        component: () => import('@/views/Private/Residents/UserProfile.vue'),
         props: (route) => ({ id: route.params.id as string }),
         meta: {
           title: 'User Profile',
@@ -53,7 +38,7 @@ export const privateRoutes: RouteRecordRaw[] = [
       {
         path: 'residents/create',
         name: 'CreateUserProfile',
-        component: CreateUserProfile,
+        component: () => import('@/views/Private/Residents/CreateUserProfile.vue'),
         props: (route) => ({ role: route.params.role as string }),
         meta: {
           title: 'Create User Profile',
@@ -63,7 +48,7 @@ export const privateRoutes: RouteRecordRaw[] = [
       {
         path: 'certifications',
         name: 'Certifications',
-        component: ViewAllCertifications,
+        component: () => import('@/views/Private/Certifications/ViewAllCertifications.vue'),
         props: (route) => ({ role: route.params.role as string }),
         meta: {
           title: 'Certification Requests',
@@ -73,7 +58,7 @@ export const privateRoutes: RouteRecordRaw[] = [
       {
         path: 'certifications/create/:id',
         name: 'CreateCertification',
-        component: CreateCertification,
+        component: () => import('@/views/Private/Certifications/CreateCertification.vue'),
         props: (route) => ({ role: route.params.role as string, id: route.params.id as string }),
         meta: {
           title: 'Request Certifications',
@@ -83,7 +68,7 @@ export const privateRoutes: RouteRecordRaw[] = [
       {
         path: 'certifications/:id',
         name: 'ViewCertificateRequest',
-        component: ViewCertificateRequest,
+        component: () => import('@/views/Private/Certifications/ViewCertificateRequest.vue'),
         props: (route) => ({ role: route.params.role as string, id: route.params.id as string }),
         meta: {
           title: 'View Certification Request',
@@ -93,7 +78,8 @@ export const privateRoutes: RouteRecordRaw[] = [
       {
         path: 'certifications/:id/preview',
         name: 'CertificatePreview',
-        component: PdfPreviewCertificateRequest,
+        component: () =>
+          import('@/views/Private/Certifications/components/PdfPreviewCertificateRequest.vue'),
         props: (route) => ({
           certificateId: route.params.id as string,
           certificateType: route.query.certificateType as string,
@@ -106,7 +92,7 @@ export const privateRoutes: RouteRecordRaw[] = [
       {
         path: 'blotter-reports',
         name: 'BlotterReports',
-        component: ViewBlotterReports,
+        component: () => import('@/views/Private/BlotterReports/ViewBlotterReports.vue'),
         props: (route) => ({ role: route.params.role as string }),
         meta: {
           title: 'Blotter Reports',
@@ -116,7 +102,7 @@ export const privateRoutes: RouteRecordRaw[] = [
       {
         path: 'blotter-reports/file-report/:id',
         name: 'CreateBlotterReport',
-        component: CreateBlotterReport,
+        component: () => import('@/views/Private/BlotterReports/CreateBlotterReport.vue'),
         props: (route) => ({ role: route.params.role as string, id: route.params.id as string }),
         meta: {
           title: 'File Blotter Report',
@@ -126,7 +112,7 @@ export const privateRoutes: RouteRecordRaw[] = [
       {
         path: 'blotter-reports/report/:id',
         name: 'ViewBlotterReport',
-        component: ViewBlotterReportInfo,
+        component: () => import('@/views/Private/BlotterReports/ViewBlotterReportInfo.vue'),
         props: (route) => ({ role: route.params.role as string, id: route.params.id as string }),
         meta: {
           title: 'File Blotter Report',
@@ -136,7 +122,8 @@ export const privateRoutes: RouteRecordRaw[] = [
       {
         path: 'blotter-reports/report/:id/preview',
         name: 'BlotterPreview',
-        component: PdfPreviewBlotterReport,
+        component: () =>
+          import('@/views/Private/BlotterReports/components/PdfPreviewBlotterReport.vue'),
         props: (route) => ({ blotterId: route.params.id as string }),
         meta: {
           title: 'Blotter Report Preview',
@@ -146,7 +133,7 @@ export const privateRoutes: RouteRecordRaw[] = [
       {
         path: 'heat-maps',
         name: 'HeatMaps',
-        component: HeatMaps,
+        component: () => import('@/views/Private/HeatMaps/HeatMaps.vue'),
         props: (route) => ({ role: route.params.role as string }),
         meta: {
           title: 'View Heat Map',
@@ -156,7 +143,7 @@ export const privateRoutes: RouteRecordRaw[] = [
       {
         path: 'settings/addresses',
         name: 'ManageAddresses',
-        component: ManageAddresses,
+        component: () => import('@/views/Private/Settings/ManageAddresses.vue'),
         props: (route) => ({ role: route.params.role as string }),
         meta: {
           title: 'Manage Barangay Addresses',
