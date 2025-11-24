@@ -1,17 +1,33 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { PDFDocument, StandardFonts } from 'pdf-lib'
 import { endpoints } from '@/services/api/endpoints'
 import { PdfRelatedService } from '@/services/api/http/pdf-service'
 
 const props = defineProps<{
-  certificateId: string
+  certificateId: string,
+  certificateType?: string,
 }>()
 
 const pdfService = PdfRelatedService.getInstance()
 
-// Static PDF template
-const pdfTemplateUrl = new URL('@/assets/pdf/affidavit.pdf', import.meta.url).href
+const certBrgyClearance = new URL('@/assets/images/certs/cert-brgy.pdf', import.meta.url).href
+const certIndigency = new URL('@/assets/images/certs/cert-indigency.pdf', import.meta.url).href
+const certResidency = new URL('@/assets/images/certs/cert-residency.pdf', import.meta.url).href
+
+const templateMap: Record<string, string> = {
+  clearance: certBrgyClearance,
+  indigency: certIndigency,
+  residency: certResidency,
+}
+
+const pdfTemplateUrl = computed(() => {
+  const requestedType = props.certificateType?.toLowerCase()
+  const payloadType = payload.value?.cert_request_type?.toLowerCase()
+  const resolvedType = requestedType || payloadType
+
+  return (resolvedType && templateMap[resolvedType]) || certBrgyClearance
+})
 
 const pdfUrl = ref<string | null>(null)
 const isLoading = ref<boolean>(false)
@@ -44,7 +60,7 @@ const drawText = (
 }
 
 const buildPdfWithData = async (data: CertificateData) => {
-  const templateBytes = await fetch(pdfTemplateUrl).then((res) => res.arrayBuffer())
+  const templateBytes = await fetch(pdfTemplateUrl.value).then((res) => res.arrayBuffer())
   const pdfDoc = await PDFDocument.load(templateBytes)
   const page = pdfDoc.getPages()[0]
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
@@ -90,6 +106,15 @@ watch(
   (newVal, oldVal) => {
     if (newVal && newVal !== oldVal) {
       loadCertificateData()
+    }
+  }
+)
+
+watch(
+  () => props.certificateType,
+  (newVal, oldVal) => {
+    if (newVal !== oldVal && payload.value) {
+      buildPdfWithData(payload.value)
     }
   }
 )
