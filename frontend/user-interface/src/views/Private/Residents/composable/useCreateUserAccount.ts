@@ -3,6 +3,8 @@ import { useBarangayAddresses } from '@/composables/useBarangayAddresses'
 import type { CreateUserAccountRequest } from '@/Types'
 import { reactive, ref } from 'vue'
 
+type CreateAccountErrorKey = keyof CreateUserAccountRequest | 'general'
+
 export function useCreateUserAccount(options?: {
   requirePassword: boolean
   requireGovernmentId?: boolean
@@ -32,7 +34,7 @@ export function useCreateUserAccount(options?: {
     governmentIdentity: [],
   })
 
-  const errors = ref<Record<keyof CreateUserAccountRequest, boolean>>({
+  const errors = ref<Record<CreateAccountErrorKey, boolean>>({
     name: false,
     email: false,
     password: false,
@@ -44,9 +46,10 @@ export function useCreateUserAccount(options?: {
     mobileNumber: false,
     govtIdentityType: false,
     governmentIdentity: false,
+    general: false,
   })
 
-  const errorMessages = ref<Record<keyof CreateUserAccountRequest, { error: string }>>({
+  const errorMessages = ref<Record<CreateAccountErrorKey, { error: string }>>({
     name: { error: '' },
     role: { error: '' },
     email: { error: '' },
@@ -58,12 +61,13 @@ export function useCreateUserAccount(options?: {
     mobileNumber: { error: '' },
     govtIdentityType: { error: '' },
     governmentIdentity: { error: '' },
+    general: { error: '' },
   })
 
   const roleOptions = ['admin', 'resident', 'staff']
 
   const resetErrors = () => {
-    for (const key of Object.keys(errors.value) as (keyof CreateUserAccountRequest)[]) {
+    for (const key of Object.keys(errors.value) as CreateAccountErrorKey[]) {
       errors.value[key] = false
       errorMessages.value[key] = { error: '' }
     }
@@ -102,11 +106,18 @@ export function useCreateUserAccount(options?: {
         isValid = false
       }
 
-      if (form.password.trim() !== form.passwordConfirmation.trim()) {
+      if (!passwordConfirmationVal.length) {
         errors.value.passwordConfirmation = true
         errorMessages.value.passwordConfirmation = {
-          error: 'Password confirmation does not match with password...',
+          error: 'Please confirm your password.',
         }
+        isValid = false
+      } else if (passwordVal && passwordConfirmationVal && passwordVal !== passwordConfirmationVal) {
+        errors.value.password = true
+        errors.value.passwordConfirmation = true
+        const message = { error: 'Passwords do not match.' }
+        errorMessages.value.password = message
+        errorMessages.value.passwordConfirmation = message
         isValid = false
       }
     }
@@ -171,8 +182,8 @@ export function useCreateUserAccount(options?: {
 
     if (!apiErrors || Object.keys(apiErrors).length === 0) {
       if (fallbackMessage) {
-        errorMessages.value.email = { error: fallbackMessage }
-        errors.value.email = true
+        errorMessages.value.general = { error: fallbackMessage }
+        errors.value.general = true
       }
       return
     }
