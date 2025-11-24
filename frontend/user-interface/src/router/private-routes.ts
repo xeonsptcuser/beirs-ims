@@ -94,7 +94,10 @@ export const privateRoutes: RouteRecordRaw[] = [
         path: 'certifications/:id/preview',
         name: 'CertificatePreview',
         component: PdfPreviewCertificateRequest,
-        props: (route) => ({ certificateId: route.params.id as string }),
+        props: (route) => ({
+          certificateId: route.params.id as string,
+          certificateType: route.query.certificateType as string,
+        }),
         meta: {
           title: 'Certificate Preview',
           requiresAuth: true,

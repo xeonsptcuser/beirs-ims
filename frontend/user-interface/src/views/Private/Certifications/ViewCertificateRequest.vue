@@ -130,6 +130,9 @@ const previewCertificateRequest = async () => {
         role: props.role,
         id: certificateInfo.value.id,
       },
+      query: {
+        certificateType: certificateInfo.value?.cert_request_type,
+      },
     });
   } finally {
     navigation.endNavigation();
