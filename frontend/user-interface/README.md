@@ -37,3 +37,7 @@ npm run test:unit
 ```sh
 npm run lint
 ```
+
+## Environment variables
+- Copy `.env.example` to `.env.local` for local development. The defaults target `http://localhost:8000/api` for the Laravel API and `http://localhost:8000/storage` for public assets.
+- On Vercel, add `VITE_API_BASE_URL` and `VITE_STORAGE_URL` under **Project Settings → Environment Variables** pointing to your Render backend (e.g., `https://<render-service>.onrender.com/api` and `/storage`).
