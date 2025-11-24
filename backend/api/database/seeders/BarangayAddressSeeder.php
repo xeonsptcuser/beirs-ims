@@ -10,26 +10,17 @@ class BarangayAddressSeeder extends Seeder
     public function run(): void
     {
         $addresses = [
-            'pulang bukid',
-            'mabolo 1',
-            'mabolo 2',
-            'liong',
-            'sacred heart',
             'sapang daan',
-            'sumbrero',
-            'kalubihan',
             'abbra',
-            'hiland',
+            'liong',
+            'mabolo',
+            'sacred heart',
+            'pulang bukid',
             'tres rosas',
-            'ura',
-            'tinago a',
-            'tinago b',
-            'tinago c',
-            'battiler',
+            'tinago',
             'sudlon',
-            'cenapro',
-            'perez',
-            'mayol',
+            'perez compd.',
+            
         ];
 
         foreach ($addresses as $name) {
