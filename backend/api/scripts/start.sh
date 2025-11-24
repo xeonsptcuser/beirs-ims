@@ -13,8 +13,5 @@ php artisan route:cache
 echo "Running migrations..."
 php artisan migrate --force
 
-echo "Running seeder for addresses..."
-php artisan db:seed --class=BarangayAddressSeeder
-
 echo "Starting Nginx..."
 nginx -g "daemon off;"
