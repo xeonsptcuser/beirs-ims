@@ -17,7 +17,6 @@ const navItems = computed(() => {
     return [
       { path: '/', label: 'Home' },
       { path: '/about', label: 'About' },
-      { path: '/services', label: 'Services' },
     ];
   }
 
@@ -48,7 +47,6 @@ const navItems = computed(() => {
     { path: buildPath('dashboard'), label: 'Dashboard' },
     { path: buildPath('certifications'), label: 'Certificates' },
     { path: buildPath('blotter-reports'), label: 'Reports' },
-    { path: buildPath('heat-maps'), label: 'Heat Map' },
   ];
 });
 

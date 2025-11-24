@@ -13,10 +13,12 @@ import type {
   BlotterReportStatus,
   CommonResponse,
   PageInfo,
-  PaginationLink
+  PaginationLink,
+  User,
 } from '@/Types';
 import type { AxiosError } from 'axios';
 import { computed, onMounted, reactive, ref } from 'vue';
+import { fetchSingleUserProfile } from '@/Utils/userServices';
 
 const props = defineProps<{ role: string }>();
 
@@ -24,11 +26,14 @@ const navigation = useGlobalLoadingStore();
 const session = useSessionStore();
 
 const blotterReports = ref<BlotterReportResponse[]>([]);
+const userProfile = ref<User | null>(null);
 const searchKeyword = ref<string>('');
 const hasError = ref<boolean>(false);
 const errorMessage = ref<string>('');
 const isHistoryScreen = ref<boolean>(false);
 const selectedStatusFilter = ref<BlotterReportStatus | null>(null);
+const isLoadingProfile = ref<boolean>(false);
+const profileErrorMessage = ref<string>('');
 
 const pagination = reactive({
   current: 1,
@@ -144,6 +149,64 @@ const fetchBlotterRecords = async (
   }
 };
 
+const fetchUserProfile = async () => {
+  if (!isResidentView.value || !session.id) {
+    return;
+  }
+
+  isLoadingProfile.value = true;
+  profileErrorMessage.value = '';
+
+  try {
+    const response = await fetchSingleUserProfile(session.id.toString());
+
+    if (response.status !== 'success') {
+      throw response;
+    }
+
+    userProfile.value = response.data;
+  } catch (error) {
+    const axiosError = error as AxiosError<ApiErrorResponse>;
+    const fallbackResponse = error as CommonResponse;
+
+    if (axiosError?.isAxiosError) {
+      const responseData = axiosError.response?.data;
+      profileErrorMessage.value = responseData?.message ?? 'Failed to fetch user profile info.';
+    } else if (fallbackResponse?.message) {
+      profileErrorMessage.value = fallbackResponse.message;
+    } else {
+      profileErrorMessage.value = 'Failed to fetch user profile info.';
+    }
+  } finally {
+    isLoadingProfile.value = false;
+  }
+};
+
+const isProfileIncomplete = computed(() => {
+  const profile = userProfile.value?.profile;
+  if (!profile) {
+    return false;
+  }
+
+  const missingMobile = !profile.mobile_number || !profile.mobile_number.trim();
+  const missingAddress = !profile.street_address || !profile.street_address.trim();
+  const unverifiedMobile = !profile.mobile_verified_at;
+  const hasNoGovtId = !profile.government_identity;
+  const isInactive = profile.is_active === false;
+
+  return missingMobile || missingAddress || unverifiedMobile || hasNoGovtId || isInactive;
+});
+
+const shouldBlockActions = computed(
+  () => isProfileIncomplete.value && !isLoadingProfile.value && !profileErrorMessage.value
+);
+
+const handleBlockedNavigation = (event: Event) => {
+  if (shouldBlockActions.value) {
+    event.preventDefault();
+  }
+};
+
 const handleSearch = () => {
   const trimmed = searchKeyword.value.trim();
   pagination.current = 1;
@@ -182,6 +245,7 @@ const createReportRoute = computed(() => {
 
 onMounted(() => {
   fetchBlotterRecords();
+  fetchUserProfile();
 });
 </script>
 
@@ -193,10 +257,15 @@ onMounted(() => {
         <h2 class="fw-bold mb-0">Blotter Report Overview</h2>
         <p class="text-secondary small mb-0">Track ongoing cases, follow their status, and stay informed.</p>
       </div>
-      <router-link v-if="isResidentView && createReportRoute" class="btn btn-primary mt-3 mt-lg-0"
-        :to="createReportRoute">
-        <i class="bi bi-plus-circle me-2"></i> File New Report
-      </router-link>
+      <div class="text-end">
+        <router-link v-if="isResidentView && createReportRoute" class="btn btn-primary mt-3 mt-lg-0"
+          :class="{ disabled: shouldBlockActions }" :aria-disabled="shouldBlockActions" :tabindex="shouldBlockActions ? -1 : 0"
+          :to="createReportRoute" @click="handleBlockedNavigation">
+          <i class="bi bi-plus-circle me-2"></i> File New Report
+        </router-link>
+        <p v-if="shouldBlockActions" class="fw-bold mt-2"><small class="text-danger">Please complete profile verification
+            to file a blotter report.</small></p>
+      </div>
     </div>
 
     <WarningLabel :has-error="hasError" :errors="hasError ? [{ error: errorMessage }] : []" />
@@ -238,7 +307,9 @@ onMounted(() => {
       <i class="bi bi-file-earmark-text display-4 text-muted"></i>
       <p class="mt-3 mb-1 fw-semibold">No blotter reports found.</p>
       <p class="text-secondary mb-3">File a new report or adjust your filters to see previous submissions.</p>
-      <router-link v-if="isResidentView && createReportRoute" :to="createReportRoute" class="btn btn-primary">
+      <router-link v-if="isResidentView && createReportRoute" :to="createReportRoute" class="btn btn-primary"
+        :class="{ disabled: shouldBlockActions }" :aria-disabled="shouldBlockActions" :tabindex="shouldBlockActions ? -1 : 0"
+        @click="handleBlockedNavigation">
         File a Report
       </router-link>
     </div>
