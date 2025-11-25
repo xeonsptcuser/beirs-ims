@@ -7,9 +7,11 @@ use App\Interfaces\UsersRepositoryInterface;
 use App\Models\Users\UserProfile;
 use App\Services\SupabaseStorageService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -27,7 +29,9 @@ class UsersController extends Controller
         $perPage = $request->integer('per_page');
         $search = $this->resolveSearch($request);
         $sort = $request->filled('sort') ? $request->string('sort')->lower()->value() : null;
-        $users = $this->users->all(['profile.governmentIdentity'], $perPage, $search, $sort);
+        $users = $this->withGovernmentIdUrls(
+            $this->users->all(['profile.governmentIdentity'], $perPage, $search, $sort)
+        );
 
         return response()->json([
             'status' => 'success',
@@ -38,7 +42,9 @@ class UsersController extends Controller
     // GET /api/auth/users/{id}
     public function show(int $userId)
     {
-        $user = $this->users->findById($userId, ['profile.governmentIdentity']);
+        $user = $this->withGovernmentIdUrls(
+            $this->users->findById($userId, ['profile.governmentIdentity'])
+        );
 
         return response()->json([
             'status' => 'success',
@@ -220,5 +226,37 @@ class UsersController extends Controller
             );
         }
         $userProfile->loadMissing('governmentIdentity');
+    }
+
+    private function appendGovernmentIdSignedUrl(mixed $user): void
+    {
+        $identity = $user?->profile?->governmentIdentity;
+
+        if (!$identity || !$identity->storage_path || str_starts_with($identity->storage_path, 'http')) {
+            return;
+        }
+
+        $identity->storage_path = $this->storage->signedUrl($identity->storage_path);
+    }
+
+    private function withGovernmentIdUrls(Collection|LengthAwarePaginator|mixed $users): Collection|LengthAwarePaginator|mixed
+    {
+        if ($users instanceof LengthAwarePaginator) {
+            $users->getCollection()->each(function ($user) {
+                $this->appendGovernmentIdSignedUrl($user);
+            });
+            return $users;
+        }
+
+        if ($users instanceof Collection) {
+            $users->each(function ($user) {
+                $this->appendGovernmentIdSignedUrl($user);
+            });
+            return $users;
+        }
+
+        $this->appendGovernmentIdSignedUrl($users);
+
+        return $users;
     }
 }
