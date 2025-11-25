@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_profile_id')->constrained('user_profiles')->cascadeOnDelete(); // foreign key to user profile
             $table->string('storage_path');      // e.g., storage/app/evidences/...
+            $table->string('identity_type');      // e.g., e.g drivers license, national id
             $table->string('original_name');     // filename the user uploaded
             $table->string('mime_type', 100);    // image/png, application/pdf, etc.
             $table->unsignedBigInteger('size');  // bytes

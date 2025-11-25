@@ -86,7 +86,7 @@ const governmentIdUrl = computed(() => {
   const doc = responseData.value?.profile?.government_identity;
   if (!doc?.storage_path) return '';
   const normalizedBase = storageBaseUrl.endsWith('/') ? storageBaseUrl.slice(0, -1) : storageBaseUrl;
-  return `${normalizedBase}/${doc.storage_path}`.replace(/([^:]\/)\/+/g, '$1');
+  return `${normalizedBase}/${doc.storage_path}`.replaceAll(/([^:]\/)\/+/g, '$1');
 });
 
 const handleUpdateUserAccount = async () => {
@@ -214,7 +214,7 @@ const isProfileOwner = computed(() => {
 const toTitleCase = (value?: string | null) => {
   if (!value) return ''
   const lower = value.toLowerCase()
-  return lower.replace(/\b\w/g, (char) => char.toUpperCase())
+  return lower.replaceAll(/\b\w/g, (char) => char.toUpperCase())
 }
 
 const fullName = computed(() => {
@@ -437,7 +437,7 @@ onBeforeUnmount(() => {
                   <div class="col-md-6">
                     <FormFloatingInput type="email" label="Email Address" id="email" v-model="form.email"
                       :has-error="errors.email" :error-message="errorMessages.email.error"
-                      :is-disabled="isNotEditableUser.email" />
+                      :is-disabled="isNotEditableUser.email" :is-capitalized="false" />
                   </div>
                   <div class="col-md-3">
                     <FormFloatingInput v-if="!isNotEditableUser.dateOfBirth" type="date" label="Date Of Birth"

@@ -110,6 +110,7 @@ class UsersController extends Controller
             'mobile_number' => ['sometimes', 'nullable', 'string', 'max:20'],
             'date_of_birth' => ['sometimes', 'date', "before_or_equal:{$legalAgeDate}"],
             'is_active' => ['sometimes', 'boolean'],
+            'government_identity_type' => ['sometimes', 'string', 'max:255'],
             'government_identity' => ['sometimes', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ]);
 
@@ -126,7 +127,7 @@ class UsersController extends Controller
         $updated = $this->users->updateWithProfile($user, $userData, $profileData);
 
         $governmentIdentityFiles = Arr::wrap($request->file('government_identity'));
-        $this->storeGovernmentIdentity($governmentIdentityFiles, $updated->profile);
+        $this->storeGovernmentIdentity($governmentIdentityFiles, $validated['government_identity_type'], $updated->profile);
 
         return response()->json([
             'status' => 'success',
@@ -162,7 +163,7 @@ class UsersController extends Controller
         return !empty($search) ? $search : null;
     }
 
-    private function storeGovernmentIdentity($files, UserProfile $userProfile): void
+    private function storeGovernmentIdentity($files, $type, UserProfile $userProfile): void
     {
         foreach ($files as $file) {
             if (!$file) {
@@ -176,6 +177,7 @@ class UsersController extends Controller
                 [],
                 [
                     'storage_path' => $path,
+                    'identity_type' => $type,
                     'original_name' => $file->getClientOriginalName(),
                     'mime_type' => $file->getClientMimeType(),
                     'size' => $file->getSize(),
