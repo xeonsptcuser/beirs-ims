@@ -13,6 +13,7 @@ class GovernmentIdentity extends Model
     protected $fillable = [
         'user_profile_id',
         'storage_path',
+        'identity_type',
         'original_name',
         'mime_type',
         'size',

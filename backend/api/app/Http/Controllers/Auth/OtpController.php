@@ -87,6 +87,56 @@ class OtpController extends Controller
         ]);
     }
 
+    public function requestForAuthenticated(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        $otpResponse = $this->otpService->requestForUser($user);
+
+        return response()->json([
+            'status' => $otpResponse['status'],
+            'message' => $otpResponse['message'],
+        ], $otpResponse['status_code'] ?? 200);
+    }
+
+    public function verifyForAuthenticated(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        $validated = $request->validate([
+            'otp_code' => ['required', 'string'],
+        ]);
+
+        $verification = $this->otpService->verify($user, $validated['otp_code']);
+
+        if (!$verification['ok']) {
+            return response()->json([
+                'status' => $verification['status'],
+                'message' => $verification['message'],
+            ], $verification['status_code'] ?? 400);
+        }
+
+        if ($user->profile && !$user->profile->mobile_verified_at) {
+            $user->profile->update(['mobile_verified_at' => now()]);
+        }
+
+        $user->load('profile');
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Mobile number verified successfully.',
+            'user' => $user,
+        ]);
+    }
+
     /**
      * @return array{email: string, password: string}
      */

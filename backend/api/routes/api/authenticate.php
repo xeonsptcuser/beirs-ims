@@ -22,5 +22,7 @@ Route::prefix('auth')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+        Route::post('/otp/request', [OtpController::class, 'requestForAuthenticated'])->name('auth.otp.request');
+        Route::post('/otp/verify', [OtpController::class, 'verifyForAuthenticated'])->name('auth.otp.verify');
     });
 });

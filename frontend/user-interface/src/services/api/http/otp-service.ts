@@ -3,6 +3,7 @@ import type {
   LoginResponse,
   VerifyOtpPayload,
   LoginSuccessResponse,
+  CommonResponse,
 } from '@/Types'
 import { ApiService } from '../ApiService'
 
@@ -26,6 +27,14 @@ export class OtpService {
   }
 
   async verifyOtp(payload: VerifyOtpPayload, endpoint: string): Promise<LoginSuccessResponse> {
+    return this.apiService.post(endpoint, payload)
+  }
+
+  async requestOtpAuthenticated(endpoint: string): Promise<CommonResponse> {
+    return this.apiService.post(endpoint, {})
+  }
+
+  async verifyOtpAuthenticated(payload: Omit<VerifyOtpPayload, 'user_id'>, endpoint: string): Promise<CommonResponse> {
     return this.apiService.post(endpoint, payload)
   }
 }
