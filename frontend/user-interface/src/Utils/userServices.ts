@@ -34,7 +34,6 @@ export const userAccountCreation = async (data: CreateAccountRequestPayload) => 
   appendIfPresent('date_of_birth', data.date_of_birth)
   appendIfPresent('password', data.password)
   appendIfPresent('password_confirmation', data.password_confirmation)
-  appendIfPresent('government_identity_type', data.government_identity_type)
 
   const response = await userRelatedService.createUserAccount(
     endpoints.CREATE_USER_ACCOUNT,
@@ -90,6 +89,7 @@ export const updateUserAccount = async (userId: string, data: UpdateAccountReque
   appendIfPresent('date_of_birth', data.date_of_birth)
   appendIfPresent('password', data.password)
   appendIfPresent('password_confirmation', data.password_confirmation)
+  appendIfPresent('government_identity_type', data.government_identity_type)
 
   const governmentIdentityRaw = data.government_identity ?? []
   const governmentIdentity = Array.isArray(governmentIdentityRaw)

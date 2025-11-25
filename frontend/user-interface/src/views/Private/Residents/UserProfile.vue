@@ -392,19 +392,13 @@ onBeforeUnmount(() => {
               <p class="text-muted small mb-1">Mobile Number</p>
               <div class="d-flex align-items-center gap-2 flex-wrap">
                 <p class="fw-semibold mb-0">{{ responseData?.profile?.mobile_number || '—' }}</p>
-                <span
-                  class="badge"
-                  :class="mobileVerificationPending ? 'bg-warning-subtle text-warning' : 'bg-success-subtle text-success'"
-                >
+                <span class="badge"
+                  :class="mobileVerificationPending ? 'bg-warning-subtle text-warning' : 'bg-success-subtle text-success'">
                   {{ mobileVerificationPending ? 'Verification required' : 'Verified' }}
                 </span>
               </div>
-              <button
-                v-if="mobileVerificationPending && responseData?.profile?.mobile_number"
-                class="btn btn-link p-0 mt-1"
-                type="button"
-                @click="requestOtpForMobileVerification"
-              >
+              <button v-if="mobileVerificationPending && responseData?.profile?.mobile_number"
+                class="btn btn-link p-0 mt-1 text-sm" type="button" @click="requestOtpForMobileVerification">
                 Verify this number via OTP
               </button>
             </div>
@@ -468,11 +462,12 @@ onBeforeUnmount(() => {
               </div>
             </div>
             <div v-if="hasGovernmentId" class="border rounded text-center p-3 mb-2">
-              <p v-if="governmentIdType" class="text-uppercase text-muted small fw-semibold mb-2">{{ governmentIdType }}</p>
+              <p v-if="governmentIdType" class="text-uppercase text-muted small fw-semibold mb-2">{{ governmentIdType }}
+              </p>
               <img :src="governmentIdUrl || nationalId" alt="Government ID" class="img-fluid" />
               <p class="text-muted small mb-0 mt-2">Uploading a new file will replace the existing ID.</p>
             </div>
-            <div class="mb-2" v-if="isProfileOwner">
+            <div class="mb-2" v-if="isProfileOwner && !isEditableSubmit">
               <DropdownInput :options="govtIdentityTypeOption" label="Type" id="govt-id-type"
                 v-model="form.govtIdentityType" :error-message="errorMessages.govtIdentityType.error"
                 :has-error="errors.govtIdentityType" :is-capitalized="false" />
@@ -591,37 +586,44 @@ onBeforeUnmount(() => {
     </div>
   </div>
 
-  <div v-if="isOtpModalVisible" class="modal fade show d-block" tabindex="-1" role="dialog">
+  <div v-if="isOtpModalVisible" class="modal fade show d-block" tabindex="-1" aria-modal="true" role="dialog">
     <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
+      <div class="modal-content" style="z-index: 1056;">
         <div class="modal-header">
           <h5 class="modal-title">Verify Mobile Number</h5>
           <button type="button" class="btn-close" aria-label="Close" @click="isOtpModalVisible = false"></button>
         </div>
+
         <div class="modal-body">
-          <p class="text-muted mb-3">Enter the one-time password sent to your updated mobile number.</p>
-          <FormFloatingInput
-            type="text"
-            label="OTP Code"
-            id="otp_code"
-            v-model="otpCode"
-            :has-error="!!otpError"
-            :error-message="otpError"
-          />
-          <p v-if="otpMessage" class="text-success small mb-0 mt-2">{{ otpMessage }}</p>
+          <p class="text-muted mb-3">
+            Enter the one-time password sent to your updated mobile number.
+          </p>
+
+          <FormFloatingInput type="text" label="OTP Code" id="otp_code" v-model="otpCode" :has-error="Boolean(otpError)"
+            :error-message="otpError" />
+
+          <p v-if="otpMessage" class="text-success small mb-0 mt-2">
+            {{ otpMessage }}
+          </p>
         </div>
+
         <div class="modal-footer d-flex justify-content-between">
-          <button class="btn btn-outline-secondary" type="button" @click="requestOtpForMobileVerification" :disabled="isRequestingOtp">
+          <button class="btn btn-outline-secondary" type="button" @click="requestOtpForMobileVerification"
+            :disabled="isRequestingOtp">
             {{ isRequestingOtp ? 'Resending...' : 'Resend OTP' }}
           </button>
+
           <button class="btn btn-primary" type="button" @click="verifyOtpForMobileChange" :disabled="isVerifyingOtp">
             {{ isVerifyingOtp ? 'Verifying...' : 'Verify' }}
           </button>
         </div>
       </div>
     </div>
-    <div class="modal-backdrop fade show"></div>
+
+    <!-- Backdrop -->
+    <div class="modal-backdrop fade show" style="z-index: 1055;"></div>
   </div>
+
 </template>
 
 <style scoped>
