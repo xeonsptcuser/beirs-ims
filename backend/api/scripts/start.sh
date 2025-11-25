@@ -4,9 +4,6 @@ set -e
 echo "Running composer install (already done in Dockerfile, but safe)..."
 composer install --no-dev --optimize-autoloader
 
-echo "Clearing Queue..."
-php artisan queue:clear
-
 echo "Clearing Config..."
 php artisan config:clear
 
