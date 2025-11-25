@@ -12,16 +12,16 @@
             Partnering with residents through transparent and responsive services.
           </p>
           <div class="d-flex gap-2">
-            <a href="#" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-facebook"></i></a>
-            <a href="#" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-envelope"></i></a>
+            <a href="https://web.facebook.com/barangay.alang.alang.2025" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-facebook"></i></a>
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=goalangalang@gmail.com" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-envelope"></i></a>
           </div>
         </div>
         <div class="col-md-4">
           <h6 class="text-uppercase fw-semibold mb-3">Contact Details</h6>
           <ul class="list-unstyled text-white-50 small mb-0">
             <li class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i>Brgy. Alang-Alang, Mandaue City</li>
-            <li class="mb-2"><i class="bi bi-telephone-fill me-2"></i>+63 975 123 1234</li>
-            <li><i class="bi bi-envelope-fill me-2"></i>barangay@alang-alang.gov</li>
+            <li class="mb-2"><i class="bi bi-telephone-fill me-2"></i>032-520-8206 / 0966-075-7388</li>
+            <li><i class="bi bi-envelope-fill me-2"></i>goalangalang@gmail.com</li>
           </ul>
         </div>
         <div class="col-md-4">
