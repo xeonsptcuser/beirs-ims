@@ -8,6 +8,7 @@ use App\Models\Users\UserProfile;
 use App\Services\SupabaseStorageService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -239,7 +240,7 @@ class UsersController extends Controller
         $identity->storage_path = $this->storage->signedUrl($identity->storage_path);
     }
 
-    private function withGovernmentIdUrls(Collection|LengthAwarePaginator|mixed $users): Collection|LengthAwarePaginator|mixed
+    private function withGovernmentIdUrls(Collection|LengthAwarePaginator|Model $users): Collection|LengthAwarePaginator|Model
     {
         if ($users instanceof LengthAwarePaginator) {
             $users->getCollection()->each(function ($user) {
