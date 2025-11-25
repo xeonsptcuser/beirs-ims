@@ -1,7 +1,11 @@
 import { endpoints } from '@/services/api/endpoints'
 import { UserRelatedService } from '@/services/api/http/user-related-service'
 import { OtpService } from '@/services/api/http/otp-service'
-import type { CreateAccountRequestPayload, PageInfo, UpdateAccountRequestPayload } from '@/Types'
+import type {
+  CreateAccountRequestPayload,
+  PageInfo,
+  UpdateAccountRequestPayload,
+} from '@/Types'
 
 const userRelatedService = UserRelatedService.getInstance()
 const otpService = OtpService.getInstance()
@@ -90,6 +94,7 @@ export const updateUserAccount = async (userId: string, data: UpdateAccountReque
   appendIfPresent('date_of_birth', data.date_of_birth)
   appendIfPresent('password', data.password)
   appendIfPresent('password_confirmation', data.password_confirmation)
+  appendIfPresent('government_identity_type', data.government_identity_type)
 
   const governmentIdentityRaw = data.government_identity ?? []
   const governmentIdentity = Array.isArray(governmentIdentityRaw)
