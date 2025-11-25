@@ -10,6 +10,7 @@ use App\Notifications\BlotterReportStatusUpdated;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class BlotterReportsController extends Controller
@@ -271,8 +272,11 @@ class BlotterReportsController extends Controller
             if (!$file instanceof UploadedFile || !$file->isValid()) {
                 continue;
             }
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = "blotter-evidences/{$blotterReport->id}/{$filename}";
 
-            $path = $file->store('blotter-evidences', 'public');
+            // Upload to Supabase S3
+            Storage::disk('supabase')->put($path, file_get_contents($file));
 
             $blotterReport->evidence()->create([
                 'storage_path' => $path,

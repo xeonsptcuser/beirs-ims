@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class UsersController extends Controller
@@ -188,7 +189,12 @@ class UsersController extends Controller
                 Log::warning('gov-id.update.null-file');
                 continue;
             }
-            $path = $file->store("government-ids/{$userProfile->id}", 'public'); // keep disk consistent
+
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = "government-ids/{$userProfile->id}/{$filename}";
+
+            // Upload to Supabase S3
+            Storage::disk('supabase')->put($path, file_get_contents($file));
             Log::info('gov-id.update.saved', ['path' => $path]);
 
             $userProfile->governmentIdentity()->updateOrCreate(

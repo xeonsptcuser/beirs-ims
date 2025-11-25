@@ -68,6 +68,18 @@ return [
             'report' => false,
         ],
 
+        'supabase' => [
+            'driver' => 's3',
+            'key' => env('SUPABASE_SERVICE_KEY'),
+            'secret' => env('SUPABASE_SERVICE_SECRET'),
+            'region' => 'us-east-1', // arbitrary; Supabase ignores region
+            'bucket' => env('SUPABASE_BUCKET'),
+            'endpoint' => env('SUPABASE_S3_ENDPOINT'),
+            'use_path_style_endpoint' => true,
+            'throw' => false,
+        ],
+
+
     ],
 
     /*
