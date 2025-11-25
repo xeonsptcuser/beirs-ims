@@ -7,16 +7,22 @@ use App\Interfaces\BlotterReportRepositoryInterface;
 use App\Models\BlotterReport\BlotterReport;
 use App\Models\Users\User;
 use App\Notifications\BlotterReportStatusUpdated;
+use App\Services\SupabaseStorageService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class BlotterReportsController extends Controller
 {
 
-    public function __construct(private readonly BlotterReportRepositoryInterface $blotter_report)
-    {
+    public function __construct(
+        private readonly BlotterReportRepositoryInterface $blotter_report,
+        private readonly SupabaseStorageService $storage
+    ) {
     }
     /**
      * Display a listing of the resource.
@@ -31,9 +37,13 @@ class BlotterReportsController extends Controller
         if ($user && $user->role === 'staff') {
             $handlerProfileId = $user->profile?->id;
             $staffStatuses = $this->resolveStaffStatuses($statuses);
-            $certificates = $this->blotter_report->getAllHandledByStaff(['profile', 'handler.user'], $handlerProfileId, $perPage, $staffStatuses, $search);
+            $certificates = $this->withSignedEvidenceUrls(
+                $this->blotter_report->getAllHandledByStaff(['profile', 'handler.user', 'evidence'], $handlerProfileId, $perPage, $staffStatuses, $search)
+            );
         } else {
-            $certificates = $this->blotter_report->getAll(['profile', 'handler.user'], $perPage, $statuses, $search);
+            $certificates = $this->withSignedEvidenceUrls(
+                $this->blotter_report->getAll(['profile', 'handler.user', 'evidence'], $perPage, $statuses, $search)
+            );
         }
 
         return response()->json([
@@ -51,7 +61,9 @@ class BlotterReportsController extends Controller
         $userId = $request->integer('user_id');
         $search = $request->string('search');
         $statuses = $this->resolveStatuses($request);
-        $blotter_report = $this->blotter_report->getAllById(['profile', 'handler.user'], $userId, $perPage, $statuses, $search);
+        $blotter_report = $this->withSignedEvidenceUrls(
+            $this->blotter_report->getAllById(['profile', 'handler.user', 'evidence'], $userId, $perPage, $statuses, $search)
+        );
 
         return response()->json([
             'status' => 'success',
@@ -102,7 +114,9 @@ class BlotterReportsController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $blotterReport->load(['profile', 'handler', 'evidence'])
+            'data' => $this->withSignedEvidenceUrls(
+                $blotterReport->load(['profile', 'handler', 'evidence'])
+            )
         ], 201);
     }
 
@@ -111,7 +125,9 @@ class BlotterReportsController extends Controller
      */
     public function show(int $blotterReportId)
     {
-        $blotter_report = $this->blotter_report->getById($blotterReportId, ['profile', 'handler.user', 'evidence']);
+        $blotter_report = $this->withSignedEvidenceUrls(
+            $this->blotter_report->getById($blotterReportId, ['profile', 'handler.user', 'evidence'])
+        );
 
         return response()->json([
             'status' => 'success',
@@ -150,7 +166,9 @@ class BlotterReportsController extends Controller
             ->toArray();
         $certificateData['handled_by'] = $handlerProfileId;
 
-        $certificate = $this->blotter_report->updateBlotterReport($blotterReport, $certificateData);
+        $certificate = $this->withSignedEvidenceUrls(
+            $this->blotter_report->updateBlotterReport($blotterReport, $certificateData)
+        );
 
         return response()->json([
             'status' => 'success',
@@ -271,11 +289,12 @@ class BlotterReportsController extends Controller
             if (!$file instanceof UploadedFile || !$file->isValid()) {
                 continue;
             }
+            $path = "blotter-evidences/{$blotterReport->id}";
 
-            $path = $file->store('blotter-evidences', 'public');
+            $storagePath = $this->storage->upload($file, $path);
 
             $blotterReport->evidence()->create([
-                'storage_path' => $path,
+                'storage_path' => $storagePath,
                 'original_name' => $file->getClientOriginalName(),
                 'mime_type' => $file->getClientMimeType(),
                 'size' => $file->getSize(),
@@ -283,5 +302,43 @@ class BlotterReportsController extends Controller
         }
 
         $blotterReport->load('evidence');
+    }
+
+    private function withSignedEvidenceUrls(Collection|LengthAwarePaginator|mixed $reports): Collection|LengthAwarePaginator|mixed
+    {
+        if ($reports instanceof LengthAwarePaginator) {
+            $reports->getCollection()->each(function ($report) {
+                $this->applyEvidenceSignedUrls($report);
+            });
+            return $reports;
+        }
+
+        if ($reports instanceof Collection) {
+            $reports->each(function ($report) {
+                $this->applyEvidenceSignedUrls($report);
+            });
+            return $reports;
+        }
+
+        $this->applyEvidenceSignedUrls($reports);
+
+        return $reports;
+    }
+
+    private function applyEvidenceSignedUrls(mixed $report): void
+    {
+        $evidences = $report?->evidence;
+
+        if (!$evidences) {
+            return;
+        }
+
+        $evidences->each(function ($evidence) {
+            if (!$evidence->storage_path || str_starts_with($evidence->storage_path, 'http')) {
+                return;
+            }
+
+            $evidence->storage_path = $this->storage->signedUrl($evidence->storage_path);
+        });
     }
 }

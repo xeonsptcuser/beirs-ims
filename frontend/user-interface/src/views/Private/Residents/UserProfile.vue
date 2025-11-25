@@ -93,12 +93,19 @@ const govtIdentityTypeOption = [...primaryGovernmentIds, '...', ...secondaryGove
 const governmentIdUrl = computed(() => {
   const doc = responseData.value?.profile?.government_identity;
   if (!doc?.storage_path) return '';
+  const path = doc.storage_path;
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+
   const normalizedBase = storageBaseUrl.endsWith('/') ? storageBaseUrl.slice(0, -1) : storageBaseUrl;
-  return `${normalizedBase}/${doc.storage_path}`.replaceAll(/([^:]\/)\/+/g, '$1');
+  return `${normalizedBase}/${path}`.replaceAll(/([^:]\/)\/+/g, '$1');
 });
+
 const governmentIdType = computed(() => {
   return responseData.value?.profile?.government_identity?.identity_type ?? ''
 });
+
 const hasMobileChanged = computed(() => form.mobileNumber !== originalMobileNumber.value)
 
 const handleUpdateUserAccount = async () => {

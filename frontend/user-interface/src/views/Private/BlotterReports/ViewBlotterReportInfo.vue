@@ -67,6 +67,9 @@ const formatCaseId = (id?: number) => {
 
 const buildEvidenceUrl = (path: string) => {
   if (!path) return '';
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
   const normalizedBase = storageBaseUrl.endsWith('/') ? storageBaseUrl.slice(0, -1) : storageBaseUrl;
   return `${normalizedBase}/${path}`.replace(/([^:]\/)\/+/g, '$1');
 };
