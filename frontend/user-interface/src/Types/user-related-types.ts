@@ -79,6 +79,7 @@ export interface GovernmentIdentity {
   id: number
   user_profile_id: number
   storage_path: string
+  identity_type: string
   original_name: string
   mime_type: string
   size: number

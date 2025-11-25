@@ -1,8 +1,14 @@
 import { endpoints } from '@/services/api/endpoints'
 import { UserRelatedService } from '@/services/api/http/user-related-service'
-import type { CreateAccountRequestPayload, PageInfo, UpdateAccountRequestPayload } from '@/Types'
+import { OtpService } from '@/services/api/http/otp-service'
+import type {
+  CreateAccountRequestPayload,
+  PageInfo,
+  UpdateAccountRequestPayload,
+} from '@/Types'
 
 const userRelatedService = UserRelatedService.getInstance()
+const otpService = OtpService.getInstance()
 
 export const fetchAllUsers = async (params?: PageInfo) => {
   const response = await userRelatedService.getAllUsers(endpoints.GET_ALL_USERS, params)
@@ -32,6 +38,7 @@ export const userAccountCreation = async (data: CreateAccountRequestPayload) => 
   appendIfPresent('date_of_birth', data.date_of_birth)
   appendIfPresent('password', data.password)
   appendIfPresent('password_confirmation', data.password_confirmation)
+  appendIfPresent('government_identity_type', data.government_identity_type)
 
   const response = await userRelatedService.createUserAccount(
     endpoints.CREATE_USER_ACCOUNT,
@@ -87,6 +94,7 @@ export const updateUserAccount = async (userId: string, data: UpdateAccountReque
   appendIfPresent('date_of_birth', data.date_of_birth)
   appendIfPresent('password', data.password)
   appendIfPresent('password_confirmation', data.password_confirmation)
+  appendIfPresent('government_identity_type', data.government_identity_type)
 
   const governmentIdentityRaw = data.government_identity ?? []
   const governmentIdentity = Array.isArray(governmentIdentityRaw)
@@ -104,6 +112,26 @@ export const updateUserAccount = async (userId: string, data: UpdateAccountReque
 
   if (!response.status || response.status !== 'success') {
     throw new Error(`Failed to update user with id ${userId}`)
+  }
+
+  return response
+}
+
+export const requestMobileVerificationOtp = async () => {
+  const response = await otpService.requestOtpAuthenticated(endpoints.AUTH_REQUEST_OTP)
+
+  if (!response.status) {
+    throw new Error('Failed to request OTP for mobile verification.')
+  }
+
+  return response
+}
+
+export const verifyMobileVerificationOtp = async (otp_code: string) => {
+  const response = await otpService.verifyOtpAuthenticated({ otp_code }, endpoints.AUTH_VERIFY_OTP)
+
+  if (!response.status || response.status !== 'success') {
+    throw new Error(response.message ?? 'Failed to verify OTP for mobile number.')
   }
 
   return response
