@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Users;
 use App\Http\Controllers\Controller;
 use App\Interfaces\UsersRepositoryInterface;
 use App\Models\Users\UserProfile;
+use App\Services\SupabaseStorageService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ use Illuminate\Validation\Rule;
 
 class UsersController extends Controller
 {
-    public function __construct(private readonly UsersRepositoryInterface $users)
+    public function __construct(private readonly UsersRepositoryInterface $users, private readonly SupabaseStorageService $storage)
     {
     }
 
@@ -135,6 +136,17 @@ class UsersController extends Controller
         $identityType = $validated['government_identity_type'] ?? $updated->profile->governmentIdentity?->identity_type;
         $this->storeGovernmentIdentity($governmentIdentityFiles, $identityType, $updated->profile);
 
+        // Reload latest identity
+        $updated->refresh()->load('profile.governmentIdentity');
+
+        $identity = $updated->profile->governmentIdentity;
+
+        if ($identity && $identity->storage_path) {
+            $identity->storage_path = $this->storage->signedUrl($identity->storage_path);
+        }
+
+        Log::info('updated.user.information', ['info' => $updated]);
+
         return response()->json([
             'status' => 'success',
             'message' => 'User updated successfully.',
@@ -190,23 +202,16 @@ class UsersController extends Controller
                 continue;
             }
 
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $path = "government-ids/{$userProfile->id}/{$filename}";
+            $path = "government-ids/{$userProfile->id}";
 
-            // Upload to Supabase S3
-            Storage::disk('supabase')->put(
-                $path,
-                file_get_contents($file),
-                [
-                    'ContentType' => $file->getClientMimeType(),
-                ]
-            );
-            Log::info('gov-id.update.saved', ['path' => $path]);
+            $storagePath = $this->storage->upload($file, $path);
+
+            Log::info('gov-id.update.saved', ['path' => $storagePath]);
 
             $userProfile->governmentIdentity()->updateOrCreate(
                 [],
                 [
-                    'storage_path' => $path,
+                    'storage_path' => $storagePath,
                     ...$typePayload,
                     'original_name' => $file->getClientOriginalName(),
                     'mime_type' => $file->getClientMimeType(),

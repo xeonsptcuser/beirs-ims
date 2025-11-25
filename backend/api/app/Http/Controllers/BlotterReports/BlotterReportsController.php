@@ -7,6 +7,7 @@ use App\Interfaces\BlotterReportRepositoryInterface;
 use App\Models\BlotterReport\BlotterReport;
 use App\Models\Users\User;
 use App\Notifications\BlotterReportStatusUpdated;
+use App\Services\SupabaseStorageService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -16,8 +17,10 @@ use Illuminate\Validation\ValidationException;
 class BlotterReportsController extends Controller
 {
 
-    public function __construct(private readonly BlotterReportRepositoryInterface $blotter_report)
-    {
+    public function __construct(
+        private readonly BlotterReportRepositoryInterface $blotter_report,
+        private readonly SupabaseStorageService $storage
+    ) {
     }
     /**
      * Display a listing of the resource.
@@ -272,20 +275,12 @@ class BlotterReportsController extends Controller
             if (!$file instanceof UploadedFile || !$file->isValid()) {
                 continue;
             }
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $path = "blotter-evidences/{$blotterReport->id}/{$filename}";
+            $path = "blotter-evidences/{$blotterReport->id}";
 
-            // Upload to Supabase S3
-            Storage::disk('supabase')->put(
-                $path,
-                file_get_contents($file),
-                [
-                    'ContentType' => $file->getClientMimeType(),
-                ]
-            );
+            $storagePath = $this->storage->upload($file, $path);
 
             $blotterReport->evidence()->create([
-                'storage_path' => $path,
+                'storage_path' => $storagePath,
                 'original_name' => $file->getClientOriginalName(),
                 'mime_type' => $file->getClientMimeType(),
                 'size' => $file->getSize(),
