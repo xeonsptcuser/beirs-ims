@@ -124,10 +124,15 @@ class UsersController extends Controller
             ->filter(fn($value) => !is_null($value))
             ->toArray();
 
+        if (array_key_exists('mobile_number', $profileData) && $profileData['mobile_number'] !== $user->profile->mobile_number) {
+            $profileData['mobile_verified_at'] = null;
+        }
+
         $updated = $this->users->updateWithProfile($user, $userData, $profileData);
 
-        $governmentIdentityFiles = Arr::wrap($request->file('government_identity'));
-        $this->storeGovernmentIdentity($governmentIdentityFiles, $validated['government_identity_type'], $updated->profile);
+        $governmentIdentityFiles = array_filter(Arr::wrap($request->file('government_identity')));
+        $identityType = $validated['government_identity_type'] ?? $updated->profile->governmentIdentity?->identity_type;
+        $this->storeGovernmentIdentity($governmentIdentityFiles, $identityType, $updated->profile);
 
         return response()->json([
             'status' => 'success',
@@ -163,8 +168,21 @@ class UsersController extends Controller
         return !empty($search) ? $search : null;
     }
 
-    private function storeGovernmentIdentity($files, $type, UserProfile $userProfile): void
+    private function storeGovernmentIdentity($files, ?string $type, UserProfile $userProfile): void
     {
+        $typePayload = [];
+
+        if (!empty($type)) {
+            $typePayload['identity_type'] = $type;
+        }
+
+        if (empty($files)) {
+            if (!empty($typePayload)) {
+                $userProfile->governmentIdentity()->update($typePayload);
+            }
+            return;
+        }
+
         foreach ($files as $file) {
             if (!$file) {
                 Log::warning('gov-id.update.null-file');
@@ -177,7 +195,7 @@ class UsersController extends Controller
                 [],
                 [
                     'storage_path' => $path,
-                    'identity_type' => $type,
+                    ...$typePayload,
                     'original_name' => $file->getClientOriginalName(),
                     'mime_type' => $file->getClientMimeType(),
                     'size' => $file->getSize(),

@@ -2,7 +2,7 @@
 import { useEditUserAccount } from './composable/useEditUserAccount';
 import DropdownInput from '@/components/common/DropdownInput/DropdownInput.vue';
 import FormButton from '@/components/common/FormButton/FormButton.vue';
-import { fetchSingleUserProfile, updateUserAccount } from '@/Utils/userServices';
+import { fetchSingleUserProfile, requestMobileVerificationOtp, updateUserAccount, verifyMobileVerificationOtp } from '@/Utils/userServices';
 import { computed, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue';
 import { Collapse, Tooltip } from 'bootstrap';
 import type { AxiosError } from 'axios';
@@ -44,6 +44,14 @@ const localErrorMsg = ref<string>('')
 const hasGovernmentId = ref<boolean>(false)
 const govtIdTooltipButton = ref<HTMLElement | null>(null)
 const govtIdCollapseRef = ref<HTMLElement | null>(null)
+const originalMobileNumber = ref<string>('')
+const isOtpModalVisible = ref(false)
+const otpCode = ref('')
+const otpMessage = ref('')
+const otpError = ref('')
+const isRequestingOtp = ref(false)
+const isVerifyingOtp = ref(false)
+const mobileVerificationPending = ref(false)
 let govtIdTooltipInstance: Tooltip | null = null
 let govtIdCollapseInstance: Collapse | null = null
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '');
@@ -88,6 +96,10 @@ const governmentIdUrl = computed(() => {
   const normalizedBase = storageBaseUrl.endsWith('/') ? storageBaseUrl.slice(0, -1) : storageBaseUrl;
   return `${normalizedBase}/${doc.storage_path}`.replaceAll(/([^:]\/)\/+/g, '$1');
 });
+const governmentIdType = computed(() => {
+  return responseData.value?.profile?.government_identity?.identity_type ?? ''
+});
+const hasMobileChanged = computed(() => form.mobileNumber !== originalMobileNumber.value)
 
 const handleUpdateUserAccount = async () => {
   navigation.startNavigation();
@@ -99,6 +111,7 @@ const handleUpdateUserAccount = async () => {
 
     if (isValid) {
       hasError.value = false
+      const mobileChanged = hasMobileChanged.value
       const requestPayload: UpdateAccountRequestPayload = {
         first_name: form.name.firstName,
         middle_name: form.name.middleName,
@@ -124,6 +137,8 @@ const handleUpdateUserAccount = async () => {
       const response = await updateUserAccount(props.id, requestPayload)
       responseData.value = response.data
       hasGovernmentId.value = !!responseData.value?.profile?.government_identity
+      originalMobileNumber.value = response.data.profile.mobile_number ?? ''
+      mobileVerificationPending.value = mobileChanged || !response.data.profile.mobile_verified_at
 
       setSuccessResponse({
         status: response.status ?? 'success',
@@ -136,7 +151,9 @@ const handleUpdateUserAccount = async () => {
         useSession.updateUserName(formatName(profile.first_name, profile.middle_name, profile.last_name))
       }
 
-      globalThis.location.reload();
+      if (mobileChanged && response.data.profile.mobile_number) {
+        await requestOtpForMobileVerification()
+      }
 
     } else {
       hasError.value = true
@@ -151,6 +168,56 @@ const handleUpdateUserAccount = async () => {
     setServerErrors(axiosError.response?.data?.errors, axiosError.response?.data?.message ?? fallbackResponse.message)
   } finally {
     navigation.endNavigation();
+  }
+}
+
+const resetOtpState = () => {
+  otpCode.value = ''
+  otpMessage.value = ''
+  otpError.value = ''
+}
+
+const requestOtpForMobileVerification = async () => {
+  if (isRequestingOtp.value) return
+
+  otpError.value = ''
+  otpMessage.value = ''
+  isRequestingOtp.value = true
+
+  try {
+    const response = await requestMobileVerificationOtp()
+    otpMessage.value = response.message ?? 'OTP sent to your mobile number.'
+    mobileVerificationPending.value = true
+    isOtpModalVisible.value = true
+  } catch (error) {
+    const axiosError = error as AxiosError<ApiErrorResponse>
+    otpError.value = axiosError.response?.data?.message || (error as Error)?.message || 'Failed to send OTP.'
+  } finally {
+    isRequestingOtp.value = false
+  }
+}
+
+const verifyOtpForMobileChange = async () => {
+  if (!otpCode.value.trim()) {
+    otpError.value = 'Please enter the OTP code sent to your mobile number.'
+    return
+  }
+
+  isVerifyingOtp.value = true
+  otpError.value = ''
+
+  try {
+    const response = await verifyMobileVerificationOtp(otpCode.value.trim())
+    otpMessage.value = response.message ?? 'Mobile number verified successfully.'
+    mobileVerificationPending.value = false
+    isOtpModalVisible.value = false
+    resetOtpState()
+    await fetchUserProfile()
+  } catch (error) {
+    const axiosError = error as AxiosError<ApiErrorResponse>
+    otpError.value = axiosError.response?.data?.message || (error as Error)?.message || 'Failed to verify OTP.'
+  } finally {
+    isVerifyingOtp.value = false
   }
 }
 
@@ -176,6 +243,8 @@ const fetchUserProfile = async () => {
     form.addressLine = responseData.value.profile.address_line
     form.mobileNumber = responseData.value.profile.mobile_number
     form.date_of_birth = responseData.value.profile.date_of_birth
+    originalMobileNumber.value = responseData.value.profile.mobile_number ?? ''
+    mobileVerificationPending.value = !responseData.value.profile.mobile_verified_at
 
   } catch (error) {
     hasError.value = true
@@ -321,7 +390,23 @@ onBeforeUnmount(() => {
             </div>
             <div class="mb-3">
               <p class="text-muted small mb-1">Mobile Number</p>
-              <p class="fw-semibold mb-0">{{ responseData?.profile?.mobile_number || '—' }}</p>
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <p class="fw-semibold mb-0">{{ responseData?.profile?.mobile_number || '—' }}</p>
+                <span
+                  class="badge"
+                  :class="mobileVerificationPending ? 'bg-warning-subtle text-warning' : 'bg-success-subtle text-success'"
+                >
+                  {{ mobileVerificationPending ? 'Verification required' : 'Verified' }}
+                </span>
+              </div>
+              <button
+                v-if="mobileVerificationPending && responseData?.profile?.mobile_number"
+                class="btn btn-link p-0 mt-1"
+                type="button"
+                @click="requestOtpForMobileVerification"
+              >
+                Verify this number via OTP
+              </button>
             </div>
             <div class="mb-3">
               <p class="text-muted small mb-1">Address</p>
@@ -383,6 +468,7 @@ onBeforeUnmount(() => {
               </div>
             </div>
             <div v-if="hasGovernmentId" class="border rounded text-center p-3 mb-2">
+              <p v-if="governmentIdType" class="text-uppercase text-muted small fw-semibold mb-2">{{ governmentIdType }}</p>
               <img :src="governmentIdUrl || nationalId" alt="Government ID" class="img-fluid" />
               <p class="text-muted small mb-0 mt-2">Uploading a new file will replace the existing ID.</p>
             </div>
@@ -503,6 +589,38 @@ onBeforeUnmount(() => {
         </div>
       </div>
     </div>
+  </div>
+
+  <div v-if="isOtpModalVisible" class="modal fade show d-block" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Verify Mobile Number</h5>
+          <button type="button" class="btn-close" aria-label="Close" @click="isOtpModalVisible = false"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted mb-3">Enter the one-time password sent to your updated mobile number.</p>
+          <FormFloatingInput
+            type="text"
+            label="OTP Code"
+            id="otp_code"
+            v-model="otpCode"
+            :has-error="!!otpError"
+            :error-message="otpError"
+          />
+          <p v-if="otpMessage" class="text-success small mb-0 mt-2">{{ otpMessage }}</p>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+          <button class="btn btn-outline-secondary" type="button" @click="requestOtpForMobileVerification" :disabled="isRequestingOtp">
+            {{ isRequestingOtp ? 'Resending...' : 'Resend OTP' }}
+          </button>
+          <button class="btn btn-primary" type="button" @click="verifyOtpForMobileChange" :disabled="isVerifyingOtp">
+            {{ isVerifyingOtp ? 'Verifying...' : 'Verify' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
   </div>
 </template>
 
