@@ -13,7 +13,7 @@ php artisan cache:clear
 echo "Optimized Clearing..."
 php artisan optimize:clear
 
-cho "Running migrations..."
+echo "Running migrations..."
 php artisan migrate --force
 
 echo "Running Server"
