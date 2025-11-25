@@ -4,13 +4,19 @@ set -e
 echo "Running composer install (already done in Dockerfile, but safe)..."
 composer install --no-dev --optimize-autoloader
 
-echo "Caching config..."
-php artisan config:cache
+echo "Clearing Queue..."
+php artisan queue:clear
 
-echo "Caching routes..."
-php artisan route:cache
+echo "Clearing Config..."
+php artisan config:clear
 
-echo "Running migrations"
+echo "Clearing Cache..."
+php artisan cache:clear
+
+echo "Optimized Clearing..."
+php artisan optimize:clear
+
+cho "Running migrations..."
 php artisan migrate --force
 
 echo "Running Server"
