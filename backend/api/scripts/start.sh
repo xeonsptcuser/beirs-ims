@@ -13,6 +13,9 @@ php artisan cache:clear
 echo "Optimized Clearing..."
 php artisan optimize:clear
 
+echo "Running Dump Auto-load..."
+composer dump-autoload
+
 echo "Running migrations..."
 php artisan migrate --force
 
