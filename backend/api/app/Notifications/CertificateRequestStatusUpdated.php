@@ -4,17 +4,17 @@ namespace App\Notifications;
 
 use App\Models\Certificates\CertificateRequest;
 use App\Models\Users\User;
-use App\Notifications\Channels\ItextmoChannel;
-use App\Notifications\Contracts\ItextmoMessage;
-use App\Notifications\Traits\FormatItextMoMessage;
+use App\Notifications\Channels\ITextMoChannel;
+use App\Notifications\Contracts\ITextMoMessage;
+use App\Notifications\Traits\FormatITextMoMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class CertificateRequestStatusUpdated extends Notification implements ShouldQueue, ItextmoMessage
+class CertificateRequestStatusUpdated extends Notification implements ShouldQueue, ITextMoMessage
 {
-    use Queueable, FormatItextMoMessage;
+    use Queueable, FormatITextMoMessage;
 
     /**
      * Create a new notification instance.
@@ -33,7 +33,7 @@ class CertificateRequestStatusUpdated extends Notification implements ShouldQueu
      */
     public function via(object $notifiable): array
     {
-        return ['database', ItextmoChannel::class];
+        return ['database', ITextMoChannel::class];
     }
 
     /**

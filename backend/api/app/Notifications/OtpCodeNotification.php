@@ -3,7 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Users\UserProfile;
-use App\Notifications\Channels\ItextmoChannel;
+use App\Notifications\Channels\ITextMoChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
@@ -22,7 +22,7 @@ class OtpCodeNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return [ItextmoChannel::class];
+        return [ITextMoChannel::class];
     }
 
     /**

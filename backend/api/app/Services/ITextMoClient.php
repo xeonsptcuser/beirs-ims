@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Exceptions\MessagingException;
 use GuzzleHttp\Client;
 
-class ItextmoClient
+class ITextMoClient
 {
     public function __construct(
         private readonly Client $http = new Client(['base_uri' => 'https://www.itexmo.com/php_api/'])

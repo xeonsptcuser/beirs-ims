@@ -2,23 +2,23 @@
 
 namespace App\Notifications\Channels;
 
-use App\Notifications\Contracts\ItextmoMessage;
-use App\Services\ItextmoClient;
+use App\Notifications\Contracts\ITextMoMessage;
+use App\Services\ITextMoClient;
 use Illuminate\Notifications\Notification;
 
-class ItextmoChannel
+class ITextMoChannel
 {
-    public function __construct(private readonly ItextmoClient $client)
+    public function __construct(private readonly ITextMoClient $client)
     {
     }
 
     /**
      * @param object $notifiable The notifiable entity (e.g., UserProfile)
-     * @param Notification&ItextmoMessage $notification Notification that can format an iTextMo payload
+     * @param Notification&ITextMoMessage $notification Notification that can format an iTextMo payload
      */
     public function send(object $notifiable, Notification $notification): void
     {
-        if (!$notification instanceof ItextmoMessage) {
+        if (!$notification instanceof ITextMoMessage) {
             return;
         }
 

@@ -2,7 +2,7 @@
 
 namespace App\Notifications\Contracts;
 
-interface ItextmoMessage
+interface ITextMoMessage
 {
     /**
      * Build the SMS payload for iTextMo.

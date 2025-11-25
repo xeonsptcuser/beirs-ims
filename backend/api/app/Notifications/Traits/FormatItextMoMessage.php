@@ -2,7 +2,7 @@
 
 namespace App\Notifications\Traits;
 
-trait FormatItextMoMessage
+trait FormatITextMoMessage
 {
     public function buildItextMoMessage(object $model, object $notifiable, string $releasedStatus): array
     {
