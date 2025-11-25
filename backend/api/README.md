@@ -33,7 +33,7 @@ Use `.env.example` as the source of truth for both local development and Render 
 
 ### Render deployment
 - In Render, create environment variables using the _Render deployment_ block in `.env.example` (Render provides `RENDER_EXTERNAL_URL`, `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD`, and `DATABASE_URL`).
-- Point `FRONTEND_URL`, `CORS_ALLOWED_ORIGINS`, and `SANCTUM_STATEFUL_DOMAINS` to your Vercel domain so CORS and Sanctum cookies work in production.
+- Point `FRONTEND_URL`, `CORS_ALLOWED_ORIGINS`, and `SANCTUM_STATEFUL_DOMAINS` to your Render Static Site domain so CORS and Sanctum cookies work in production.
 - Keep `APP_ENV=production` and `APP_DEBUG=false` for the hosted service.
 
 ## Supabase Storage setup
