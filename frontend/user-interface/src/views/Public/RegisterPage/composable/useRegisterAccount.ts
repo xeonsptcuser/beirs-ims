@@ -114,14 +114,6 @@ export function useRegisterAccount() {
       isValid = false
     }
 
-    if (!form.streetAddress.trim()) {
-      errors.value.streetAddress = true
-      errorMessages.value.streetAddress = {
-        error: 'Home address is required.',
-      }
-      isValid = false
-    }
-
     return isValid
   }
 
