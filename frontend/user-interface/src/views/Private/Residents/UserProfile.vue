@@ -165,7 +165,7 @@ const handleUpdateUserAccount = async () => {
     } else {
       hasError.value = true
     }
-
+    globalThis.location.reload();
   } catch (error) {
     hasError.value = true
     setSuccessResponse(null)
