@@ -25,6 +25,8 @@ export const endpoints = {
 
   // AUTHENTICATED ENDPOINTS
   LOGOUT: `${AUTH_BASE}/logout`,
+  AUTH_REQUEST_OTP: `${AUTH_BASE}/otp/request`,
+  AUTH_VERIFY_OTP: `${AUTH_BASE}/otp/verify`,
 
   // USER ACCOUNT RELATED
   GET_ALL_USERS: `${USER_API_ROUTES}`,
