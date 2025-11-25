@@ -64,6 +64,7 @@ type PayloadBase = ProfileCore & {
 export interface CreateAccountRequestPayload extends PayloadBase {
   password: string
   password_confirmation: string
+  government_identity_type: string
 }
 
 export type UpdateAccountRequestPayload = Partial<

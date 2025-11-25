@@ -1,11 +1,7 @@
 import { endpoints } from '@/services/api/endpoints'
 import { UserRelatedService } from '@/services/api/http/user-related-service'
 import { OtpService } from '@/services/api/http/otp-service'
-import type {
-  CreateAccountRequestPayload,
-  PageInfo,
-  UpdateAccountRequestPayload,
-} from '@/Types'
+import type { CreateAccountRequestPayload, PageInfo, UpdateAccountRequestPayload } from '@/Types'
 
 const userRelatedService = UserRelatedService.getInstance()
 const otpService = OtpService.getInstance()

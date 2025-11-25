@@ -10,7 +10,6 @@ import SuccessLabel from '@/components/common/SuccessLabel/SuccessLabel.vue';
 import type { AxiosError } from 'axios';
 import type { ApiErrorResponse, CertificateRequestsResponse, CommonResponse, StatusOptions, UpdateCertificateRequestPayload } from '@/Types';
 import WarningLabel from '@/components/common/WarningLabel/WarningLabel.vue';
-import { fetchOpenCertificatePreview } from '@/Utils/pdfServices';
 
 const props = defineProps<{
   role: string,
