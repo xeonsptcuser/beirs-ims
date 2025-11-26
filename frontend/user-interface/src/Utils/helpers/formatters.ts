@@ -31,8 +31,7 @@ export const dateToday = () => {
 
 export const maxDate = () => {
   // Allow selecting today by not subtracting a day
-  const today = new Date()
-  return today.toISOString().split('T')[0]
+  return dateToday()
 }
 
 export const orderedOptions = (optionsList: string[]) => {

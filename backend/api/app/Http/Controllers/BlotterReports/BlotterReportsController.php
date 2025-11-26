@@ -15,7 +15,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
-
+use Illuminate\Database\Eloquent\Model;
 class BlotterReportsController extends Controller
 {
 
@@ -304,7 +304,7 @@ class BlotterReportsController extends Controller
         $blotterReport->load('evidence');
     }
 
-    private function withSignedEvidenceUrls(Collection|LengthAwarePaginator|mixed $reports): Collection|LengthAwarePaginator|mixed
+    private function withSignedEvidenceUrls(Collection|LengthAwarePaginator|Model $reports): Collection|LengthAwarePaginator|Model
     {
         if ($reports instanceof LengthAwarePaginator) {
             $reports->getCollection()->each(function ($report) {

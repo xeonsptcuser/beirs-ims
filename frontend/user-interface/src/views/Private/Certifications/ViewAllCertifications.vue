@@ -145,7 +145,6 @@ const fetchCertificateRequests = async (page: number = pagination.current, searc
     pagination.total = paginator.total ?? 0;
     pagination.links = paginator.links ?? [];
 
-    console.log(paginator.data);
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
     const fallbackResponse = error as CommonResponse;
@@ -357,7 +356,7 @@ onMounted(() => {
                         <p class="text-secondary mb-2">Purpose: {{ truncatedPurpose(request.cert_request_reason) }}</p>
                         <p class="text-muted small mb-0" v-if="request.profile">
                           Requested by: {{ formatName(request.profile.first_name, request.profile.middle_name,
-                          request.profile.last_name) }}
+                            request.profile.last_name) }}
                         </p>
                       </div>
                       <div class="text-end">
@@ -389,7 +388,7 @@ onMounted(() => {
                   <span class="badge" :class="statusBadgeClass(status)"></span>
                   <span class="fw-bold">{{
                     certificationRequestItems.filter((item) => item.status === status).length
-                  }}</span>
+                    }}</span>
                 </div>
               </div>
             </div>
