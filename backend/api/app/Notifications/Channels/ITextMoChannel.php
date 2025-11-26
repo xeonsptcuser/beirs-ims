@@ -5,6 +5,8 @@ namespace App\Notifications\Channels;
 use App\Notifications\Contracts\ITextMoMessage;
 use App\Services\ITextMoClient;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class ITextMoChannel
 {
@@ -24,7 +26,16 @@ class ITextMoChannel
 
         $data = $notification->toItextMo($notifiable);
         if (!empty($data['to']) && !empty($data['message'])) {
-            $this->client->sendSms($data['to'], $data['message']);
+            try {
+                $this->client->sendSms($data['to'], $data['message']);
+            } catch (Throwable $e) {
+                Log::warning('iTextMo SMS skipped; continuing without SMS delivery.', [
+                    'notifiable' => get_class($notifiable),
+                    'to' => $data['to'],
+                    'message' => $data['message'],
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
     }
 }

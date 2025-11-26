@@ -115,7 +115,7 @@ const fetchUserProfile = async () => {
 watch(() => form.isCurrent, (isCurrent) => {
   if (isCurrent) {
     // set the endResidencyDate field if Present checkbox is checked
-    form.endResidencyDate = `${dateToday}`
+    form.endResidencyDate = dateToday()
   } else {
     // Optionally clear the field when unchecked
     form.endResidencyDate = ''

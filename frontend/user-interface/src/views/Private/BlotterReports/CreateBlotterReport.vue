@@ -13,6 +13,7 @@ import { maxDate, orderedOptions } from '@/Utils/helpers/formatters';
 import { submitBlotterReport } from '@/Utils/blotterReportServices';
 import type { AxiosError } from 'axios';
 import router from '@/router';
+import { useRoute } from 'vue-router';
 import { fetchSingleUserProfile } from '@/Utils/userServices';
 import { useBarangayAddresses } from '@/composables/useBarangayAddresses';
 
@@ -31,6 +32,7 @@ const {
 } = useBlotterReports();
 
 const navigation = useGlobalLoadingStore();
+const route = useRoute();
 const { addressOptions, isLoadingAddresses, loadBarangayAddresses } = useBarangayAddresses();
 loadBarangayAddresses();
 
@@ -106,6 +108,13 @@ const handleCreateBlotterReport = async () => {
     return;
   }
 
+  const resolvedRole = props.role || (route.params.role as string | undefined);
+  if (!resolvedRole) {
+    setServerErrors(undefined, 'Missing role parameter for this request.');
+    hasError.value = true;
+    return;
+  }
+
   const requestPayload: BlotterReportRequestPayload = {
     incident_type: form.value.incidentType,
     incident_title: form.value.incidentTitle,
@@ -126,7 +135,7 @@ const handleCreateBlotterReport = async () => {
       throw response;
     }
     hasError.value = false;
-    router.push({ name: 'BlotterReports', params: { role: props.role } });
+    await router.push({ name: 'BlotterReports', params: { role: resolvedRole } });
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
     const fallbackResponse = error as CommonResponse;
