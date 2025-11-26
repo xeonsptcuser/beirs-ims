@@ -194,8 +194,8 @@ watch(isLoggedIn, (loggedIn) => {
       <div class="container d-flex flex-wrap justify-content-between align-items-center small">
         <span><i class="bi bi-geo-alt-fill me-1"></i> Brgy. Alang-Alang, Mandaue City</span>
         <div class="d-flex flex-wrap gap-3">
-          <span><i class="bi bi-telephone me-1"></i> +63 975 123 1234</span>
-          <span><i class="bi bi-envelope me-1"></i> barangay@alang-alang.gov</span>
+          <span><i class="bi bi-telephone me-1"></i>032-520-8206 / 0966-075-7388</span>
+          <span><i class="bi bi-envelope me-1"></i>goalangalang@gmail.com</span>
         </div>
       </div>
     </div>
@@ -204,8 +204,8 @@ watch(isLoggedIn, (loggedIn) => {
         <div class="d-flex align-items-center gap-3">
           <AppLogo />
           <div class="d-none d-sm-block">
-            <p class="mb-0 fw-bold text-uppercase small">BIERS-IMS</p>
-            <small class="text-white-50">Community Information Portal</small>
+            <p class="mb-0 fw-bold text-uppercase small">BEIRS</p>
+            <small class="text-white-50">Barangay E-Blotter and Incident Reporting System</small>
           </div>
         </div>
         <div class="d-flex align-items-center gap-3">
