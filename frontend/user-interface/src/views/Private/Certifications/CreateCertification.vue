@@ -41,6 +41,7 @@ const handleCreateCertificateRequest = async () => {
   navigation.startNavigation();
   try {
     const isValid = validateCertificateForm();
+    hasError.value = false
 
     if (isValid) {
       // HNDLE FORM REQUEST HERE
@@ -59,9 +60,8 @@ const handleCreateCertificateRequest = async () => {
       }
 
       // Update to redirect to new success page.
-      router.push({ name: 'SuccessCertTransaction', params: { role: props.role } })
-
-      hasError.value = false
+      await router.replace({ name: 'SuccessCertTransaction', params: { role: props.role } })
+      globalThis.location.reload();
     } else {
       hasError.value = true
     }
@@ -115,7 +115,7 @@ const fetchUserProfile = async () => {
 watch(() => form.isCurrent, (isCurrent) => {
   if (isCurrent) {
     // set the endResidencyDate field if Present checkbox is checked
-    form.endResidencyDate = dateToday()
+    form.endResidencyDate = dateToday();
   } else {
     // Optionally clear the field when unchecked
     form.endResidencyDate = ''

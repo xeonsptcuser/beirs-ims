@@ -266,7 +266,7 @@ watch(() => props.id, (newVal, oldVal) => {
           {{ blotterReport?.status }}
         </span>
         <p class="text-secondary small mt-2 mb-0">Filed on {{ formatDateToHuman(blotterReport?.created_at ?? '') || '—'
-          }}</p>
+        }}</p>
       </div>
     </div>
 

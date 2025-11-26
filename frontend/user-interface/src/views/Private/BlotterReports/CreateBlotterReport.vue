@@ -16,6 +16,7 @@ import router from '@/router';
 import { useRoute } from 'vue-router';
 import { fetchSingleUserProfile } from '@/Utils/userServices';
 import { useBarangayAddresses } from '@/composables/useBarangayAddresses';
+import { useRoute } from 'vue-router';
 
 const props = defineProps<{
   role: string,
@@ -136,6 +137,8 @@ const handleCreateBlotterReport = async () => {
     }
     hasError.value = false;
     await router.push({ name: 'BlotterReports', params: { role: resolvedRole } });
+
+    globalThis.location.reload();
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
     const fallbackResponse = error as CommonResponse;

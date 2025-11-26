@@ -30,7 +30,7 @@ export const dateToday = () => {
 }
 
 export const maxDate = () => {
-  // Use local date to avoid timezone shifts pushing max to tomorrow
+  // Allow selecting today by not subtracting a day
   return dateToday()
 }
 

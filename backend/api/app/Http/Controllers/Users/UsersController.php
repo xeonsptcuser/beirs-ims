@@ -152,8 +152,6 @@ class UsersController extends Controller
             $identity->storage_path = $this->storage->signedUrl($identity->storage_path);
         }
 
-        Log::info('updated.user.information', ['info' => $updated]);
-
         return response()->json([
             'status' => 'success',
             'message' => 'User updated successfully.',
@@ -212,8 +210,6 @@ class UsersController extends Controller
             $path = "government-ids/{$userProfile->id}";
 
             $storagePath = $this->storage->upload($file, $path);
-
-            Log::info('gov-id.update.saved', ['path' => $storagePath]);
 
             $userProfile->governmentIdentity()->updateOrCreate(
                 [],

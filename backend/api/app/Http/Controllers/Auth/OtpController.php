@@ -7,6 +7,7 @@ use App\Interfaces\UsersRepositoryInterface;
 use App\Services\OtpService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class OtpController extends Controller
 {
@@ -35,12 +36,12 @@ class OtpController extends Controller
         }
 
         $otpResponse = $this->otpService->requestForUser($user);
-
         return response()->json(
             [
                 'status' => $otpResponse['status'],
                 'user_id' => $user->id,
                 'message' => $otpResponse['message'],
+                'show_otp' => $otpResponse['show_otp']
             ],
             $otpResponse['status_code'] ?? 200
         );
@@ -53,7 +54,7 @@ class OtpController extends Controller
             'otp_code' => ['required', 'string'],
         ]);
 
-        $user = $this->users->findById((int)$validated['user_id'], ['profile']);
+        $user = $this->users->findById((int) $validated['user_id'], ['profile']);
 
         if (!$user) {
             return response()->json(['message' => 'User not found.'], 404);
@@ -100,6 +101,7 @@ class OtpController extends Controller
         return response()->json([
             'status' => $otpResponse['status'],
             'message' => $otpResponse['message'],
+            'show_otp' => $otpResponse['show_otp']
         ], $otpResponse['status_code'] ?? 200);
     }
 

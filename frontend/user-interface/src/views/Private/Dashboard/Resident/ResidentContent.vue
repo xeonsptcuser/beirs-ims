@@ -101,7 +101,7 @@ const profileCompletionMessage = computed(() => {
         <div class="card border-0 shadow-sm h-100">
           <div class="card-body">
             <p class="text-muted small mb-1">Resident Overview</p>
-            <h4 class="fw-bold mb-2">
+            <h4 class="fw-bold mb-2 text-capitalize">
               {{ residentUser?.profile ? residentUser?.profile?.first_name + ' ' + (residentUser?.profile?.last_name ||
                 '') : 'Welcome' }}
             </h4>
