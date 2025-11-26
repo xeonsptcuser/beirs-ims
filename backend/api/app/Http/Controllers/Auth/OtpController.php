@@ -101,6 +101,7 @@ class OtpController extends Controller
         return response()->json([
             'status' => $otpResponse['status'],
             'message' => $otpResponse['message'],
+            'show_otp' => $otpResponse['show_otp']
         ], $otpResponse['status_code'] ?? 200);
     }
 
