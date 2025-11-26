@@ -269,7 +269,8 @@ watch(isLoggedIn, (loggedIn) => {
                 </div>
               </div>
               <div class="dropdown" ref="userDropdownRef" :class="{ show: showUserMenu }">
-                <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" @click="toggleUserMenu">
+                <button class="btn btn-outline-light btn-sm dropdown-toggle text-capitalize" type="button"
+                  @click="toggleUserMenu">
                   <i class="bi bi-person-circle me-1"></i> {{ session.name || 'Profile' }}
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end" :class="{ show: showUserMenu }">

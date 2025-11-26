@@ -363,7 +363,7 @@ onBeforeUnmount(() => {
       class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center mb-4 gap-3">
       <div>
         <p class="text-muted text-uppercase small mb-1">Resident Profile</p>
-        <h2 class="fw-bold mb-1">{{ fullName || 'Resident Profile' }}</h2>
+        <h2 class="fw-bold mb-1 text-capitalize">{{ fullName || 'Resident Profile' }}</h2>
         <p class="text-secondary small mb-0">Review and update necessary information in one place.</p>
       </div>
       <button class="btn btn-link text-decoration-none" type="button" @click="navigateToTopPage">
@@ -387,7 +387,7 @@ onBeforeUnmount(() => {
                 <i class="bi bi-person-fill text-white"></i>
               </div>
               <div>
-                <h5 class="mb-0">{{ fullName || 'Resident' }}</h5>
+                <h5 class="mb-0 text-capitalize">{{ fullName || 'Resident' }}</h5>
                 <span class="badge mt-2" :class="profileStatusClass">{{ profileStatusLabel }}</span>
               </div>
             </div>

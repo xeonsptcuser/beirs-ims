@@ -31,7 +31,7 @@ class OtpService
     }
 
     /**
-     * @return array{ok: bool, status: string, message: string, otp?: OtpCode, status_code?: int}
+     * @return array{ok: bool, status: string, message: string, otp?: OtpCode, status_code?: int, show_otp?: string }
      */
     public function requestForUser(User $user): array
     {
@@ -73,7 +73,7 @@ class OtpService
             ];
         }
 
-        [$otp, $code] = $this->createOtp($user);
+        [$otp, $code, $showCode] = $this->createOtp($user);
 
         $user->profile?->notify(new OtpCodeNotification($code, $this->ttlMinutes));
 
@@ -82,11 +82,12 @@ class OtpService
             'status' => 'otp_required',
             'message' => 'OTP sent to your registered mobile number.',
             'otp' => $otp,
+            'show_otp' => $showCode,
         ];
     }
 
     /**
-     * @return array{ok: bool, status: string, message: string, otp?: OtpCode, status_code?: int}
+     * @return array{ok: bool, status: string, message: string, otp?: OtpCode, status_code?: int, show_otp?: string}
      */
     public function verify(User $user, string $plainCode): array
     {
@@ -170,7 +171,7 @@ class OtpService
 
         $code = str_pad((string) random_int(0, (10 ** $this->length) - 1), $this->length, '0', STR_PAD_LEFT);
         Log::info('generated.otp.code', ['otp_code' => $code]);
-
+        $showCode = $code;
         $otp = OtpCode::create([
             'user_id' => $user->id,
             'code_hash' => Hash::make($code),
@@ -178,7 +179,7 @@ class OtpService
             'attempts' => 0,
         ]);
 
-        return [$otp, $code];
+        return [$otp, $code, $showCode];
     }
 
     private function latestActiveOtp(User $user): ?OtpCode
