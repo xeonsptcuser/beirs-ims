@@ -170,7 +170,6 @@ class OtpService
             ->update(['consumed_at' => CarbonImmutable::now()]);
 
         $code = str_pad((string) random_int(0, (10 ** $this->length) - 1), $this->length, '0', STR_PAD_LEFT);
-        Log::info('generated.otp.code', ['otp_code' => $code]);
         $showCode = $code;
         $otp = OtpCode::create([
             'user_id' => $user->id,
