@@ -220,7 +220,7 @@ watch(isLoggedIn, (loggedIn) => {
                   @click="toggleNotifications" v-if="session.isRoleResident()">
                   <i class="bi bi-bell"></i>
                   <span v-if="unreadCount"
-                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
                     {{ unreadCount }}
                   </span>
                 </button>
