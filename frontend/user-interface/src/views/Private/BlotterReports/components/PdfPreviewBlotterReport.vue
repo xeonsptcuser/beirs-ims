@@ -11,7 +11,7 @@ const props = defineProps<{
 const pdfService = PdfRelatedService.getInstance()
 
 // Static PDF template
-const pdfTemplateUrl = new URL('@/assets/images/certs/blotter1.pdf', import.meta.url).href
+const pdfTemplateUrl = new URL('@/assets/images/pdf/blotter-form.pdf', import.meta.url).href
 
 const pdfUrl = ref<string | null>(null)
 const isLoading = ref<boolean>(false)

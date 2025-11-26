@@ -11,9 +11,9 @@ const props = defineProps<{
 
 const pdfService = PdfRelatedService.getInstance()
 
-const certBrgyClearance = new URL('@/assets/images/certs/cert-brgy.pdf', import.meta.url).href
-const certIndigency = new URL('@/assets/images/certs/cert-indigency.pdf', import.meta.url).href
-const certResidency = new URL('@/assets/images/certs/cert-residency.pdf', import.meta.url).href
+const certBrgyClearance = new URL('@/assets/images/pdf/cert-clearance.pdf', import.meta.url).href
+const certIndigency = new URL('@/assets/images/pdf/cert-indigency.pdf', import.meta.url).href
+const certResidency = new URL('@/assets/images/pdf/cert-residency.pdf', import.meta.url).href
 
 const templateMap: Record<string, string> = {
   clearance: certBrgyClearance,
