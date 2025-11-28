@@ -193,7 +193,7 @@ export function useHeatMap() {
         polygon.addTo(polygonLayerGroup)
       }
 
-      const centroid = getPolygonCentroid(section.coords)
+      const centroid = section.centroid ?? getPolygonCentroid(section.coords)
 
       for (const activeType of activeTypes) {
         const value = getSectionValue(section, activeType)

@@ -15,6 +15,8 @@ export interface Section {
   name: string
   // polygon coordinates in [y, x] (lat, lng) for CRS.Simple
   coords: [number, number][]
+  // optional custom centroid override in [y, x] (lat, lng) for CRS.Simple
+  centroid?: [number, number]
   // counts of case types – in real app this comes from Laravel
   cases: Record<string, number>
 }
