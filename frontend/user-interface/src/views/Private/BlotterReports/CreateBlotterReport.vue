@@ -42,7 +42,11 @@ const complainantAge = ref<string>('')
 const complainantContactInfo = ref<string>('')
 const address = ref<string>('')
 
-const sortedIncidentTypeOptions = orderedOptions(incidentTypeOptions)
+const incidentTypes = computed(() => {
+  return incidentTypeOptions.map(incidentType => incidentType.label)
+})
+
+const sortedIncidentTypeOptions = orderedOptions(incidentTypes.value)
 
 const buildFullName = (profile: Partial<UserProfileType>): string => {
   const first = profile.first_name ?? ''
