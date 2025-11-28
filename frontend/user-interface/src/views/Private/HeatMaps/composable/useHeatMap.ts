@@ -64,8 +64,7 @@ export function useHeatMap() {
     }
   }
 
-  const clamp = (value: number, min: number, max: number) =>
-    Math.min(Math.max(value, min), max)
+  const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
 
   const seededRandom = (seed: string) => {
     let hash = 0
@@ -110,10 +109,7 @@ export function useHeatMap() {
     'brgy-service-complaint': [-0.18, 0.08],
   }
 
-  const getIconOffset = (
-    section: Section,
-    type: Exclude<CaseType, 'total'>
-  ): [number, number] => {
+  const getIconOffset = (section: Section, type: Exclude<CaseType, 'total'>): [number, number] => {
     const { latSpan, lngSpan } = getSectionExtents(section)
     const [latRatio, lngRatio] = iconOffsetRatios[type]
 
@@ -161,7 +157,23 @@ export function useHeatMap() {
     markerLayerGroup.clearLayers()
 
     const activeTypes: Exclude<CaseType, 'total'>[] =
-      type === 'total' ? ['theft', 'vandalism', 'animal-related', 'trespassing'] : [type]
+      type === 'total'
+        ? [
+            'personal-conflict',
+            'noice-disturbance',
+            'trespassing',
+            'harrasment-threat',
+            'physical-injury',
+            'vandalism',
+            'theft',
+            'domestic-dispute',
+            'animal-related',
+            'curfew-violation',
+            'public-disturbance',
+            'lost-and-found',
+            'brgy-service-complaint',
+          ]
+        : [type]
 
     for (const section of sections.value) {
       const polygon = L.polygon(section.coords, {
