@@ -31,14 +31,6 @@ onMounted(async () => {
           Filters and legends show here
         </div>
         <div class="col-md-7 col-12">
-          <div class="controls">
-            <button @click="setType('total')">All</button>
-            <button @click="setType('theft')">Theft</button>
-            <button @click="setType('vandalism')">Vandalism</button>
-            <button @click="setType('animal-related')">Animal-related</button>
-            <button @click="setType('trespassing')">Trespassing</button>
-          </div>
-
           <div class="status" v-if="isLoadingSections">Loading heatmap data...</div>
           <div class="status error" v-else-if="sectionsError">{{ sectionsError }}</div>
           <div id="map" style="height: 750px;"></div>
@@ -49,12 +41,6 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.controls {
-  margin-bottom: 0.5rem;
-  display: flex;
-  gap: 0.5rem;
-}
-
 .status {
   padding: 0.5rem 0;
 }
