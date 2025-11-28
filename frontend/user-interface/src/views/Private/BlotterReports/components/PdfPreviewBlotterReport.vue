@@ -3,6 +3,7 @@ import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { PDFDocument, StandardFonts } from 'pdf-lib'
 import { endpoints } from '@/services/api/endpoints'
 import { PdfRelatedService } from '@/services/api/http/pdf-service'
+import blotterForm from '@/assets/images/pdf/blotter-form.pdf'
 
 const props = defineProps<{
   blotterId: string
@@ -11,7 +12,7 @@ const props = defineProps<{
 const pdfService = PdfRelatedService.getInstance()
 
 // Static PDF template
-const pdfTemplateUrl = new URL('@/assets/images/pdf/blotter-form.pdf', import.meta.url).href
+const pdfTemplateUrl = blotterForm
 
 const pdfUrl = ref<string | null>(null)
 const isLoading = ref<boolean>(false)
