@@ -54,6 +54,16 @@ export function useHeatMap() {
     return [total.lat / coords.length, total.lng / coords.length]
   }
 
+  const getSectionExtents = (section: Section) => {
+    const lats = section.coords.map(([lat]) => lat)
+    const lngs = section.coords.map(([, lng]) => lng)
+
+    return {
+      latSpan: Math.max(...lats) - Math.min(...lats),
+      lngSpan: Math.max(...lngs) - Math.min(...lngs),
+    }
+  }
+
   const iconColors: Record<Exclude<CaseType, 'total'>, string> = {
     theft: '#e63946',
     vandalism: '#2a9d8f',
@@ -70,20 +80,33 @@ export function useHeatMap() {
     'brgy-service-complaint': '#457b9d',
   }
 
-  const iconOffsets: Record<Exclude<CaseType, 'total'>, [number, number]> = {
-    theft: [-70, -50],
-    vandalism: [-10, 0],
-    'animal-related': [0, 10],
-    trespassing: [0, -10],
-    'personal-conflict': [0, 10],
-    'noice-disturbance': [0, 10],
-    'harrasment-threat': [0, 10],
-    'physical-injury': [0, 10],
-    'domestic-dispute': [0, 10],
-    'curfew-violation': [0, 10],
-    'public-disturbance': [0, 10],
-    'lost-and-found': [0, 10],
-    'brgy-service-complaint': [0, 10],
+  const iconOffsetRatios: Record<Exclude<CaseType, 'total'>, [number, number]> = {
+    theft: [-0.45, -0.35],
+    vandalism: [-0.2, 0.12],
+    'animal-related': [0.05, 0.35],
+    trespassing: [0.42, 0.08],
+    'personal-conflict': [-0.32, 0.28],
+    'noice-disturbance': [0.22, -0.28],
+    'harrasment-threat': [0.3, 0.22],
+    'physical-injury': [0.36, -0.36],
+    'domestic-dispute': [-0.08, 0.32],
+    'curfew-violation': [0.18, -0.32],
+    'public-disturbance': [-0.28, -0.18],
+    'lost-and-found': [0.18, 0.18],
+    'brgy-service-complaint': [-0.18, 0.08],
+  }
+
+  const getIconOffset = (
+    section: Section,
+    type: Exclude<CaseType, 'total'>
+  ): [number, number] => {
+    const { latSpan, lngSpan } = getSectionExtents(section)
+    const [latRatio, lngRatio] = iconOffsetRatios[type]
+
+    const largestSpan = Math.max(latSpan, lngSpan) || 1
+    const scale = Math.min(Math.max(largestSpan * 0.18, 12), 90)
+
+    return [latRatio * scale, lngRatio * scale]
   }
 
   const buildMarkerIcon = (type: Exclude<CaseType, 'total'>, value: number) =>
@@ -133,7 +156,7 @@ export function useHeatMap() {
         const value = getSectionValue(section, activeType)
         if (!value) continue
 
-        const [latOffset, lngOffset] = iconOffsets[activeType]
+        const [latOffset, lngOffset] = getIconOffset(section, activeType)
         const marker = L.marker([centroid[0] + latOffset, centroid[1] + lngOffset], {
           icon: buildMarkerIcon(activeType, value),
         })
