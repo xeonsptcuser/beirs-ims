@@ -64,6 +64,9 @@ export function useHeatMap() {
     }
   }
 
+  const clamp = (value: number, min: number, max: number) =>
+    Math.min(Math.max(value, min), max)
+
   const iconColors: Record<Exclude<CaseType, 'total'>, string> = {
     theft: '#e63946',
     vandalism: '#2a9d8f',
@@ -103,10 +106,24 @@ export function useHeatMap() {
     const { latSpan, lngSpan } = getSectionExtents(section)
     const [latRatio, lngRatio] = iconOffsetRatios[type]
 
-    const largestSpan = Math.max(latSpan, lngSpan) || 1
-    const scale = Math.min(Math.max(largestSpan * 0.18, 12), 90)
+    const safeLatSpan = latSpan || 1
+    const safeLngSpan = lngSpan || 1
+    const minSpan = Math.min(safeLatSpan, safeLngSpan)
 
-    return [latRatio * scale, lngRatio * scale]
+    const baseSpacing = Math.min(Math.max(minSpan * 0.28, 8), 30)
+
+    const latOffset = clamp(
+      latRatio * baseSpacing,
+      -safeLatSpan * 0.42,
+      safeLatSpan * 0.42
+    )
+    const lngOffset = clamp(
+      lngRatio * baseSpacing,
+      -safeLngSpan * 0.42,
+      safeLngSpan * 0.42
+    )
+
+    return [latOffset, lngOffset]
   }
 
   const buildMarkerIcon = (type: Exclude<CaseType, 'total'>, value: number) =>
