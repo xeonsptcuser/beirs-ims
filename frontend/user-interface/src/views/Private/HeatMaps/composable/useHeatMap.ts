@@ -125,21 +125,26 @@ export function useHeatMap() {
     const safeLatSpan = latSpan || 1
     const safeLngSpan = lngSpan || 1
     const minSpan = Math.min(safeLatSpan, safeLngSpan)
-    const scatterRadius = clamp(minSpan * 0.18, 6, 22)
-    const jitterScale = scatterRadius * 0.45
+    const scatterRadius = clamp(minSpan * 0.28, 10, 30)
+    const jitterScale = scatterRadius * 0.2
 
     const jitterLat = (seededRandom(`${section.id}-${type}-lat`) - 0.5) * jitterScale
     const jitterLng = (seededRandom(`${section.id}-${type}-lng`) - 0.5) * jitterScale
+    const baseLat = latRatio * scatterRadius
+    const baseLng = lngRatio * scatterRadius
+
+    const pushOut = scatterRadius * 0.25
+    const baseMagnitude = Math.hypot(baseLat, baseLng) || 1
 
     const latOffset = clamp(
-      latRatio * scatterRadius + jitterLat,
-      -safeLatSpan * 0.26,
-      safeLatSpan * 0.26
+      baseLat + (baseLat / baseMagnitude) * pushOut + jitterLat,
+      -safeLatSpan * 0.3,
+      safeLatSpan * 0.3
     )
     const lngOffset = clamp(
-      lngRatio * scatterRadius + jitterLng,
-      -safeLngSpan * 0.26,
-      safeLngSpan * 0.26
+      baseLng + (baseLng / baseMagnitude) * pushOut + jitterLng,
+      -safeLngSpan * 0.3,
+      safeLngSpan * 0.3
     )
 
     return [latOffset, lngOffset]
@@ -211,10 +216,10 @@ export function useHeatMap() {
         const { minLat, maxLat, minLng, maxLng, latSpan, lngSpan } = getSectionExtents(section)
         const [latOffset, lngOffset] = getIconOffset(section, activeType)
 
-        const paddedLatMin = minLat + latSpan * 0.18
-        const paddedLatMax = maxLat - latSpan * 0.18
-        const paddedLngMin = minLng + lngSpan * 0.18
-        const paddedLngMax = maxLng - lngSpan * 0.18
+        const paddedLatMin = minLat + latSpan * 0.15
+        const paddedLatMax = maxLat - latSpan * 0.15
+        const paddedLngMin = minLng + lngSpan * 0.15
+        const paddedLngMax = maxLng - lngSpan * 0.15
 
         const finalLat = clamp(centroid[0] + latOffset, paddedLatMin, paddedLatMax)
         const finalLng = clamp(centroid[1] + lngOffset, paddedLngMin, paddedLngMax)
