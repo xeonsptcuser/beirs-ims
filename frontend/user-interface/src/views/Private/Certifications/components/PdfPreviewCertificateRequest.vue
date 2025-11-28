@@ -139,8 +139,8 @@ onBeforeUnmount(() => {
       <div v-else-if="errorMessage" class="alert alert-danger" role="alert">
         {{ errorMessage }}
       </div>
-      <iframe v-else-if="pdfUrl" :src="iframeSrc" title="pdf" width="100%" height="800" style="border: 1px solid #ccc;"
-        sandbox="allow-same-origin allow-scripts"></iframe>
+      <iframe v-else-if="pdfUrl" :src="iframeSrc" title="pdf" width="100%" height="800"
+        style="border: 1px solid #ccc;"></iframe>
       <p v-else class="text-muted mb-0">No preview available.</p>
     </div>
 
