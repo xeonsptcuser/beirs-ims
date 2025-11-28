@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import type { IncidentType } from '@/Types';
 import { computed } from 'vue';
 
 
 const props = withDefaults(defineProps<{
   id: string
-  options: Array<string>
+  options: Array<IncidentType | string>
   label?: string
   errorMessage?: string
   hasError?: boolean
@@ -16,7 +17,7 @@ const props = withDefaults(defineProps<{
   isCapitalized: true
 })
 
-const model = defineModel<string>()
+const model = defineModel<string | IncidentType>()
 
 const capitalizeWords = (value: string) => {
   if (!value) return ''
@@ -30,8 +31,8 @@ const formatOptionalLabel = computed(() => {
 
 const formattedOptions = computed(() =>
   props.options.map((option) => ({
-    value: option,
-    label: props.isCapitalized ? capitalizeWords(option) : option
+    value: typeof option === 'object' ? option.label : option,
+    label: typeof option === 'object' ? (props.isCapitalized ? capitalizeWords(option.label) : option.label) : (props.isCapitalized ? capitalizeWords(option) : option)
   }))
 )
 </script>

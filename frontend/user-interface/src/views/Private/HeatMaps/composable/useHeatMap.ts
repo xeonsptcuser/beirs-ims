@@ -5,7 +5,21 @@ import { endpoints } from '@/services/api/endpoints'
 import { HeatmapService } from '@/services/api/http/heatmap-service'
 import { sections as localSections } from './heatmap-data'
 
-export type CaseType = 'theft' | 'vandalism' | 'trespassing' | 'animal-related' | 'total'
+export type CaseType =
+  | 'personal-conflict'
+  | 'noice-disturbance'
+  | 'trespassing'
+  | 'harrasment-threat'
+  | 'physical-injury'
+  | 'vandalism'
+  | 'theft'
+  | 'domestic-dispute'
+  | 'animal-related'
+  | 'curfew-violation'
+  | 'public-disturbance'
+  | 'lost-and-found'
+  | 'brgy-service-complaint'
+  | 'total'
 
 export function useHeatMap() {
   let map: L.Map | null = null
@@ -45,13 +59,31 @@ export function useHeatMap() {
     vandalism: '#2a9d8f',
     'animal-related': '#f4a261',
     trespassing: '#457b9d',
+    'personal-conflict': '#e63046',
+    'noice-disturbance': '#f4a261',
+    'harrasment-threat': '#457b9d',
+    'physical-injury': '#e63046',
+    'domestic-dispute': '#f4a261',
+    'curfew-violation': '#457b9d',
+    'public-disturbance': '#e63046',
+    'lost-and-found': '#f4a261',
+    'brgy-service-complaint': '#457b9d',
   }
 
   const iconOffsets: Record<Exclude<CaseType, 'total'>, [number, number]> = {
-    theft: [10, 0],
+    theft: [-70, -50],
     vandalism: [-10, 0],
     'animal-related': [0, 10],
     trespassing: [0, -10],
+    'personal-conflict': [0, 10],
+    'noice-disturbance': [0, 10],
+    'harrasment-threat': [0, 10],
+    'physical-injury': [0, 10],
+    'domestic-dispute': [0, 10],
+    'curfew-violation': [0, 10],
+    'public-disturbance': [0, 10],
+    'lost-and-found': [0, 10],
+    'brgy-service-complaint': [0, 10],
   }
 
   const buildMarkerIcon = (type: Exclude<CaseType, 'total'>, value: number) =>
@@ -135,24 +167,6 @@ export function useHeatMap() {
 
     polygonLayerGroup = L.layerGroup().addTo(map)
     markerLayerGroup = L.layerGroup().addTo(map)
-  }
-
-  const fetchSections = async () => {
-    isLoadingSections.value = true
-    sectionsError.value = null
-
-    try {
-      const response = await heatmapService.getSections(endpoints.GET_HEATMAP_SECTIONS)
-      const remoteSections = response?.data ?? []
-
-      sections.value = remoteSections.length ? remoteSections : [...localSections]
-    } catch (error) {
-      console.error('Failed to load heatmap sections', error)
-      sectionsError.value = 'Unable to load heatmap data. Showing local snapshot.'
-      sections.value = [...localSections]
-    } finally {
-      isLoadingSections.value = false
-    }
   }
 
   const fetchSections = async () => {
