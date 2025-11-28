@@ -1,3 +1,4 @@
+import type { CaseType } from '@/views/Private/HeatMaps/composable/useHeatMap'
 import type { UserProfile } from './user-related-types'
 
 export interface BlotterReport {
@@ -11,6 +12,11 @@ export interface BlotterReport {
   incidentWitnesses: string[]
   incidentDescription: string
   evidences: File[]
+}
+
+export interface IncidentType {
+  id: CaseType
+  label: string
 }
 
 export type BlotterReportStatus =

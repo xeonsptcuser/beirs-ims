@@ -1,21 +1,61 @@
-import type { BlotterReport } from '@/Types/blotter-report-types'
+import type { BlotterReport, IncidentType } from '@/Types/blotter-report-types'
 import { ref } from 'vue'
 
 export function useBlotterReports() {
-  const incidentTypeOptions: string[] = [
-    'Personal Conflicts / Misunderstandings',
-    'Noise Disturbance',
-    'Trespassing / Loitering',
-    'Threats / Harassment',
-    'Minor Physical Injury',
-    'Vandalism / Property Damage',
-    'Theft (Petty)',
-    'Domestic Disputes',
-    'Animal-Related Concerns',
-    'Curfew Violations (if applicable)',
-    'Public Disturbance',
-    'Lost & Found Reports',
-    'Complaints Regarding Barangay Services',
+  const incidentTypeOptions: IncidentType[] = [
+    {
+      id: 'personal-conflict',
+      label: 'Personal Conflicts / Misunderstandings',
+    },
+
+    {
+      id: 'noice-disturbance',
+      label: 'Noise Disturbance',
+    },
+    {
+      id: 'trespassing',
+      label: 'Trespassing / Loitering',
+    },
+    {
+      id: 'harrasment-threat',
+      label: 'Threats / Harassment',
+    },
+    {
+      id: 'physical-injury',
+      label: 'Minor Physical Injury',
+    },
+    {
+      id: 'vandalism',
+      label: 'Vandalism / Property Damage',
+    },
+    {
+      id: 'theft',
+      label: 'Theft (Petty)',
+    },
+    {
+      id: 'domestic-dispute',
+      label: 'Domestic Disputes',
+    },
+    {
+      id: 'animal-related',
+      label: 'Animal-Related Concerns',
+    },
+    {
+      id: 'curfew-violation',
+      label: 'Curfew Violations (if applicable)',
+    },
+    {
+      id: 'public-disturbance',
+      label: 'Public Disturbance',
+    },
+    {
+      id: 'lost-and-found',
+      label: 'Lost & Found Reports',
+    },
+    {
+      id: 'brgy-service-complaint',
+      label: 'Complaints Regarding Barangay Services',
+    },
   ]
 
   const form = ref<BlotterReport>({
