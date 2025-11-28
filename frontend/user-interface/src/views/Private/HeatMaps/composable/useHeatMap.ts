@@ -58,9 +58,18 @@ export function useHeatMap() {
     const lats = section.coords.map(([lat]) => lat)
     const lngs = section.coords.map(([, lng]) => lng)
 
+    const minLat = Math.min(...lats)
+    const maxLat = Math.max(...lats)
+    const minLng = Math.min(...lngs)
+    const maxLng = Math.max(...lngs)
+
     return {
-      latSpan: Math.max(...lats) - Math.min(...lats),
-      lngSpan: Math.max(...lngs) - Math.min(...lngs),
+      latSpan: maxLat - minLat,
+      lngSpan: maxLng - minLng,
+      minLat,
+      maxLat,
+      minLng,
+      maxLng,
     }
   }
 
@@ -116,7 +125,7 @@ export function useHeatMap() {
     const safeLatSpan = latSpan || 1
     const safeLngSpan = lngSpan || 1
     const minSpan = Math.min(safeLatSpan, safeLngSpan)
-    const scatterRadius = clamp(minSpan * 0.22, 6, 26)
+    const scatterRadius = clamp(minSpan * 0.18, 6, 22)
     const jitterScale = scatterRadius * 0.45
 
     const jitterLat = (seededRandom(`${section.id}-${type}-lat`) - 0.5) * jitterScale
@@ -124,13 +133,13 @@ export function useHeatMap() {
 
     const latOffset = clamp(
       latRatio * scatterRadius + jitterLat,
-      -safeLatSpan * 0.32,
-      safeLatSpan * 0.32
+      -safeLatSpan * 0.26,
+      safeLatSpan * 0.26
     )
     const lngOffset = clamp(
       lngRatio * scatterRadius + jitterLng,
-      -safeLngSpan * 0.32,
-      safeLngSpan * 0.32
+      -safeLngSpan * 0.26,
+      safeLngSpan * 0.26
     )
 
     return [latOffset, lngOffset]
@@ -199,8 +208,18 @@ export function useHeatMap() {
         const value = getSectionValue(section, activeType)
         if (!value) continue
 
+        const { minLat, maxLat, minLng, maxLng, latSpan, lngSpan } = getSectionExtents(section)
         const [latOffset, lngOffset] = getIconOffset(section, activeType)
-        const marker = L.marker([centroid[0] + latOffset, centroid[1] + lngOffset], {
+
+        const paddedLatMin = minLat + latSpan * 0.18
+        const paddedLatMax = maxLat - latSpan * 0.18
+        const paddedLngMin = minLng + lngSpan * 0.18
+        const paddedLngMax = maxLng - lngSpan * 0.18
+
+        const finalLat = clamp(centroid[0] + latOffset, paddedLatMin, paddedLatMax)
+        const finalLng = clamp(centroid[1] + lngOffset, paddedLngMin, paddedLngMax)
+
+        const marker = L.marker([finalLat, finalLng], {
           icon: buildMarkerIcon(activeType, value),
         })
 

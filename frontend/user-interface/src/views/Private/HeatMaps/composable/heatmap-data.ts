@@ -119,6 +119,7 @@ export const sections: Section[] = [
       'lost-and-found': 12,
       'brgy-service-complaint': 13,
     },
+    centroid: [1234.6666660308838, 1113.4444580078125],
   },
   {
     id: 'perez',
@@ -193,6 +194,7 @@ export const sections: Section[] = [
       'lost-and-found': 12,
       'brgy-service-complaint': 13,
     },
+    centroid: [1389.6666660308838, 1078.4444580078125],
   },
   {
     id: 'sacred-heart',
