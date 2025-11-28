@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import L from 'leaflet';
 import brgyMap from '@/assets/images/alang2-map.png'
 import { useHeatMap, type CaseType } from './composable/useHeatMap';
 
@@ -8,7 +7,7 @@ const imageURL = new URL(brgyMap, import.meta.url).href;
 const imageWidth = 1650;
 const imageHeight = 1500;
 
-const { initializeMap, drawHeatmap } = useHeatMap();
+const { initializeMap, drawHeatmap, fetchSections, isLoadingSections, sectionsError } = useHeatMap();
 const currentType = ref<CaseType>("total");
 
 const setType = (type: CaseType) => {
@@ -16,8 +15,9 @@ const setType = (type: CaseType) => {
   drawHeatmap(type);
 }
 
-onMounted(() => {
+onMounted(async () => {
   initializeMap("map", imageURL, imageWidth, imageHeight);
+  await fetchSections();
   drawHeatmap(currentType.value);
 });
 
@@ -39,6 +39,8 @@ onMounted(() => {
             <button @click="setType('trespassing')">Trespassing</button>
           </div>
 
+          <div class="status" v-if="isLoadingSections">Loading heatmap data...</div>
+          <div class="status error" v-else-if="sectionsError">{{ sectionsError }}</div>
           <div id="map" style="height: 750px;"></div>
         </div>
       </div>
@@ -51,5 +53,13 @@ onMounted(() => {
   margin-bottom: 0.5rem;
   display: flex;
   gap: 0.5rem;
+}
+
+.status {
+  padding: 0.5rem 0;
+}
+
+.status.error {
+  color: #b22222;
 }
 </style>
