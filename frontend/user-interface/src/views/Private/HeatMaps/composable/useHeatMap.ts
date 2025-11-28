@@ -10,6 +10,7 @@ export type CaseType = 'theft' | 'vandalism' | 'trespassing' | 'animal-related' 
 export function useHeatMap() {
   let map: L.Map | null = null
   let polygonLayerGroup: L.LayerGroup | null = null
+  let markerLayerGroup: L.LayerGroup | null = null
   const sections = ref<Section[]>([...localSections])
   const isLoadingSections = ref(false)
   const sectionsError = ref<string | null>(null)
@@ -26,59 +27,64 @@ export function useHeatMap() {
     return section.cases[type] ?? 0
   }
 
-  const computeMinMax = (type: CaseType) => {
-    let min = Infinity
-    let max = -Infinity
+  const getPolygonCentroid = (coords: [number, number][]): [number, number] => {
+    const total = coords.reduce(
+      (acc, [lat, lng]) => {
+        acc.lat += lat
+        acc.lng += lng
+        return acc
+      },
+      { lat: 0, lng: 0 }
+    )
 
-    for (const section of sections.value) {
-      const v = getSectionValue(section, type)
-      min = Math.min(min, v)
-      max = Math.max(max, v)
-    }
-
-    if (min === max) max = min + 1 // avoid division by zero
-    return { min, max }
+    return [total.lat / coords.length, total.lng / coords.length]
   }
 
-  const colorScale = (t: number): string => {
-    // green → yellow → red
-    const r = t < 0.5 ? Math.round(510 * t) : 255
-    const g = t < 0.5 ? 255 : Math.round(510 * (1 - t))
-    return `rgb(${r},${g},0)`
+  const iconColors: Record<Exclude<CaseType, 'total'>, string> = {
+    theft: '#e63946',
+    vandalism: '#2a9d8f',
+    'animal-related': '#f4a261',
+    trespassing: '#457b9d',
   }
 
-  const valueToColor = (value: number, min: number, max: number) => {
-    const t = (value - min) / (max - min)
-    return colorScale(Math.min(1, Math.max(0, t)))
+  const iconOffsets: Record<Exclude<CaseType, 'total'>, [number, number]> = {
+    theft: [10, 0],
+    vandalism: [-10, 0],
+    'animal-related': [0, 10],
+    trespassing: [0, -10],
   }
+
+  const buildMarkerIcon = (type: Exclude<CaseType, 'total'>, value: number) =>
+    L.divIcon({
+      className: 'heatmap-pin',
+      html: `<div class="heatmap-pin__body" style="background:${iconColors[type]}"><span class="heatmap-pin__label">${value}</span></div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14],
+    })
 
   // -----------------------------------------------------------------
   // 2. MAIN HEATMAP DRAWING FUNCTION
   // -----------------------------------------------------------------
   function drawHeatmap(type: CaseType) {
-    if (!map || !polygonLayerGroup) return
+    if (!map || !polygonLayerGroup || !markerLayerGroup) return
     if (!sections.value.length) return
 
     polygonLayerGroup.clearLayers()
+    markerLayerGroup.clearLayers()
 
-    const { min, max } = computeMinMax(type)
+    const activeTypes: Exclude<CaseType, 'total'>[] =
+      type === 'total' ? ['theft', 'vandalism', 'animal-related', 'trespassing'] : [type]
 
     for (const section of sections.value) {
-      const value = getSectionValue(section, type)
-      const fill = valueToColor(value, min, max)
-
       const polygon = L.polygon(section.coords, {
         color: '#000',
-        weight: 2,
+        weight: 1.5,
         dashArray: '6 4',
-        fillColor: fill,
-        fillOpacity: 0.6,
+        fillColor: '#f2f2f2',
+        fillOpacity: 0.35,
       })
 
-      polygon.bindTooltip(
-        `${section.name}<br>${type === 'total' ? 'Total cases' : type}: ${value}`,
-        { sticky: true }
-      )
+      polygon.bindTooltip(section.name, { sticky: true })
 
       polygon.on('click', () => {
         console.log('Clicked section:', section.id)
@@ -87,6 +93,24 @@ export function useHeatMap() {
 
       if (polygonLayerGroup) {
         polygon.addTo(polygonLayerGroup)
+      }
+
+      const centroid = getPolygonCentroid(section.coords)
+
+      for (const activeType of activeTypes) {
+        const value = getSectionValue(section, activeType)
+        if (!value) continue
+
+        const [latOffset, lngOffset] = iconOffsets[activeType]
+        const marker = L.marker([centroid[0] + latOffset, centroid[1] + lngOffset], {
+          icon: buildMarkerIcon(activeType, value),
+        })
+
+        marker.bindPopup(
+          `<div class="heatmap-popup"><strong>${section.name}</strong><br/>${activeType}: ${value} case${value > 1 ? 's' : ''}<div class="heatmap-popup__meta">Updated data</div></div>`
+        )
+
+        marker.addTo(markerLayerGroup)
       }
     }
   }
@@ -110,6 +134,25 @@ export function useHeatMap() {
     })
 
     polygonLayerGroup = L.layerGroup().addTo(map)
+    markerLayerGroup = L.layerGroup().addTo(map)
+  }
+
+  const fetchSections = async () => {
+    isLoadingSections.value = true
+    sectionsError.value = null
+
+    try {
+      const response = await heatmapService.getSections(endpoints.GET_HEATMAP_SECTIONS)
+      const remoteSections = response?.data ?? []
+
+      sections.value = remoteSections.length ? remoteSections : [...localSections]
+    } catch (error) {
+      console.error('Failed to load heatmap sections', error)
+      sectionsError.value = 'Unable to load heatmap data. Showing local snapshot.'
+      sections.value = [...localSections]
+    } finally {
+      isLoadingSections.value = false
+    }
   }
 
   const fetchSections = async () => {

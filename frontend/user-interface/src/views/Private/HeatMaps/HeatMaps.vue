@@ -62,4 +62,37 @@ onMounted(async () => {
 .status.error {
   color: #b22222;
 }
+
+:global(.heatmap-pin) {
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+:global(.heatmap-pin__body) {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 700;
+  border: 2px solid #ffffffaa;
+}
+
+:global(.heatmap-pin__label) {
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+:global(.heatmap-popup) {
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+
+:global(.heatmap-popup__meta) {
+  margin-top: 0.25rem;
+  color: #666;
+  font-size: 0.8rem;
+  text-align: right;
+}
 </style>
