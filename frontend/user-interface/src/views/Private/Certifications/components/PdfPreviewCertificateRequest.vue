@@ -40,6 +40,8 @@ const payload = ref<Record<string, any> | null>(null)
 
 type CertificateData = Record<string, any>
 
+const iframeSrc = computed(() => (pdfUrl.value ? `${pdfUrl.value}#toolbar=0&navpanes=0&statusbar=0` : ''))
+
 const positions = {
   full_name: { x: 140, y: 640, size: 14 },
   address: { x: 140, y: 610, size: 12 },
@@ -137,8 +139,8 @@ onBeforeUnmount(() => {
       <div v-else-if="errorMessage" class="alert alert-danger" role="alert">
         {{ errorMessage }}
       </div>
-      <iframe v-else-if="pdfUrl" :src="pdfUrl" title="pdf" width="100%" height="800"
-        style="border: 1px solid #ccc;"></iframe>
+      <iframe v-else-if="pdfUrl" :src="iframeSrc" title="pdf" width="100%" height="800" style="border: 1px solid #ccc;"
+        sandbox="allow-same-origin allow-scripts"></iframe>
       <p v-else class="text-muted mb-0">No preview available.</p>
     </div>
 
