@@ -67,6 +67,17 @@ export function useHeatMap() {
   const clamp = (value: number, min: number, max: number) =>
     Math.min(Math.max(value, min), max)
 
+  const seededRandom = (seed: string) => {
+    let hash = 0
+    for (let i = 0; i < seed.length; i += 1) {
+      hash = (hash << 5) - hash + seed.charCodeAt(i)
+      hash |= 0
+    }
+
+    const x = Math.sin(hash) * 10000
+    return x - Math.floor(x)
+  }
+
   const iconColors: Record<Exclude<CaseType, 'total'>, string> = {
     theft: '#e63946',
     vandalism: '#2a9d8f',
@@ -109,18 +120,23 @@ export function useHeatMap() {
     const safeLatSpan = latSpan || 1
     const safeLngSpan = lngSpan || 1
     const minSpan = Math.min(safeLatSpan, safeLngSpan)
+    const maxSpan = Math.max(safeLatSpan, safeLngSpan)
 
-    const baseSpacing = Math.min(Math.max(minSpan * 0.28, 8), 30)
+    const baseSpacing = Math.min(Math.max(minSpan * 0.36, 10), 38)
+    const scatterScale = Math.min(Math.max(maxSpan * 0.25, 8), 55)
+
+    const jitterLat = (seededRandom(`${section.id}-${type}-lat`) - 0.5) * scatterScale
+    const jitterLng = (seededRandom(`${section.id}-${type}-lng`) - 0.5) * scatterScale
 
     const latOffset = clamp(
-      latRatio * baseSpacing,
-      -safeLatSpan * 0.42,
-      safeLatSpan * 0.42
+      latRatio * baseSpacing + jitterLat,
+      -safeLatSpan * 0.45,
+      safeLatSpan * 0.45
     )
     const lngOffset = clamp(
-      lngRatio * baseSpacing,
-      -safeLngSpan * 0.42,
-      safeLngSpan * 0.42
+      lngRatio * baseSpacing + jitterLng,
+      -safeLngSpan * 0.45,
+      safeLngSpan * 0.45
     )
 
     return [latOffset, lngOffset]
