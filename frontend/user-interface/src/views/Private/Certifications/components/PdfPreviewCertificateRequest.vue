@@ -3,9 +3,9 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { PDFDocument, StandardFonts } from 'pdf-lib'
 import { endpoints } from '@/services/api/endpoints'
 import { PdfRelatedService } from '@/services/api/http/pdf-service'
-import certBrgyClearancePdf from '@/assets/images/pdf/cert-clearance.pdf'
-import certIndigencyPdf from '@/assets/images/pdf/cert-indigency.pdf'
-import certResidencyPdf from '@/assets/images/pdf/cert-residency.pdf'
+import certBrgyClearancePdf from '../../../../assets/pdf/cert-clearance.pdf'
+import certIndigencyPdf from '../../../../assets/pdf/cert-indigency.pdf'
+import certResidencyPdf from '../../../../assets/pdf/cert-residency.pdf'
 
 
 const props = defineProps<{

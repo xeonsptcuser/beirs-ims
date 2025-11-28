@@ -3,7 +3,7 @@ import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { PDFDocument, StandardFonts } from 'pdf-lib'
 import { endpoints } from '@/services/api/endpoints'
 import { PdfRelatedService } from '@/services/api/http/pdf-service'
-import blotterForm from '@/assets/images/pdf/blotter-form.pdf'
+import blotterForm from '../../../../assets/pdf/blotter-form.pdf'
 
 const props = defineProps<{
   blotterId: string
