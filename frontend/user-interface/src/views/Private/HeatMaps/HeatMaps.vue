@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import brgyMap from '@/assets/images/alang2-map.png'
+import brgyMap from '../../../assets/images/alang2-map.png'
 import { useHeatMap, type CaseType } from './composable/useHeatMap';
 
-const imageURL = new URL(brgyMap, import.meta.url).href;
-const imageWidth = 1650;
-const imageHeight = 1500;
+const imageURL = brgyMap
+const imageWidth = 1650
+const imageHeight = 1500
 
 const { initializeMap, drawHeatmap, fetchSections, isLoadingSections, sectionsError } = useHeatMap();
 const currentType = ref<CaseType>("total");
