@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { PDFDocument, StandardFonts } from 'pdf-lib'
 import { endpoints } from '@/services/api/endpoints'
 import { PdfRelatedService } from '@/services/api/http/pdf-service'
+import blotterForm from '../../../../assets/pdf/blotter-form.pdf'
 
 const props = defineProps<{
   blotterId: string
@@ -11,7 +12,7 @@ const props = defineProps<{
 const pdfService = PdfRelatedService.getInstance()
 
 // Static PDF template
-const pdfTemplateUrl = new URL('@/assets/images/pdf/blotter-form.pdf', import.meta.url).href
+const pdfTemplateUrl = blotterForm
 
 const pdfUrl = ref<string | null>(null)
 const isLoading = ref<boolean>(false)
@@ -72,6 +73,9 @@ const buildPdfWithData = async (data: BlotterData) => {
   pdfUrl.value = globalThis.URL.createObjectURL(pdfBlob)
 }
 
+const iframeSrc = computed(() => (pdfUrl.value ? `${pdfUrl.value}#toolbar=0&navpanes=0&statusbar=0` : ''))
+
+
 const loadBlotterData = async () => {
   if (!props.blotterId) return
   isLoading.value = true
@@ -92,6 +96,8 @@ const loadBlotterData = async () => {
     isLoading.value = false
   }
 }
+
+
 
 onMounted(loadBlotterData)
 
@@ -118,7 +124,7 @@ onBeforeUnmount(() => {
       <div v-else-if="errorMessage" class="alert alert-danger" role="alert">
         {{ errorMessage }}
       </div>
-      <iframe v-else-if="pdfUrl" :src="pdfUrl" title="pdf" width="100%" height="800"
+      <iframe v-else-if="pdfUrl" :src="iframeSrc" title="pdf" width="100%" height="800"
         style="border: 1px solid #ccc;"></iframe>
       <p v-else class="text-muted mb-0">No preview available.</p>
     </div>

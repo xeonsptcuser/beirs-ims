@@ -3,6 +3,10 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { PDFDocument, StandardFonts } from 'pdf-lib'
 import { endpoints } from '@/services/api/endpoints'
 import { PdfRelatedService } from '@/services/api/http/pdf-service'
+import certBrgyClearancePdf from '../../../../assets/pdf/cert-clearance.pdf'
+import certIndigencyPdf from '../../../../assets/pdf/cert-indigency.pdf'
+import certResidencyPdf from '../../../../assets/pdf/cert-residency.pdf'
+
 
 const props = defineProps<{
   certificateId: string,
@@ -11,9 +15,9 @@ const props = defineProps<{
 
 const pdfService = PdfRelatedService.getInstance()
 
-const certBrgyClearance = new URL('@/assets/images/pdf/cert-clearance.pdf', import.meta.url).href
-const certIndigency = new URL('@/assets/images/pdf/cert-indigency.pdf', import.meta.url).href
-const certResidency = new URL('@/assets/images/pdf/cert-residency.pdf', import.meta.url).href
+const certBrgyClearance = certBrgyClearancePdf
+const certIndigency = certIndigencyPdf
+const certResidency = certResidencyPdf
 
 const templateMap: Record<string, string> = {
   clearance: certBrgyClearance,
@@ -35,6 +39,8 @@ const errorMessage = ref<string | null>(null)
 const payload = ref<Record<string, any> | null>(null)
 
 type CertificateData = Record<string, any>
+
+const iframeSrc = computed(() => (pdfUrl.value ? `${pdfUrl.value}#toolbar=0&navpanes=0&statusbar=0` : ''))
 
 const positions = {
   full_name: { x: 140, y: 640, size: 14 },
@@ -133,7 +139,7 @@ onBeforeUnmount(() => {
       <div v-else-if="errorMessage" class="alert alert-danger" role="alert">
         {{ errorMessage }}
       </div>
-      <iframe v-else-if="pdfUrl" :src="pdfUrl" title="pdf" width="100%" height="800"
+      <iframe v-else-if="pdfUrl" :src="iframeSrc" title="pdf" width="100%" height="800"
         style="border: 1px solid #ccc;"></iframe>
       <p v-else class="text-muted mb-0">No preview available.</p>
     </div>
