@@ -15,6 +15,7 @@ const BLOTTER_API_ROUTES = `${AUTH_BASE}/blotter-reports`
 const NOTIFICATIONS_ROUTE = `${COMMON_BASE}/notifications`
 const PUBLIC_ADDRESSES_ROUTE = `${COMMON_BASE}/addresses`
 const AUTH_ADDRESSES_ROUTE = `${AUTH_BASE}/addresses`
+const HEATMAP_ROUTES = `${COMMON_BASE}/heatmaps`
 
 export const endpoints = {
   // PUBLIC ENDPOINTS
@@ -58,6 +59,9 @@ export const endpoints = {
   CREATE_ADDRESS: `${AUTH_ADDRESSES_ROUTE}`,
   UPDATE_ADDRESS: (id: number | string) => `${AUTH_ADDRESSES_ROUTE}/${id}`,
   DELETE_ADDRESS: (id: number | string) => `${AUTH_ADDRESSES_ROUTE}/${id}`,
+
+  // HEATMAPS
+  GET_HEATMAP_SECTIONS: `${HEATMAP_ROUTES}/sections`,
 
   // PDF GENERATE PREVIEW
   OPEN_CERTIFICATE_PDF: (id: string | number) => `${COMMON_BASE}/generate-certificate/${id}`,

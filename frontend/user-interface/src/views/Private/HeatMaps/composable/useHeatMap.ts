@@ -1,12 +1,20 @@
 import L from 'leaflet'
+import { ref } from 'vue'
 import type { Section } from '@/Types'
-import { sections } from './heatmap-data'
+import { endpoints } from '@/services/api/endpoints'
+import { HeatmapService } from '@/services/api/http/heatmap-service'
+import { sections as localSections } from './heatmap-data'
 
 export type CaseType = 'theft' | 'vandalism' | 'trespassing' | 'animal-related' | 'total'
 
 export function useHeatMap() {
   let map: L.Map | null = null
   let polygonLayerGroup: L.LayerGroup | null = null
+  const sections = ref<Section[]>([...localSections])
+  const isLoadingSections = ref(false)
+  const sectionsError = ref<string | null>(null)
+
+  const heatmapService = HeatmapService.getInstance()
 
   // -----------------------------------------------------------------
   // 1. UTILS – can always live outside Vue lifecycle
@@ -22,7 +30,7 @@ export function useHeatMap() {
     let min = Infinity
     let max = -Infinity
 
-    for (const section of sections) {
+    for (const section of sections.value) {
       const v = getSectionValue(section, type)
       min = Math.min(min, v)
       max = Math.max(max, v)
@@ -49,12 +57,13 @@ export function useHeatMap() {
   // -----------------------------------------------------------------
   function drawHeatmap(type: CaseType) {
     if (!map || !polygonLayerGroup) return
+    if (!sections.value.length) return
 
     polygonLayerGroup.clearLayers()
 
     const { min, max } = computeMinMax(type)
 
-    for (const section of sections) {
+    for (const section of sections.value) {
       const value = getSectionValue(section, type)
       const fill = valueToColor(value, min, max)
 
@@ -103,8 +112,30 @@ export function useHeatMap() {
     polygonLayerGroup = L.layerGroup().addTo(map)
   }
 
+  const fetchSections = async () => {
+    isLoadingSections.value = true
+    sectionsError.value = null
+
+    try {
+      const response = await heatmapService.getSections(endpoints.GET_HEATMAP_SECTIONS)
+      const remoteSections = response?.data ?? []
+
+      sections.value = remoteSections.length ? remoteSections : [...localSections]
+    } catch (error) {
+      console.error('Failed to load heatmap sections', error)
+      sectionsError.value = 'Unable to load heatmap data. Showing local snapshot.'
+      sections.value = [...localSections]
+    } finally {
+      isLoadingSections.value = false
+    }
+  }
+
   return {
     initializeMap,
     drawHeatmap,
+    fetchSections,
+    sections,
+    isLoadingSections,
+    sectionsError,
   }
 }
