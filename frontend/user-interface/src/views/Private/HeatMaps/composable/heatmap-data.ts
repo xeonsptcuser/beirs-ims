@@ -19,6 +19,7 @@ export const sections: Section[] = [
 
       [1152.4750003814697, 999.125],
     ],
+    centroid: [1072.7777862548828, 878.4444580078125],
     cases: {
       theft: 1,
       vandalism: 2,
@@ -66,6 +67,7 @@ export const sections: Section[] = [
       [1154.027777671814, 802.875],
       [1104.9288194179535, 805.265625],
     ],
+    centroid: [1328.7777862548828, 679.4444580078125],
     cases: {
       theft: 1,
       vandalism: 2,
@@ -117,6 +119,7 @@ export const sections: Section[] = [
       'lost-and-found': 12,
       'brgy-service-complaint': 13,
     },
+    centroid: [1234.6666660308838, 1113.4444580078125],
   },
   {
     id: 'perez',
@@ -141,6 +144,7 @@ export const sections: Section[] = [
       [15.95138931274414, 275.1875],
       [197.52777862548828, 414.25],
     ],
+    centroid: [341.6666660308838, 317.4444580078125],
     cases: {
       theft: 1,
       vandalism: 2,
@@ -190,6 +194,7 @@ export const sections: Section[] = [
       'lost-and-found': 12,
       'brgy-service-complaint': 13,
     },
+    centroid: [1389.6666660308838, 1078.4444580078125],
   },
   {
     id: 'sacred-heart',
@@ -236,6 +241,7 @@ export const sections: Section[] = [
 
       [1312.5961371660233, 913.001953125],
     ],
+    centroid: [1281.7777862548828, 855.4444580078125],
     cases: {
       theft: 1,
       vandalism: 2,
@@ -264,6 +270,7 @@ export const sections: Section[] = [
       [258.66319465637207, 200.1875],
       [205.8889533150941, 175.56243896484375],
     ],
+    centroid: [153.6666660308838, 232.4444580078125],
     cases: {
       theft: 1,
       vandalism: 2,
@@ -304,6 +311,7 @@ export const sections: Section[] = [
       [434.35069465637207, 277.59375],
       [456.6379123330116, 295.73046875],
     ],
+    centroid: [579.6666660308838, 422.4444580078125],
     cases: {
       theft: 1,
       vandalism: 2,
