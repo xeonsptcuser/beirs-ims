@@ -4,8 +4,8 @@ import { PDFDocument, StandardFonts } from 'pdf-lib'
 import { endpoints } from '@/services/api/endpoints'
 import { PdfRelatedService } from '@/services/api/http/pdf-service'
 import certBrgyClearancePdf from '@/assets/images/pdf/cert-clearance.pdf'
-import certIndigencyPdf from '@/assets/images/pdf/cert-clearance.pdf'
-import certResidencyPdf from '@/assets/images/pdf/cert-clearance.pdf'
+import certIndigencyPdf from '@/assets/images/pdf/cert-indigency.pdf'
+import certResidencyPdf from '@/assets/images/pdf/cert-residency.pdf'
 
 
 const props = defineProps<{
