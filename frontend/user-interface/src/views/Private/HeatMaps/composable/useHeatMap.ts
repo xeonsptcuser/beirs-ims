@@ -58,9 +58,18 @@ export function useHeatMap() {
     const lats = section.coords.map(([lat]) => lat)
     const lngs = section.coords.map(([, lng]) => lng)
 
+    const minLat = Math.min(...lats)
+    const maxLat = Math.max(...lats)
+    const minLng = Math.min(...lngs)
+    const maxLng = Math.max(...lngs)
+
     return {
-      latSpan: Math.max(...lats) - Math.min(...lats),
-      lngSpan: Math.max(...lngs) - Math.min(...lngs),
+      latSpan: maxLat - minLat,
+      lngSpan: maxLng - minLng,
+      minLat,
+      maxLat,
+      minLng,
+      maxLng,
     }
   }
 
@@ -116,23 +125,21 @@ export function useHeatMap() {
     const safeLatSpan = latSpan || 1
     const safeLngSpan = lngSpan || 1
     const minSpan = Math.min(safeLatSpan, safeLngSpan)
-    const maxSpan = Math.max(safeLatSpan, safeLngSpan)
+    const scatterRadius = clamp(minSpan * 0.18, 6, 22)
+    const jitterScale = scatterRadius * 0.45
 
-    const baseSpacing = Math.min(Math.max(minSpan * 0.36, 10), 38)
-    const scatterScale = Math.min(Math.max(maxSpan * 0.25, 8), 55)
-
-    const jitterLat = (seededRandom(`${section.id}-${type}-lat`) - 0.5) * scatterScale
-    const jitterLng = (seededRandom(`${section.id}-${type}-lng`) - 0.5) * scatterScale
+    const jitterLat = (seededRandom(`${section.id}-${type}-lat`) - 0.5) * jitterScale
+    const jitterLng = (seededRandom(`${section.id}-${type}-lng`) - 0.5) * jitterScale
 
     const latOffset = clamp(
-      latRatio * baseSpacing + jitterLat,
-      -safeLatSpan * 0.45,
-      safeLatSpan * 0.45
+      latRatio * scatterRadius + jitterLat,
+      -safeLatSpan * 0.26,
+      safeLatSpan * 0.26
     )
     const lngOffset = clamp(
-      lngRatio * baseSpacing + jitterLng,
-      -safeLngSpan * 0.45,
-      safeLngSpan * 0.45
+      lngRatio * scatterRadius + jitterLng,
+      -safeLngSpan * 0.26,
+      safeLngSpan * 0.26
     )
 
     return [latOffset, lngOffset]
@@ -195,14 +202,24 @@ export function useHeatMap() {
         polygon.addTo(polygonLayerGroup)
       }
 
-      const centroid = getPolygonCentroid(section.coords)
+      const centroid = section.centroid ?? getPolygonCentroid(section.coords)
 
       for (const activeType of activeTypes) {
         const value = getSectionValue(section, activeType)
         if (!value) continue
 
+        const { minLat, maxLat, minLng, maxLng, latSpan, lngSpan } = getSectionExtents(section)
         const [latOffset, lngOffset] = getIconOffset(section, activeType)
-        const marker = L.marker([centroid[0] + latOffset, centroid[1] + lngOffset], {
+
+        const paddedLatMin = minLat + latSpan * 0.18
+        const paddedLatMax = maxLat - latSpan * 0.18
+        const paddedLngMin = minLng + lngSpan * 0.18
+        const paddedLngMax = maxLng - lngSpan * 0.18
+
+        const finalLat = clamp(centroid[0] + latOffset, paddedLatMin, paddedLatMax)
+        const finalLng = clamp(centroid[1] + lngOffset, paddedLngMin, paddedLngMax)
+
+        const marker = L.marker([finalLat, finalLng], {
           icon: buildMarkerIcon(activeType, value),
         })
 
