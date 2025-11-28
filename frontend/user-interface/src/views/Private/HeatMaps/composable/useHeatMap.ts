@@ -155,6 +155,24 @@ export function useHeatMap() {
     }
   }
 
+  const fetchSections = async () => {
+    isLoadingSections.value = true
+    sectionsError.value = null
+
+    try {
+      const response = await heatmapService.getSections(endpoints.GET_HEATMAP_SECTIONS)
+      const remoteSections = response?.data ?? []
+
+      sections.value = remoteSections.length ? remoteSections : [...localSections]
+    } catch (error) {
+      console.error('Failed to load heatmap sections', error)
+      sectionsError.value = 'Unable to load heatmap data. Showing local snapshot.'
+      sections.value = [...localSections]
+    } finally {
+      isLoadingSections.value = false
+    }
+  }
+
   return {
     initializeMap,
     drawHeatmap,
