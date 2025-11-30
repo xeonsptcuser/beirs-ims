@@ -1,25 +1,13 @@
 import L from 'leaflet'
 import { ref } from 'vue'
-import type { Section } from '@/Types'
+import type { CaseType, Section } from '@/Types'
 import { endpoints } from '@/services/api/endpoints'
 import { HeatmapService } from '@/services/api/http/heatmap-service'
 import { sections as localSections } from './heatmap-data'
 
-export type CaseType =
-  | 'personal-conflict'
-  | 'noice-disturbance'
-  | 'trespassing'
-  | 'harrasment-threat'
-  | 'physical-injury'
-  | 'vandalism'
-  | 'theft'
-  | 'domestic-dispute'
-  | 'animal-related'
-  | 'curfew-violation'
-  | 'public-disturbance'
-  | 'lost-and-found'
-  | 'brgy-service-complaint'
-  | 'total'
+export type { CaseType }
+
+export type HeatmapCaseType = CaseType | 'total'
 
 export function useHeatMap() {
   let map: L.Map | null = null
@@ -34,7 +22,7 @@ export function useHeatMap() {
   // -----------------------------------------------------------------
   // 1. UTILS – can always live outside Vue lifecycle
   // -----------------------------------------------------------------
-  const getSectionValue = (section: Section, type: CaseType): number => {
+  const getSectionValue = (section: Section, type: HeatmapCaseType): number => {
     if (type === 'total') {
       return Object.values(section.cases).reduce((a, b) => a + b, 0)
     }
@@ -86,7 +74,7 @@ export function useHeatMap() {
     return x - Math.floor(x)
   }
 
-  const iconColors: Record<Exclude<CaseType, 'total'>, string> = {
+  const iconColors: Record<CaseType, string> = {
     theft: '#e63946',
     vandalism: '#2a9d8f',
     'animal-related': '#f4a261',
@@ -102,7 +90,7 @@ export function useHeatMap() {
     'brgy-service-complaint': '#457b9d',
   }
 
-  const typeOrder: Exclude<CaseType, 'total'>[] = [
+  const typeOrder: CaseType[] = [
     'personal-conflict',
     'noice-disturbance',
     'trespassing',
@@ -118,16 +106,16 @@ export function useHeatMap() {
     'brgy-service-complaint',
   ]
 
-  const iconOffsetRatios = typeOrder.reduce<Record<Exclude<CaseType, 'total'>, [number, number]>>(
+  const iconOffsetRatios = typeOrder.reduce<Record<CaseType, [number, number]>>(
     (acc, caseType, index) => {
       const angle = (index / typeOrder.length) * 2 * Math.PI
       acc[caseType] = [Math.sin(angle), Math.cos(angle)]
       return acc
     },
-    {} as Record<Exclude<CaseType, 'total'>, [number, number]>
+    {} as Record<CaseType, [number, number]>
   )
 
-  const getIconOffset = (section: Section, type: Exclude<CaseType, 'total'>): [number, number] => {
+  const getIconOffset = (section: Section, type: CaseType): [number, number] => {
     const { latSpan, lngSpan } = getSectionExtents(section)
     const [latRatio, lngRatio] = iconOffsetRatios[type]
     const directionMagnitude = Math.hypot(latRatio, lngRatio) || 1
@@ -158,7 +146,7 @@ export function useHeatMap() {
     return [latOffset, lngOffset]
   }
 
-  const buildMarkerIcon = (type: Exclude<CaseType, 'total'>, value: number) =>
+  const buildMarkerIcon = (type: CaseType, value: number) =>
     L.divIcon({
       className: 'heatmap-pin',
       html: `<div class="heatmap-pin__body" style="background:${iconColors[type]}"><span class="heatmap-pin__label">${value}</span></div>`,
@@ -169,14 +157,14 @@ export function useHeatMap() {
   // -----------------------------------------------------------------
   // 2. MAIN HEATMAP DRAWING FUNCTION
   // -----------------------------------------------------------------
-  function drawHeatmap(type: CaseType) {
+  function drawHeatmap(type: HeatmapCaseType) {
     if (!map || !polygonLayerGroup || !markerLayerGroup) return
     if (!sections.value.length) return
 
     polygonLayerGroup.clearLayers()
     markerLayerGroup.clearLayers()
 
-    const activeTypes: Exclude<CaseType, 'total'>[] = type === 'total' ? [...typeOrder] : [type]
+    const activeTypes: CaseType[] = type === 'total' ? [...typeOrder] : [type]
 
     for (const section of sections.value) {
       const polygon = L.polygon(section.coords, {
@@ -250,6 +238,31 @@ export function useHeatMap() {
     markerLayerGroup = L.layerGroup().addTo(map)
   }
 
+  const mergeSectionData = (remoteSections: Section[]): Section[] => {
+    if (!remoteSections.length) {
+      return [...localSections]
+    }
+
+    const remoteMap = remoteSections.reduce<Record<string, Section>>((acc, section) => {
+      acc[section.id] = section
+      return acc
+    }, {})
+
+    return localSections.map((section) => {
+      const remote = remoteMap[section.id]
+
+      if (!remote) {
+        return section
+      }
+
+      return {
+        ...section,
+        name: remote.name ?? section.name,
+        cases: { ...section.cases, ...(remote.cases ?? {}) },
+      }
+    })
+  }
+
   const fetchSections = async () => {
     isLoadingSections.value = true
     sectionsError.value = null
@@ -257,8 +270,7 @@ export function useHeatMap() {
     try {
       const response = await heatmapService.getSections(endpoints.GET_HEATMAP_SECTIONS)
       const remoteSections = response?.data ?? []
-
-      sections.value = remoteSections.length ? remoteSections : [...localSections]
+      sections.value = mergeSectionData(remoteSections)
     } catch (error) {
       console.error('Failed to load heatmap sections', error)
       sectionsError.value = 'Unable to load heatmap data. Showing local snapshot.'

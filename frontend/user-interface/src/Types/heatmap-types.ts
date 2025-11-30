@@ -1,3 +1,18 @@
+export type CaseType =
+  | 'personal-conflict'
+  | 'noice-disturbance'
+  | 'trespassing'
+  | 'harrasment-threat'
+  | 'physical-injury'
+  | 'vandalism'
+  | 'theft'
+  | 'domestic-dispute'
+  | 'animal-related'
+  | 'curfew-violation'
+  | 'public-disturbance'
+  | 'lost-and-found'
+  | 'brgy-service-complaint'
+
 export type SectionId =
   | 'abbra'
   | 'liong'
@@ -18,5 +33,5 @@ export interface Section {
   // optional custom centroid override in [y, x] (lat, lng) for CRS.Simple
   centroid?: [number, number]
   // counts of case types – in real app this comes from Laravel
-  cases: Record<string, number>
+  cases: Partial<Record<CaseType, number>>
 }
