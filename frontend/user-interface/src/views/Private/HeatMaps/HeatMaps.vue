@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import brgyMap from '../../../assets/images/alang2-map.png'
 import { useHeatMap, type HeatmapCaseType } from './composable/useHeatMap';
-import { orderedOptions } from '@/Utils/helpers/formatters';
+import { orderedOptionsIncidentType } from '@/Utils/helpers/formatters';
 import { useBlotterReports } from '../BlotterReports/composable/useBlotterReport';
 import FormCheckboxInput from '@/components/common/FormCheckboxInput/FormCheckboxInput.vue';
 
@@ -15,14 +15,7 @@ const { incidentTypeOptions } = useBlotterReports();
 
 const currentType = ref<HeatmapCaseType>("total");
 
-
-const incidentTypes = computed(() => {
-  return incidentTypeOptions.map(incidentType => incidentType.label)
-})
-
-const orderedIncidentType = computed(() => {
-  return orderedOptions(incidentTypes.value)
-})
+const sortedIncidentTypeOptions = orderedOptionsIncidentType(incidentTypeOptions);
 
 const setType = (type: HeatmapCaseType) => {
   currentType.value = type
@@ -71,8 +64,9 @@ onMounted(async () => {
               <div class="row">
                 <div class="mt-2">
                   <ul class="list-group-flush">
-                    <li class="list-group-item mb-1" v-for="(incidentType, index) in orderedIncidentType">
-                      <FormCheckboxInput :label="incidentType" :id="index.toString()" />
+                    <li class="list-group-item mb-1" v-for="(incidentType, index) in sortedIncidentTypeOptions">
+                      <FormCheckboxInput :label="incidentType.label" :id="incidentType.id"
+                        @change="setType(incidentType.id)" />
                     </li>
                   </ul>
                 </div>
