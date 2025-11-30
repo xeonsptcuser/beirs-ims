@@ -129,7 +129,8 @@ const filteredErrors = computed(() => {
               </div>
               <div class="col-md-3 col-sm-12">
                 <FormFloatingInput type="date" label="Date Of Birth" id="birthday" v-model="form.date_of_birth"
-                  :has-error="errors.date_of_birth" :error-message="errorMessages.date_of_birth.error" />
+                  :has-error="errors.date_of_birth" :error-message="errorMessages.date_of_birth.error"
+                  :is-capitalized="false" />
               </div>
               <div class="col-md-3 col-sm-12">
                 <DropdownInput :options="orderedOptions(roleOptions)" label="Roles" id="select-roles"

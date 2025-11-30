@@ -295,22 +295,13 @@ onMounted(() => {
 
     <div class="card shadow-sm border-0 mb-4">
       <div class="card-body">
-        <form class="row gy-3 align-items-center" @submit.prevent="handleSearchCertificates">
+        <form class="row gy-3 align-items-center " @submit.prevent="handleSearchCertificates">
           <div class="col-md-6 col-lg-4">
             <FormSearchInput v-model="searchByNameKeyWord" />
           </div>
-          <div class="col-md-6 col-lg-4 d-flex gap-2">
+          <div class="col-md-6 col-lg-4 d-flex gap-2 ms-auto">
             <button class="btn btn-primary w-100" type="submit">Search</button>
             <button class="btn btn-outline-secondary w-100" type="button" @click="resetSearch">Reset</button>
-          </div>
-          <div class="col-lg-4 text-lg-end text-md-start">
-            <p class="text-muted small mb-1">Filter by Status</p>
-            <div class="d-flex flex-wrap gap-2">
-              <FormCheckboxInput v-for="status in activeStatusFilters" :key="status" :id="`filter-${status}`"
-                :label="status.toUpperCase()" :model-value="selectedStatusFilter === status"
-                :disabled="!!selectedStatusFilter && selectedStatusFilter !== status"
-                @change="(checked) => filterCertificateRequests(status, checked)" />
-            </div>
           </div>
         </form>
       </div>

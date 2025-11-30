@@ -583,8 +583,6 @@ onBeforeUnmount(() => {
               <div class="d-flex flex-column flex-md-row justify-content-center gap-3 mt-3" v-if="isProfileOwner">
                 <FormButton label="Save Changes" :is-disabled="isEditableSubmit"
                   :btn-display="isEditableSubmit ? 'secondary' : 'primary'" />
-                <FormButton type="button" label="Reset Form" btn-display="danger" :is-outlined="true"
-                  @Click.prevent="setisNotEditableUser" />
               </div>
             </form>
           </div>
