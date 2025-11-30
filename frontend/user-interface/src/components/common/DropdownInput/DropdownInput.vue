@@ -31,7 +31,7 @@ const formatOptionalLabel = computed(() => {
 
 const formattedOptions = computed(() =>
   props.options.map((option) => ({
-    value: typeof option === 'object' ? option.label : option,
+    value: typeof option === 'object' ? option.id : option,
     label: typeof option === 'object' ? (props.isCapitalized ? capitalizeWords(option.label) : option.label) : (props.isCapitalized ? capitalizeWords(option) : option)
   }))
 )

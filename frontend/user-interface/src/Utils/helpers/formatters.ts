@@ -41,3 +41,9 @@ export const orderedOptions = (optionsList: string[]) => {
     return a.localeCompare(b)
   })
 }
+
+export const orderedOptionsIncidentType = (optionList: IncidentType[]) => {
+  return [...optionList].sort((a, b) => {
+    return a.id.localeCompare(b.id)
+  })
+}

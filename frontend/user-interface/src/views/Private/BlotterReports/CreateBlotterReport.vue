@@ -9,7 +9,7 @@ import FormTextAreaInput from '@/components/common/FormTextAreaInput/FormTextAre
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import type { ApiErrorResponse, BlotterReportRequestPayload, CommonResponse, UserProfile as UserProfileType } from '@/Types';
 import UploadFiles from './components/UploadFiles.vue';
-import { maxDate, orderedOptions } from '@/Utils/helpers/formatters';
+import { maxDate, orderedOptionsIncidentType } from '@/Utils/helpers/formatters';
 import { submitBlotterReport } from '@/Utils/blotterReportServices';
 import type { AxiosError } from 'axios';
 import router from '@/router';
@@ -42,11 +42,7 @@ const complainantAge = ref<string>('')
 const complainantContactInfo = ref<string>('')
 const address = ref<string>('')
 
-const incidentTypes = computed(() => {
-  return incidentTypeOptions.map(incidentType => incidentType.label)
-})
-
-const sortedIncidentTypeOptions = orderedOptions(incidentTypes.value)
+const sortedIncidentTypeOptions = orderedOptionsIncidentType(incidentTypeOptions);
 
 const buildFullName = (profile: Partial<UserProfileType>): string => {
   const first = profile.first_name ?? ''
