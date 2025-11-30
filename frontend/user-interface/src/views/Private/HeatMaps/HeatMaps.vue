@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import brgyMap from '../../../assets/images/alang2-map.png'
-import { useHeatMap, type CaseType } from './composable/useHeatMap';
+import { useHeatMap, type HeatmapCaseType } from './composable/useHeatMap';
 import { orderedOptions } from '@/Utils/helpers/formatters';
 import { useBlotterReports } from '../BlotterReports/composable/useBlotterReport';
 import FormCheckboxInput from '@/components/common/FormCheckboxInput/FormCheckboxInput.vue';
@@ -13,7 +13,7 @@ const imageHeight = 1500
 const { initializeMap, drawHeatmap, fetchSections, isLoadingSections, sectionsError } = useHeatMap();
 const { incidentTypeOptions } = useBlotterReports();
 
-const currentType = ref<CaseType>("total");
+const currentType = ref<HeatmapCaseType>("total");
 
 
 const incidentTypes = computed(() => {
@@ -24,7 +24,7 @@ const orderedIncidentType = computed(() => {
   return orderedOptions(incidentTypes.value)
 })
 
-const setType = (type: CaseType) => {
+const setType = (type: HeatmapCaseType) => {
   currentType.value = type
   drawHeatmap(currentType.value);
 }
@@ -78,7 +78,6 @@ onMounted(async () => {
                 </div>
               </div>
             </section>
-
           </div>
         </div>
       </div>
