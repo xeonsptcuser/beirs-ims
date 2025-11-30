@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import brgyMap from '../../../assets/images/alang2-map.png'
-import { useHeatMap, type HeatmapCaseType } from './composable/useHeatMap';
-import { orderedOptions } from '@/Utils/helpers/formatters';
+import { useHeatMap } from './composable/useHeatMap';
+import { orderedOptionsIncidentType } from '@/Utils/helpers/formatters';
 import { useBlotterReports } from '../BlotterReports/composable/useBlotterReport';
 import FormCheckboxInput from '@/components/common/FormCheckboxInput/FormCheckboxInput.vue';
+import type { CaseType } from '@/Types';
 
 const imageURL = brgyMap
 const imageWidth = 1650
@@ -13,26 +14,29 @@ const imageHeight = 1500
 const { initializeMap, drawHeatmap, fetchSections, isLoadingSections, sectionsError } = useHeatMap();
 const { incidentTypeOptions } = useBlotterReports();
 
-const currentType = ref<HeatmapCaseType>("total");
+const selectedIncidentTypes = ref<CaseType[]>([]);
 
+const sortedIncidentTypeOptions = orderedOptionsIncidentType(incidentTypeOptions);
 
-const incidentTypes = computed(() => {
-  return incidentTypeOptions.map(incidentType => incidentType.label)
-})
+const setType = (type: CaseType, isChecked: boolean) => {
+  const nextSelectedTypes = isChecked
+    ? [...new Set([...selectedIncidentTypes.value, type])]
+    : selectedIncidentTypes.value.filter((selectedType) => selectedType !== type)
 
-const orderedIncidentType = computed(() => {
-  return orderedOptions(incidentTypes.value)
-})
+  selectedIncidentTypes.value = nextSelectedTypes
 
-const setType = (type: HeatmapCaseType) => {
-  currentType.value = type
-  drawHeatmap(currentType.value);
+  if (!nextSelectedTypes.length) {
+    drawHeatmap('total')
+    return
+  }
+
+  drawHeatmap(nextSelectedTypes)
 }
 
 onMounted(async () => {
   initializeMap("map", imageURL, imageWidth, imageHeight);
   await fetchSections();
-  drawHeatmap(currentType.value);
+  drawHeatmap('total');
 });
 
 </script>
@@ -71,8 +75,10 @@ onMounted(async () => {
               <div class="row">
                 <div class="mt-2">
                   <ul class="list-group-flush">
-                    <li class="list-group-item mb-1" v-for="(incidentType, index) in orderedIncidentType">
-                      <FormCheckboxInput :label="incidentType" :id="index.toString()" />
+                    <li class="list-group-item mb-1" v-for="(incidentType, index) in sortedIncidentTypeOptions">
+                      <FormCheckboxInput :label="incidentType.label" :id="incidentType.id"
+                        :model-value="selectedIncidentTypes.includes(incidentType.id as CaseType)"
+                        @change="(isChecked) => setType(incidentType.id as CaseType, isChecked)" />
                     </li>
                   </ul>
                 </div>
