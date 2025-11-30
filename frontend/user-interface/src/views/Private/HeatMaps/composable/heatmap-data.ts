@@ -16,6 +16,8 @@ const baseCaseCounts: Record<CaseType, number> = {
   'brgy-service-complaint': 0,
 }
 
+const createCaseCounts = (): Record<CaseType, number> => ({ ...baseCaseCounts })
+
 export const sections: Section[] = [
   {
     id: 'abbra',
@@ -36,7 +38,7 @@ export const sections: Section[] = [
       [1152.4750003814697, 999.125],
     ],
     centroid: [1072.7777862548828, 878.4444580078125],
-    cases: { ...baseCaseCounts },
+    cases: createCaseCounts(),
   },
   {
     id: 'liong',
@@ -70,7 +72,7 @@ export const sections: Section[] = [
       [1104.9288194179535, 805.265625],
     ],
     centroid: [1328.0555572509766, 700.2777709960938],
-    cases: { ...baseCaseCounts },
+    cases: createCaseCounts(),
   },
   {
     id: 'mabolo',
@@ -92,7 +94,7 @@ export const sections: Section[] = [
       [1416.7250003814697, 1332.75],
       [1427.4000000953674, 1346.875],
     ],
-    cases: { ...baseCaseCounts },
+    cases: createCaseCounts(),
     centroid: [1234.6666660308838, 1113.4444580078125],
   },
   {
@@ -119,7 +121,7 @@ export const sections: Section[] = [
       [197.52777862548828, 414.25],
     ],
     centroid: [341.6666660308838, 317.4444580078125],
-    cases: { ...baseCaseCounts },
+    cases: createCaseCounts(),
   },
 
   {
@@ -139,7 +141,7 @@ export const sections: Section[] = [
 
       [1416.694444656372, 1332.6875],
     ],
-    cases: { ...baseCaseCounts },
+    cases: createCaseCounts(),
     centroid: [1389.6666660308838, 1078.4444580078125],
   },
   {
@@ -153,7 +155,7 @@ export const sections: Section[] = [
       [1073.7638893127441, 433.6875],
       [1016.5763893127441, 551.75],
     ],
-    cases: { ...baseCaseCounts },
+    cases: createCaseCounts(),
     centroid: [1125.3333358764648, 525],
   },
   {
@@ -175,7 +177,7 @@ export const sections: Section[] = [
       [1312.5961371660233, 913.001953125],
     ],
     centroid: [1259.0555572509766, 862.7777709960938],
-    cases: { ...baseCaseCounts },
+    cases: createCaseCounts(),
   },
   {
     id: 'sudlon',
@@ -190,7 +192,7 @@ export const sections: Section[] = [
       [205.8889533150941, 175.56243896484375],
     ],
     centroid: [154.05555725097656, 211.27777099609375],
-    cases: { ...baseCaseCounts },
+    cases: createCaseCounts(),
   },
   {
     id: 'tinago',
@@ -217,7 +219,7 @@ export const sections: Section[] = [
       [456.6379123330116, 295.73046875],
     ],
     centroid: [579.6666660308838, 422.4444580078125],
-    cases: { ...baseCaseCounts },
+    cases: createCaseCounts(),
   },
   {
     id: 'tres-rosas',

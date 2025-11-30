@@ -74,20 +74,11 @@ export function useHeatMap() {
     return x - Math.floor(x)
   }
 
-  const iconColors: Record<CaseType, string> = {
-    theft: '#e63946',
-    vandalism: '#2a9d8f',
-    'animal-related': '#f4a261',
-    trespassing: '#457b9d',
-    'personal-conflict': '#e63046',
-    'noice-disturbance': '#f4a261',
-    'harrasment-threat': '#457b9d',
-    'physical-injury': '#e63046',
-    'domestic-dispute': '#f4a261',
-    'curfew-violation': '#457b9d',
-    'public-disturbance': '#e63046',
-    'lost-and-found': '#f4a261',
-    'brgy-service-complaint': '#457b9d',
+  const getMarkerColor = (value: number) => {
+    if (value >= 8) return '#dc2626' // high
+    if (value >= 4) return '#f59e0b' // orange
+    if (value >= 1) return '#f6d750' // yellow
+    return '#9ca3af' // empty / unknown
   }
 
   const typeOrder: CaseType[] = [
@@ -146,10 +137,10 @@ export function useHeatMap() {
     return [latOffset, lngOffset]
   }
 
-  const buildMarkerIcon = (type: CaseType, value: number) =>
+  const buildMarkerIcon = (value: number) =>
     L.divIcon({
       className: 'heatmap-pin',
-      html: `<div class="heatmap-pin__body" style="background:${iconColors[type]}"><span class="heatmap-pin__label">${value}</span></div>`,
+      html: `<div class="heatmap-pin__body" style="background:${getMarkerColor(value)}"><span class="heatmap-pin__label">${value}</span></div>`,
       iconSize: [28, 28],
       iconAnchor: [14, 14],
     })
@@ -204,7 +195,7 @@ export function useHeatMap() {
         const finalLng = clamp(centroid[1] + lngOffset, paddedLngMin, paddedLngMax)
 
         const marker = L.marker([finalLat, finalLng], {
-          icon: buildMarkerIcon(activeType, value),
+          icon: buildMarkerIcon(value),
         })
 
         marker.bindPopup(
