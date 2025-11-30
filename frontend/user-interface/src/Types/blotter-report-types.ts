@@ -1,4 +1,4 @@
-import type { CaseType } from '@/views/Private/HeatMaps/composable/useHeatMap'
+import type { CaseType } from './heatmap-types'
 import type { UserProfile } from './user-related-types'
 
 export interface BlotterReport {
