@@ -149,14 +149,18 @@ export function useHeatMap() {
   // -----------------------------------------------------------------
   // 2. MAIN HEATMAP DRAWING FUNCTION
   // -----------------------------------------------------------------
-  function drawHeatmap(type: HeatmapCaseType) {
+  function drawHeatmap(types: HeatmapCaseType | CaseType[]) {
     if (!map || !polygonLayerGroup || !markerLayerGroup) return
     if (!sections.value.length) return
 
     polygonLayerGroup.clearLayers()
     markerLayerGroup.clearLayers()
 
-    const activeTypes: CaseType[] = type === 'total' ? [...typeOrder] : [type]
+    const activeTypes: CaseType[] = Array.isArray(types)
+      ? types
+      : types === 'total'
+        ? [...typeOrder]
+        : [types]
 
     for (const section of sections.value) {
       const polygon = L.polygon(section.coords, {
