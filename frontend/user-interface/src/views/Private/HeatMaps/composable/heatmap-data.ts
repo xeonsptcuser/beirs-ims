@@ -67,7 +67,7 @@ export const sections: Section[] = [
       [1154.027777671814, 802.875],
       [1104.9288194179535, 805.265625],
     ],
-    centroid: [1328.7777862548828, 679.4444580078125],
+    centroid: [1328.0555572509766, 700.2777709960938],
     cases: {
       theft: 1,
       vandalism: 2,
@@ -222,6 +222,7 @@ export const sections: Section[] = [
       'lost-and-found': 12,
       'brgy-service-complaint': 13,
     },
+    centroid: [1125.3333358764648, 525],
   },
   {
     id: 'sapang-daan',
@@ -241,7 +242,7 @@ export const sections: Section[] = [
 
       [1312.5961371660233, 913.001953125],
     ],
-    centroid: [1281.7777862548828, 855.4444580078125],
+    centroid: [1259.0555572509766, 862.7777709960938],
     cases: {
       theft: 1,
       vandalism: 2,
@@ -270,7 +271,7 @@ export const sections: Section[] = [
       [258.66319465637207, 200.1875],
       [205.8889533150941, 175.56243896484375],
     ],
-    centroid: [153.6666660308838, 232.4444580078125],
+    centroid: [154.05555725097656, 211.27777099609375],
     cases: {
       theft: 1,
       vandalism: 2,
