@@ -5,7 +5,7 @@ import { endpoints } from '@/services/api/endpoints'
 import { HeatmapService } from '@/services/api/http/heatmap-service'
 import { sections as localSections } from './heatmap-data'
 
-export type { CaseType }
+export type { CaseType } from '@/Types'
 
 export type HeatmapCaseType = CaseType | 'total'
 
@@ -120,7 +120,8 @@ export function useHeatMap() {
     const jitterScale = scatterRadius * 0.25
 
     const radialJitter = (seededRandom(`${section.id}-${type}-radial`) - 0.5) * jitterScale
-    const tangentialJitter = (seededRandom(`${section.id}-${type}-tangent`) - 0.5) * jitterScale * 0.6
+    const tangentialJitter =
+      (seededRandom(`${section.id}-${type}-tangent`) - 0.5) * jitterScale * 0.6
     const baseDistance = scatterRadius + scatterRadius * 0.3 + radialJitter
 
     const latOffset = clamp(
