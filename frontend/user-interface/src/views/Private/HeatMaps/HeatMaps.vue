@@ -78,7 +78,6 @@ onMounted(async () => {
                 </div>
               </div>
             </section>
-
           </div>
         </div>
       </div>
