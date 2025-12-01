@@ -104,12 +104,6 @@ class CertificateRequestsController extends Controller
         $user = $request->user()->loadMissing('profile');
         $handlerProfileId = $user->profile?->id;
 
-        if ($certificateRequest->profile) {
-            $certificateRequest->profile->notify(
-                new CertificateRequestStatusUpdated($certificateRequest, $user)
-            );
-        }
-
         $validated = $request->validate([
             'status' => ['required', 'string', 'max:255'],
             'remarks' => ['nullable', 'string', 'max:65535', 'required_if:status,rejected'],
@@ -122,6 +116,12 @@ class CertificateRequestsController extends Controller
         $certificateData['handled_by'] = $handlerProfileId;
 
         $certificate = $this->certificate->updateCertificateRequest($certificateRequest, $certificateData);
+
+        if ($certificate->profile) {
+            $certificate->profile->notify(
+                new CertificateRequestStatusUpdated($certificate, $user)
+            );
+        }
 
         return response()->json([
             'status' => 'success',

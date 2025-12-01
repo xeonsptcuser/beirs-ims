@@ -142,19 +142,12 @@ class BlotterReportsController extends Controller
     public function update(Request $request, int $id)
     {
         $blotterReport = $this->blotter_report->getById($id, []);
-
-        $user = $request->user()->loadMissing('profile');
-        $handlerProfileId = $user->profile?->id;
-
-        if ($blotterReport->profile) {
-            $blotterReport->profile->notify(
-                new BlotterReportStatusUpdated($blotterReport, $user)
-            );
-        }
-
         if (is_null($blotterReport)) {
             abort(404);
         }
+
+        $user = $request->user()->loadMissing('profile');
+        $handlerProfileId = $user->profile?->id;
 
         $validated = $request->validate([
             'status' => ['required', 'string', 'max:255'],
@@ -167,13 +160,19 @@ class BlotterReportsController extends Controller
             ->toArray();
         $certificateData['handled_by'] = $handlerProfileId;
 
-        $certificate = $this->withSignedEvidenceUrls(
+        $updatedReport = $this->withSignedEvidenceUrls(
             $this->blotter_report->updateBlotterReport($blotterReport, $certificateData)
         );
 
+        if ($updatedReport->profile) {
+            $updatedReport->profile->notify(
+                new BlotterReportStatusUpdated($updatedReport, $user)
+            );
+        }
+
         return response()->json([
             'status' => 'success',
-            'data' => $certificate
+            'data' => $updatedReport
         ]);
     }
 
