@@ -363,7 +363,7 @@ watch(
           {{ blotterReport?.status }}
         </span>
         <p class="text-secondary small mt-2 mb-0">Filed on {{ formatDateToHuman(blotterReport?.created_at ?? '') || '—'
-        }}</p>
+          }}</p>
       </div>
     </div>
 
@@ -463,7 +463,7 @@ watch(
           </div>
         </div>
 
-        <div class="card shadow-sm border-0 mb-4">
+        <div class="card shadow-sm border-0 mb-4" v-if="blotterReport?.remarks?.trim()">
           <div class="card-body d-flex gap-3 align-items-start">
             <div
               class="rounded-circle bg-light text-danger d-flex align-items-center justify-content-center flex-shrink-0"
@@ -472,10 +472,9 @@ watch(
             </div>
             <div>
               <p class="text-muted small mb-1">Staff/Admin Comment</p>
-              <p class="mb-1 fw-semibold text-dark" v-if="blotterReport?.remarks?.trim()">{{ blotterReport?.remarks }}
+              <p class="mb-1 fw-semibold text-dark">{{ blotterReport?.remarks }}
               </p>
-              <p class="mb-1 text-secondary" v-else>No remarks have been provided for this report yet.</p>
-              <small class="text-secondary">Rejection notes will appear here for quick reference.</small>
+
             </div>
           </div>
         </div>
