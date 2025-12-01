@@ -334,17 +334,16 @@ onMounted(() => {
           </div>
         </div>
 
-        <div class="card shadow-sm border-0 mb-4">
+        <div class="card shadow-sm border-0 mb-4" v-if="staffRemarks">
           <div class="card-body d-flex gap-3 align-items-start">
-            <div class="rounded-circle bg-light text-danger d-flex align-items-center justify-content-center flex-shrink-0"
+            <div
+              class="rounded-circle bg-light text-danger d-flex align-items-center justify-content-center flex-shrink-0"
               style="width: 46px; height: 46px;">
               <i class="bi bi-chat-dots-fill"></i>
             </div>
             <div>
               <p class="text-muted small mb-1">Staff/Admin Comment</p>
-              <p class="mb-1 fw-semibold text-dark" v-if="staffRemarks">{{ staffRemarks }}</p>
-              <p class="mb-1 text-secondary" v-else>No staff remarks have been added yet.</p>
-              <small class="text-secondary">Comments appear here when a request is rejected.</small>
+              <p class="mb-1 fw-semibold text-dark">{{ staffRemarks }}</p>
             </div>
           </div>
         </div>
@@ -417,7 +416,9 @@ onMounted(() => {
             <button type="button" class="btn-close" aria-label="Close" @click="closeRejectionDialog"></button>
           </div>
           <div class="modal-body">
-            <p class="text-secondary mb-2">Share a short note to let the resident know why this request is being rejected.</p>
+            <p class="text-secondary mb-2">Share a short note to let the resident know why this request is being
+              rejected.
+            </p>
             <textarea v-model="rejectionComment" class="form-control" rows="4"
               placeholder="Provide a clear reason for rejecting this certificate request"></textarea>
             <small v-if="rejectionError" class="text-danger d-block mt-2">{{ rejectionError }}</small>
