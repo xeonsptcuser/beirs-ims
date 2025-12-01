@@ -36,6 +36,7 @@ class HeatmapController extends Controller
         'public-disturbance',
         'lost-and-found',
         'brgy-service-complaint',
+        'others',
     ];
 
     public function sections(): JsonResponse

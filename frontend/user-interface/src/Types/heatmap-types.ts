@@ -12,6 +12,7 @@ export type CaseType =
   | 'public-disturbance'
   | 'lost-and-found'
   | 'brgy-service-complaint'
+  | 'others'
 
 export type SectionId =
   | 'abbra'

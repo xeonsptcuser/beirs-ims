@@ -56,6 +56,10 @@ export function useBlotterReports() {
       id: 'brgy-service-complaint',
       label: 'Complaints Regarding Barangay Services',
     },
+    {
+      id: 'others',
+      label: 'Others',
+    },
   ]
 
   const form = ref<BlotterReport>({
