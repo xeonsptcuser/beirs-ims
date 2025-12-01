@@ -14,6 +14,7 @@ const baseCaseCounts: Record<CaseType, number> = {
   'public-disturbance': 0,
   'lost-and-found': 0,
   'brgy-service-complaint': 0,
+  others: 0,
 }
 
 const createCaseCounts = (): Record<CaseType, number> => ({ ...baseCaseCounts })
@@ -249,6 +250,7 @@ export const sections: Section[] = [
       'public-disturbance': 11,
       'lost-and-found': 12,
       'brgy-service-complaint': 13,
+      others: 0,
     },
   },
 ]

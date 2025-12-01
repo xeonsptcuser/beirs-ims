@@ -95,6 +95,7 @@ export function useHeatMap() {
     'public-disturbance',
     'lost-and-found',
     'brgy-service-complaint',
+    'others',
   ]
 
   const iconOffsetRatios = typeOrder.reduce<Record<CaseType, [number, number]>>(
