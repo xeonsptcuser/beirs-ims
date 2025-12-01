@@ -22,10 +22,12 @@ trait FormatSmsMessage
             ?? $notifiable->first_name
             ?? 'Resident';
 
-        $subject = $model->cert_request_type
-            ?? $model->incident_title
-            ?? $model->incident_type
-            ?? 'request';
+        $subject = strtoupper(
+            ($model->cert_request_type ? $model->cert_request_type . ' certificate request' : null)
+            ?? ($model->incident_title ? $model->incident_title . ' report' : null)
+            ?? ($model->incident_type ? $model->incident_type . ' report' : null)
+            ?? 'request'
+        );
 
         $status = strtoupper($model->status ?? '');
         $cta = ($model->status ?? null) === $releasedStatus
