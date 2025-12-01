@@ -103,12 +103,9 @@ onMounted(async () => {
                 </div>
               </div>
             </section>
-            <section style="margin-top: 3rem;">
+            <section style="margin-top: 3rem;" class="mb-4">
               <p class="h5 text-center">Filters</p>
               <hr class="col-9 mx-auto">
-              <div class="d-grid gap-2 col-9 mx-auto mb-3">
-                <button class="btn btn-primary" type="button" @click="downloadCsv">Download CSV</button>
-              </div>
               <div class="row">
                 <div class="mt-2">
                   <ul class="list-group-flush">
@@ -121,6 +118,10 @@ onMounted(async () => {
                 </div>
               </div>
             </section>
+            <div class="d-grid gap-2 col-9 mx-auto mb-3">
+              <button class="btn btn-success" type="button" @click="downloadCsv"> <i
+                  class="bi bi-file-earmark-spreadsheet"></i> Download CSV</button>
+            </div>
           </div>
         </div>
       </div>
