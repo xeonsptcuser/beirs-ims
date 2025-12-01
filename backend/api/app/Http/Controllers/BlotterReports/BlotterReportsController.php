@@ -13,9 +13,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\Model;
+use Throwable;
 class BlotterReportsController extends Controller
 {
 
@@ -262,7 +263,39 @@ class BlotterReportsController extends Controller
             'incident_witnesses.*' => ['nullable', 'string', 'max:255'],
             'incident_description' => ['required', 'string'],
             'evidences' => ['nullable', 'array', 'max:10'],
-            'evidences.*' => ['file', 'max:10240', 'mimetypes:image/jpeg,image/png,image/jpg,application/pdf,video/mp4'],
+            'evidences.*' => [
+                'file',
+                function (string $attribute, mixed $value, callable $fail) {
+                    if (!$value instanceof UploadedFile) {
+                        $fail('Each evidence upload must be a valid file.');
+                        return;
+                    }
+
+                    $mimeType = $value->getClientMimeType();
+                    $sizeInKb = $value->getSize() / 1024;
+
+                    $imageMimes = ['image/jpeg', 'image/png', 'image/jpg'];
+                    $videoMimes = ['video/mp4'];
+
+                    if (in_array($mimeType, $imageMimes, true)) {
+                        if ($sizeInKb > 5120) {
+                            $fail('Image evidences must not exceed 5MB.');
+                        }
+
+                        return;
+                    }
+
+                    if (in_array($mimeType, $videoMimes, true)) {
+                        if ($sizeInKb > 102400) {
+                            $fail('Video evidences must not exceed 100MB.');
+                        }
+
+                        return;
+                    }
+
+                    $fail('Only JPEG/PNG images or MP4 videos are allowed as evidence.');
+                },
+            ],
         ]);
     }
 
@@ -302,14 +335,26 @@ class BlotterReportsController extends Controller
             }
             $path = "blotter-evidences/{$blotterReport->id}";
 
-            $storagePath = $this->storage->upload($file, $path);
+            try {
+                $storagePath = $this->storage->upload($file, $path);
 
-            $blotterReport->evidence()->create([
-                'storage_path' => $storagePath,
-                'original_name' => $file->getClientOriginalName(),
-                'mime_type' => $file->getClientMimeType(),
-                'size' => $file->getSize(),
-            ]);
+                $blotterReport->evidence()->create([
+                    'storage_path' => $storagePath,
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getClientMimeType(),
+                    'size' => $file->getSize(),
+                ]);
+            } catch (Throwable $e) {
+                Log::error('Failed to upload blotter evidence.', [
+                    'report_id' => $blotterReport->id,
+                    'file_name' => $file->getClientOriginalName(),
+                    'error' => $e->getMessage(),
+                ]);
+
+                throw ValidationException::withMessages([
+                    'evidences' => 'One or more evidences failed to upload. Please try again.',
+                ]);
+            }
         }
 
         $blotterReport->load('evidence');
