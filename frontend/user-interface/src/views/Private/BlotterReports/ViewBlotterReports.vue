@@ -47,9 +47,9 @@ const isStaffView = computed(() => session.isRoleStaff() || session.isRoleAdmin(
 const isResidentView = computed(() => session.isRoleResident());
 
 const residentTransactionStatuses: BlotterReportStatus[] = ['pending', 'processing', 'approved', 'released'];
-const residentHistoryStatuses: BlotterReportStatus[] = ['rejected', 'cancelled', 'done'];
+const residentHistoryStatuses: BlotterReportStatus[] = ['rejected', 'done'];
 const staffTransactionStatuses: BlotterReportStatus[] = ['pending', 'processing', 'approved'];
-const staffHistoryStatuses: BlotterReportStatus[] = ['rejected', 'cancelled', 'released', 'done'];
+const staffHistoryStatuses: BlotterReportStatus[] = ['rejected', 'done'];
 
 const transactionStatuses = computed<BlotterReportStatus[]>(() => {
   return isStaffView.value ? staffTransactionStatuses : residentTransactionStatuses;

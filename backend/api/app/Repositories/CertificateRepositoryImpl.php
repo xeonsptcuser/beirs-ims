@@ -45,21 +45,36 @@ class CertificateRepositoryImpl implements CertificateRepositoryInterface
         $allowedStatuses = [
             CertificateRequest::STATUS_PENDING,
             CertificateRequest::STATUS_APPROVED,
+            CertificateRequest::STATUS_REJECTED,
+            CertificateRequest::STATUS_CANCELLED,
+            CertificateRequest::STATUS_RELEASED,
+            CertificateRequest::STATUS_DONE,
         ];
 
-        $statuses = $statuses ? array_values(array_intersect($statuses, $allowedStatuses)) : $allowedStatuses;
+        $defaultStaffStatuses = [
+            CertificateRequest::STATUS_PENDING,
+            CertificateRequest::STATUS_APPROVED,
+        ];
+
+        $statuses = $statuses ? array_values(array_intersect($statuses, $allowedStatuses)) : $defaultStaffStatuses;
 
         if (empty($statuses)) {
-            $statuses = $allowedStatuses;
+            $statuses = $defaultStaffStatuses;
         }
+
+        $handlerStatuses = array_values(array_intersect($statuses, [
+            CertificateRequest::STATUS_APPROVED,
+            CertificateRequest::STATUS_REJECTED,
+            CertificateRequest::STATUS_CANCELLED,
+            CertificateRequest::STATUS_RELEASED,
+            CertificateRequest::STATUS_DONE,
+        ]));
+        $includePending = in_array(CertificateRequest::STATUS_PENDING, $statuses, true);
 
         $query = CertificateRequest::with($relations)
             ->orderBy('created_at', 'desc')
-            ->where(function ($builder) use ($statuses, $handlerProfileId) {
-                $includePending = in_array(CertificateRequest::STATUS_PENDING, $statuses, true);
-                $includeApproved = in_array(CertificateRequest::STATUS_APPROVED, $statuses, true);
-
-                if (!$includePending && !$includeApproved) {
+            ->where(function ($builder) use ($includePending, $handlerStatuses, $handlerProfileId) {
+                if (!$includePending && empty($handlerStatuses)) {
                     $builder->whereRaw('1 = 0');
                     return;
                 }
@@ -68,14 +83,14 @@ class CertificateRepositoryImpl implements CertificateRepositoryInterface
                     $builder->where('status', CertificateRequest::STATUS_PENDING);
                 }
 
-                if ($includeApproved) {
+                if (!empty($handlerStatuses)) {
                     $method = $includePending ? 'orWhere' : 'where';
 
-                    $builder->{$method}(function ($approvedQuery) use ($handlerProfileId) {
-                        $approvedQuery->where('status', CertificateRequest::STATUS_APPROVED);
+                    $builder->{$method}(function ($handledQuery) use ($handlerStatuses, $handlerProfileId) {
+                        $handledQuery->whereIn('status', $handlerStatuses);
 
                         if (!is_null($handlerProfileId)) {
-                            $approvedQuery->where('handled_by', $handlerProfileId);
+                            $handledQuery->where('handled_by', $handlerProfileId);
                         }
                     });
                 }
@@ -159,10 +174,13 @@ class CertificateRepositoryImpl implements CertificateRepositoryInterface
             }
 
             $certificate->status = $status;
+            if (array_key_exists('remarks', $certificateData)) {
+                $certificate->remarks = $certificateData['remarks'];
+            }
             $certificate->handled_by = $certificateData['handled_by'];
             $certificate->save();
 
-            return $certificate->load('profile');
+            return $certificate->load(['profile', 'handler.user']);
         });
     }
 }
