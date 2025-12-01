@@ -309,7 +309,7 @@ const filteredErrors = computed(() => {
                 <div class="col-lg-6">
                   <FormFloatingInput type="text" label="Incident Subject/Title" id="incident-title"
                     v-model="form.incidentTitle" :error-message="errorMessages.incidentTitle.error"
-                    :has-error="errors.incidentTitle" />
+                    :has-error="errors.incidentTitle" :is-capitalized="false" />
                 </div>
                 <div class="col-md-6">
                   <FormFloatingInput type="date" label="Date of Incident" id="incident-date" :is-capitalized="false"
@@ -329,7 +329,7 @@ const filteredErrors = computed(() => {
                 <div class="col-md-6">
                   <FormFloatingInput type="text" label="Landmark / Additional Directions" id="incident-address-line"
                     v-model="form.incidentAddressLine" :error-message="errorMessages.incidentAddressLine.error"
-                    :has-error="errors.incidentAddressLine" />
+                    :has-error="errors.incidentAddressLine" :is-capitalized="false" />
                 </div>
               </div>
             </div>
@@ -404,7 +404,8 @@ const filteredErrors = computed(() => {
                 <div class="col-12">
                   <FormTextAreaInput label="Detailed Description" id="incident-description"
                     v-model="form.incidentDescription" :error-message="errorMessages.incidentDescription.error"
-                    :has-error="errors.incidentDescription" :is-resizeable="false" max-rows="6" />
+                    :has-error="errors.incidentDescription" :is-resizeable="false" max-rows="6" placeholder="..."
+                    maxLength="5000" />
                 </div>
                 <div class="col-12">
                   <UploadFiles v-model="form.evidences" />

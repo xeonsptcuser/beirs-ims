@@ -19,11 +19,13 @@ const model = defineModel<string>()
 <template>
   <div class="mb-3">
     <label :for="id" class="form-label" v-if="label">{{ label }}</label>
-    <textarea class="form-control border-base" :class="[{ 'resize-none': !isResizeable }, { 'is-invalid': hasError }]"
-      :id :rows="maxRows" :placeholder v-model="model"></textarea>
+    <textarea class="form-control border-base"
+      :class="[{ 'resize-none': !isResizeable }, { 'is-invalid border-error': hasError }]" :id :rows="maxRows"
+      :placeholder v-model="model" v-bind="$attrs"></textarea>
     <div class="invalid-feedback" v-show="hasError">
       {{ errorMessage }}
     </div>
+
   </div>
 </template>
 
@@ -33,6 +35,10 @@ const model = defineModel<string>()
 }
 
 .border-base {
-  border: 1px solid grey;
+  border: 0.7px solid grey;
+}
+
+.border-error {
+  border: 0.7px solid #DC3545;
 }
 </style>

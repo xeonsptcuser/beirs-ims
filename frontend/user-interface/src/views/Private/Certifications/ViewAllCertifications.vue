@@ -343,8 +343,11 @@ onMounted(() => {
                           </span>
                           <small class="text-muted">{{ formatDateToHuman(request.created_at) || '—' }}</small>
                         </div>
-                        <h5 class="card-title mb-1">{{ request.cert_request_type || 'Certificate Request' }}</h5>
-                        <p class="text-secondary mb-2">Purpose: {{ truncatedPurpose(request.cert_request_reason) }}</p>
+                        <h5 class="card-title mb-1 text-capitalize">
+                          {{ request.cert_request_type || 'Certificate Request' }}
+                        </h5>
+                        <p class="text-secondary mb-2 d-block text-truncate" style="width: 500px;">Purpose: {{
+                          truncatedPurpose(request.cert_request_reason) }}</p>
                         <p class="text-muted small mb-0" v-if="request.profile">
                           Requested by: {{ formatName(request.profile.first_name, request.profile.middle_name,
                             request.profile.last_name) }}
@@ -379,7 +382,7 @@ onMounted(() => {
                   <span class="badge" :class="statusBadgeClass(status)"></span>
                   <span class="fw-bold">{{
                     certificationRequestItems.filter((item) => item.status === status).length
-                    }}</span>
+                  }}</span>
                 </div>
               </div>
             </div>
