@@ -215,9 +215,7 @@ const handleSearch = () => {
 };
 
 const toggleHistoryView = () => {
-  if (isStaffView.value) {
-    return;
-  }
+
   isHistoryScreen.value = !isHistoryScreen.value;
   selectedStatusFilter.value = null;
   pagination.current = 1;
@@ -259,11 +257,12 @@ onMounted(() => {
       </div>
       <div class="text-end">
         <router-link v-if="isResidentView && createReportRoute" class="btn btn-primary mt-3 mt-lg-0"
-          :class="{ disabled: shouldBlockActions }" :aria-disabled="shouldBlockActions" :tabindex="shouldBlockActions ? -1 : 0"
-          :to="createReportRoute" @click="handleBlockedNavigation">
+          :class="{ disabled: shouldBlockActions }" :aria-disabled="shouldBlockActions"
+          :tabindex="shouldBlockActions ? -1 : 0" :to="createReportRoute" @click="handleBlockedNavigation">
           <i class="bi bi-plus-circle me-2"></i> File New Report
         </router-link>
-        <p v-if="shouldBlockActions" class="fw-bold mt-2"><small class="text-danger">Please complete profile verification
+        <p v-if="shouldBlockActions" class="fw-bold mt-2"><small class="text-danger">Please complete profile
+            verification
             to file a blotter report.</small></p>
       </div>
     </div>
@@ -285,8 +284,7 @@ onMounted(() => {
             </button>
           </div>
           <div class="col-md-3 text-md-end">
-            <button class="btn btn-link text-decoration-none" type="button" @click="toggleHistoryView"
-              :disabled="isStaffView">
+            <button class="btn btn-link text-decoration-none" type="button" @click="toggleHistoryView">
               {{ isHistoryScreen ? 'View Active Reports' : 'View History' }}
             </button>
           </div>
@@ -308,8 +306,8 @@ onMounted(() => {
       <p class="mt-3 mb-1 fw-semibold">No blotter reports found.</p>
       <p class="text-secondary mb-3">File a new report or adjust your filters to see previous submissions.</p>
       <router-link v-if="isResidentView && createReportRoute" :to="createReportRoute" class="btn btn-primary"
-        :class="{ disabled: shouldBlockActions }" :aria-disabled="shouldBlockActions" :tabindex="shouldBlockActions ? -1 : 0"
-        @click="handleBlockedNavigation">
+        :class="{ disabled: shouldBlockActions }" :aria-disabled="shouldBlockActions"
+        :tabindex="shouldBlockActions ? -1 : 0" @click="handleBlockedNavigation">
         File a Report
       </router-link>
     </div>
