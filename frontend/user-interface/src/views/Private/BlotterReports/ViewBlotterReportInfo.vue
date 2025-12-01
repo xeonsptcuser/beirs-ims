@@ -46,6 +46,9 @@ const statusLabels: Record<BlotterReportStatus, string> = {
   done: 'Completed',
 };
 
+const statusTimelineOrder: BlotterReportStatus[] = ['pending', 'processing', 'approved', 'released', 'done'];
+const statusTimestamps = ref<Partial<Record<BlotterReportStatus, string>>>({});
+
 const statusBadgeClass = (status?: BlotterReportStatus) => {
   if (!status) return 'bg-secondary';
   const mapping: Record<BlotterReportStatus, string> = {
@@ -99,6 +102,7 @@ const fetchReport = async () => {
   navigation.startNavigation();
   hasError.value = false;
   successMessage.value = '';
+  statusTimestamps.value = {};
   try {
     const response = await fetchBlotterReportInfo(props.id);
     blotterReport.value = response.data;
@@ -244,6 +248,43 @@ const showBlotterPreviewButton = computed(() => {
   return blotterReport.value?.status === 'approved' && isOwner.value && session.isRoleResident();
 })
 
+const statusTimeline = computed(() => {
+  const currentStatus = blotterReport.value?.status;
+  const currentIndex = currentStatus ? statusTimelineOrder.indexOf(currentStatus) : -1;
+
+  return statusTimelineOrder.map((status, index) => {
+    const isReached = currentIndex >= 0 ? index <= currentIndex : false;
+    const recordedDate = statusTimestamps.value[status];
+
+    return {
+      status,
+      label: statusLabels[status] || status,
+      date: recordedDate,
+      isCurrent: status === currentStatus,
+      isReached,
+    };
+  });
+});
+
+const recordStatusTimestamps = (report: BlotterReportResponse) => {
+  const currentStatus = report.status;
+  const currentDate = report.updated_at ?? report.created_at;
+  const createdDate = report.created_at ?? currentDate;
+
+  if (currentDate && !statusTimestamps.value[currentStatus]) {
+    statusTimestamps.value[currentStatus] = currentDate;
+  }
+
+  const currentIndex = statusTimelineOrder.indexOf(currentStatus);
+  if (currentIndex > 0) {
+    statusTimelineOrder.slice(0, currentIndex).forEach((status) => {
+      if (!statusTimestamps.value[status] && createdDate) {
+        statusTimestamps.value[status] = createdDate;
+      }
+    });
+  }
+};
+
 onMounted(fetchReport);
 
 watch(() => props.id, (newVal, oldVal) => {
@@ -251,6 +292,16 @@ watch(() => props.id, (newVal, oldVal) => {
     fetchReport();
   }
 });
+
+watch(
+  () => blotterReport.value,
+  (newVal) => {
+    if (newVal) {
+      recordStatusTimestamps(newVal);
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
@@ -266,7 +317,7 @@ watch(() => props.id, (newVal, oldVal) => {
           {{ blotterReport?.status }}
         </span>
         <p class="text-secondary small mt-2 mb-0">Filed on {{ formatDateToHuman(blotterReport?.created_at ?? '') || '—'
-        }}</p>
+          }}</p>
       </div>
     </div>
 
@@ -403,13 +454,15 @@ watch(() => props.id, (newVal, oldVal) => {
           <div class="card-body">
             <h5 class="card-title fw-semibold mb-3">Status Timeline</h5>
             <ul class="list-unstyled mb-0 timeline">
-              <li v-for="status in ['pending', 'processing', 'approved', 'released', 'done']" :key="status"
-                :class="['timeline-item', { active: blotterReport?.status === status }]">
-                <p class="mb-0 fw-semibold text-capitalize">{{ statusLabels[status as BlotterReportStatus] || status }}
-                </p>
+              <li v-for="item in statusTimeline" :key="item.status"
+                :class="['timeline-item', { active: item.isCurrent, reached: item.isReached }]">
+                <p class="mb-0 fw-semibold text-capitalize">{{ item.label }}</p>
                 <small class="text-muted">
-                  <template v-if="blotterReport?.status === status">
-                    Updated {{ formatDateToHuman(blotterReport?.updated_at ?? '') || '—' }}
+                  <template v-if="item.isReached && item.date">
+                    Updated {{ formatDateToHuman(item.date) || '-' }}
+                  </template>
+                  <template v-else-if="item.isReached">
+                    Completed
                   </template>
                   <template v-else>
                     Pending
@@ -451,6 +504,8 @@ watch(() => props.id, (newVal, oldVal) => {
               alt="Evidence preview" />
             <video v-else class="w-100 rounded" controls>
               <source :src="buildEvidenceUrl(previewEvidence.storage_path)" :type="previewEvidence.mime_type" />
+              <track kind="captions" src="" label="English" />
+              <track kind="descriptions" src="" label="English" />
               Your browser does not support embedded videos.
             </video>
           </div>
@@ -487,8 +542,14 @@ watch(() => props.id, (newVal, oldVal) => {
   top: 0.3rem;
 }
 
+.timeline-item.reached::before {
+  background: #0d6efd;
+  opacity: 0.5;
+}
+
 .timeline-item.active::before {
   background: #0d6efd;
+  opacity: 1;
 }
 
 .modal-backdrop {
@@ -499,3 +560,5 @@ watch(() => props.id, (newVal, oldVal) => {
   z-index: 1050 !important;
 }
 </style>
+
+

@@ -4,12 +4,16 @@ import { PDFDocument, StandardFonts } from 'pdf-lib'
 import { endpoints } from '@/services/api/endpoints'
 import { PdfRelatedService } from '@/services/api/http/pdf-service'
 import blotterForm from '../../../../assets/pdf/blotter-form.pdf'
+import { useBlotterReports } from '../composable/useBlotterReport'
+import { addOrdinalSuffix } from '@/Utils/helpers/formatters'
 
 const props = defineProps<{
   blotterId: string
 }>()
 
 const pdfService = PdfRelatedService.getInstance()
+
+const { incidentTypeOptions } = useBlotterReports();
 
 // Static PDF template
 const pdfTemplateUrl = blotterForm
@@ -22,15 +26,60 @@ const payload = ref<Record<string, any> | null>(null)
 type BlotterData = Record<string, any>
 
 const positions = {
-  case_number: { x: 80, y: 700, size: 12 },
-  complainant: { x: 140, y: 660, size: 14 },
-  contact: { x: 140, y: 640, size: 12 },
-  address: { x: 140, y: 620, size: 12 },
-  incident_title: { x: 140, y: 590, size: 12 },
-  incident_datetime: { x: 140, y: 570, size: 12 },
-  location: { x: 140, y: 550, size: 12 },
-  landmark: { x: 140, y: 530, size: 12 },
-  description: { x: 140, y: 300, size: 12 },
+  case_number: { x: 460, y: 840, size: 12 },
+  complainant: { x: 80, y: 840, size: 14 },
+  people_involved: { x: 75, y: 728, size: 12 },
+  incident_type: { x: 390, y: 812, size: 12 },
+  location: { x: 140, y: 290, size: 12 },
+  description: { x: 115, y: 562, size: 12 },
+  incident_month: { x: 350, y: 230, size: 12 },
+  incident_day: { x: 180, y: 230, size: 12 },
+  incident_year: { x: 470, y: 230, size: 12 },
+  file_month: { x: 350, y: 135, size: 12 },
+  file_day: { x: 235, y: 135, size: 12 },
+  file_year: { x: 470, y: 135, size: 12 },
+
+}
+
+const wrapText = (text: string, maxWidth: number, font: any, size: number): string[] => {
+  const words = text.split(/\s+/)
+  const lines: string[] = []
+  let currentLine = ''
+
+  for (const word of words) {
+    const testLine = currentLine ? `${currentLine} ${word}` : word
+    if (font.widthOfTextAtSize(testLine, size) <= maxWidth) {
+      currentLine = testLine
+      continue
+    }
+
+    if (currentLine) {
+      lines.push(currentLine)
+    }
+
+    // Handle exceptionally long words by breaking them
+    if (font.widthOfTextAtSize(word, size) > maxWidth) {
+      let chunk = ''
+      for (const char of word) {
+        const testChunk = `${chunk}${char}`
+        if (font.widthOfTextAtSize(testChunk, size) <= maxWidth) {
+          chunk = testChunk
+        } else {
+          lines.push(chunk)
+          chunk = char
+        }
+      }
+      currentLine = chunk
+    } else {
+      currentLine = word
+    }
+  }
+
+  if (currentLine) {
+    lines.push(currentLine)
+  }
+
+  return lines
 }
 
 const drawText = (
@@ -49,21 +98,69 @@ const drawText = (
   })
 }
 
+const drawWrappedText = (
+  page: any,
+  font: any,
+  key: keyof typeof positions,
+  value: string | undefined | null,
+  maxWidth: number,
+  lineHeight: number
+) => {
+  if (!value) return
+  const pos = positions[key]
+  const lines = wrapText(String(value), maxWidth, font, pos.size)
+  lines.forEach((line, index) => {
+    page.drawText(line, {
+      x: pos.x,
+      y: pos.y - index * lineHeight,
+      size: pos.size,
+      font,
+    })
+  })
+}
+
+const formatPeopleInvolved = (value: unknown): string => {
+  if (Array.isArray(value)) {
+    return value.filter((v) => !!v).join(', ')
+  }
+  if (typeof value === 'string') return value
+  return ''
+}
+
 const buildPdfWithData = async (data: BlotterData) => {
   const templateBytes = await fetch(pdfTemplateUrl).then((res) => res.arrayBuffer())
   const pdfDoc = await PDFDocument.load(templateBytes)
   const page = pdfDoc.getPages()[0]
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
 
+
+  const incidentType = incidentTypeOptions.find(type => type.id === data.incident_type)
+  const incidentDateTime = data.incident_datetime.split(/[ ,]+/);
+  const month = incidentDateTime[0];
+  const day = incidentDateTime[1];
+  const year = incidentDateTime[2].match(/.{1,2}/g)[1];
+
+  const dateToday = new Date();
+  const file_month = dateToday.toLocaleString('en-US', { month: 'long' }); // e.g. "December"
+  const file_day = String(dateToday.getDate());                           // e.g. "30"
+  const file_year = String(dateToday.getFullYear()).match(/.{1,2}/g)?.[1] ?? '';
+
+  const formattedLocation = computed(() => {
+    return `sitio ${data.location}`;
+  });
+
   drawText(page, font, 'case_number', data.case_number)
   drawText(page, font, 'complainant', data.complainant)
-  drawText(page, font, 'contact', data.contact)
-  drawText(page, font, 'address', data.address)
-  drawText(page, font, 'incident_title', data.incident_title)
-  drawText(page, font, 'incident_datetime', data.incident_datetime)
-  drawText(page, font, 'location', data.location)
-  drawText(page, font, 'landmark', data.landmark)
-  drawText(page, font, 'description', data.description)
+  drawText(page, font, 'incident_type', incidentType?.label)
+  drawWrappedText(page, font, 'description', data.description, 420, 27)
+  drawWrappedText(page, font, 'people_involved', formatPeopleInvolved(data.person_involved), 220, 26)
+  drawText(page, font, 'location', formattedLocation.value.toUpperCase())
+  drawText(page, font, 'incident_month', month)
+  drawText(page, font, 'incident_day', addOrdinalSuffix(day))
+  drawText(page, font, 'incident_year', year)
+  drawText(page, font, 'file_month', file_month)
+  drawText(page, font, 'file_day', addOrdinalSuffix(file_day))
+  drawText(page, font, 'file_year', file_year)
 
   const pdfBytes = await pdfDoc.save()
   if (pdfUrl.value) {

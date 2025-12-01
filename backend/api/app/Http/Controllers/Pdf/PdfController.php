@@ -37,7 +37,7 @@ class PdfController extends Controller
     {
         $report = BlotterReport::with(['profile', 'handler'])->findOrFail($id);
         $profile = $report->profile;
-
+        Log::info('blotter.report', [$report]);
         $data = [
             'case_number' => sprintf('BR-%05d', $report->id),
             'complainant' => $this->formatName($profile?->first_name, $profile?->middle_name, $profile?->last_name),
@@ -57,6 +57,7 @@ class PdfController extends Controller
                 $report->handler?->middle_name,
                 $report->handler?->last_name
             ),
+            'created_at' => $report->created_at
         ];
 
         return response()->json([
