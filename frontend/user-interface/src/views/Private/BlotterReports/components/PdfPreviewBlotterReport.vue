@@ -152,7 +152,7 @@ const buildPdfWithData = async (data: BlotterData) => {
   drawText(page, font, 'case_number', data.case_number)
   drawText(page, font, 'complainant', data.complainant)
   drawText(page, font, 'incident_type', incidentType?.label)
-  drawWrappedText(page, font, 'description', data.description, 420, 27)
+  drawWrappedText(page, font, 'description', data.description.toUpperCase(), 420, 27)
   drawWrappedText(page, font, 'people_involved', formatPeopleInvolved(data.person_involved), 220, 26)
   drawText(page, font, 'location', formattedLocation.value.toUpperCase())
   drawText(page, font, 'incident_month', month)
