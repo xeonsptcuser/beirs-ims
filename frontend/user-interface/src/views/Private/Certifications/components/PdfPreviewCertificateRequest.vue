@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { PDFDocument, StandardFonts } from 'pdf-lib'
 import { endpoints } from '@/services/api/endpoints'
 import { PdfRelatedService } from '@/services/api/http/pdf-service'
+import { addOrdinalSuffix, computeAge } from '@/Utils/helpers/formatters'
 import certBrgyClearancePdf from '../../../../assets/pdf/cert-clearance.pdf'
 import certIndigencyPdf from '../../../../assets/pdf/cert-indigency.pdf'
 import certResidencyPdf from '../../../../assets/pdf/cert-residency.pdf'
@@ -42,21 +43,59 @@ type CertificateData = Record<string, any>
 
 const iframeSrc = computed(() => (pdfUrl.value ? `${pdfUrl.value}#toolbar=0&navpanes=0&statusbar=0` : ''))
 
-const positions = {
-  full_name: { x: 140, y: 640, size: 14 },
-  address: { x: 140, y: 610, size: 12 },
-  purpose: { x: 140, y: 580, size: 12 },
-  issued_at: { x: 140, y: 550, size: 12 },
+type CertificateField = 'full_name' | 'address' | 'age' | 'month' | 'day' | 'last_name'
+type CertificateFieldMap = Partial<Record<CertificateField, FieldPosition>>
+
+type FieldPosition = {
+  x: number,
+  y: number,
+  size: number,
 }
+
+const basePositions: CertificateFieldMap = {
+  full_name: { x: 290, y: 536, size: 12 },
+  last_name: { x: 417, y: 402, size: 10 },
+  age: { x: 495, y: 536, size: 12 },
+  address: { x: 295, y: 515, size: 7.8 },
+  month: { x: 215, y: 218, size: 12 },
+  day: { x: 540, y: 240, size: 12 },
+
+}
+
+const positionMap: Record<string, CertificateFieldMap> = {
+  clearance: basePositions,
+  indigency: {
+    full_name: { x: 270, y: 532, size: 12 },
+    address: { x: 160, y: 510, size: 7.7 },
+    month: { x: 380, y: 361, size: 12 },
+    day: { x: 305, y: 361, size: 10 },
+  },
+  residency: {
+    full_name: { x: 300, y: 515, size: 12 },
+    address: { x: 238, y: 500, size: 9 },
+    age: { x: 480, y: 515, size: 12 },
+    month: { x: 275, y: 302, size: 12 },
+    day: { x: 223, y: 302, size: 12 },
+  },
+}
+
+const resolvedPositions = computed<CertificateFieldMap>(() => {
+  const payloadType = payload.value?.cert_request_type?.toLowerCase()
+  const requestedType = props.certificateType?.toLowerCase()
+  const certificateType = requestedType || payloadType
+
+  return (certificateType && positionMap[certificateType]) || basePositions
+})
 
 const drawText = (
   page: any,
   font: any,
-  key: keyof typeof positions,
+  key: CertificateField,
   value: string | undefined | null
 ) => {
   if (!value) return
-  const pos = positions[key]
+  const pos = resolvedPositions.value[key]
+  if (!pos) return
   page.drawText(String(value), {
     x: pos.x,
     y: pos.y,
@@ -65,16 +104,41 @@ const drawText = (
   })
 }
 
+const separateDate = (dateStr: string) => {
+
+  if (!dateStr) return;
+
+  const month = dateStr.split(/[ ,]+/)[0]
+  const day = dateStr.split(/[ ,]+/)[1]
+  const year = dateStr.split(/[ ,]+/)[2]
+
+  return { day, month, year }
+}
+
+
+
 const buildPdfWithData = async (data: CertificateData) => {
   const templateBytes = await fetch(pdfTemplateUrl.value).then((res) => res.arrayBuffer())
   const pdfDoc = await PDFDocument.load(templateBytes)
   const page = pdfDoc.getPages()[0]
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
 
-  drawText(page, font, 'full_name', data.full_name)
-  drawText(page, font, 'address', data.address)
-  drawText(page, font, 'purpose', data.purpose)
-  drawText(page, font, 'issued_at', data.issued_at)
+  const fullName = data.full_name.toUpperCase()
+  const splitName = fullName.split(' ');
+  const lastName = computed(() => {
+    return `Mr/Ms ${splitName[splitName.length - 1]}`
+  });
+  const homeAddress = data.address.toUpperCase()
+  const fullDate = data.issued_at;
+  const age = computeAge(data.date_of_birth)
+  const splitDate = separateDate(fullDate);
+
+  drawText(page, font, 'full_name', fullName)
+  drawText(page, font, 'last_name', lastName.value)
+  drawText(page, font, 'address', homeAddress)
+  drawText(page, font, 'day', addOrdinalSuffix(splitDate?.day ?? 0))
+  drawText(page, font, 'month', splitDate?.month)
+  drawText(page, font, 'age', age)
 
   const pdfBytes = await pdfDoc.save()
   if (pdfUrl.value) {
@@ -133,7 +197,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="mt-3 d-flex flex-column gap-3">
+  <div class="my-4 d-flex flex-column gap-3">
     <div>
       <p v-if="isLoading" class="text-muted mb-2">Loading PDF preview…</p>
       <div v-else-if="errorMessage" class="alert alert-danger" role="alert">

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BlotterReport\BlotterReport;
 use App\Models\Certificates\CertificateRequest;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
 
 class PdfController extends Controller
 {
@@ -13,11 +14,11 @@ class PdfController extends Controller
     {
         $certificate = CertificateRequest::with('profile')->findOrFail($id);
         $profile = $certificate->profile;
-
+        Log::info('date.of.birth', [$certificate->profile->date_of_birth]);
         $data = [
             'full_name' => $this->formatName($profile?->first_name, $profile?->middle_name, $profile?->last_name),
             'address' => $this->formatAddress($profile?->street_address, $profile?->address_line),
-            'date_of_birth' => optional($profile?->date_of_birth)?->format('F j, Y'),
+            'date_of_birth' => optional(value: $profile->date_of_birth)?->format('F j, Y'),
             'cert_request_type' => $certificate->cert_request_type,
             'purpose' => $certificate->cert_request_reason,
             'residency_start' => optional($certificate->start_residency_date)?->format('F j, Y'),
