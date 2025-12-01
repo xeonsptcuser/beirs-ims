@@ -53,7 +53,7 @@ class OtpService
             ];
         }
 
-        $recipient = $user->profile?->routeNotificationForTwilio();
+        $recipient = $user->profile?->routeNotificationForSemaphore();
         if (!$recipient) {
             return [
                 'ok' => false,

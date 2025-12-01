@@ -7,9 +7,11 @@ trait FormatSmsMessage
     public function buildSmsMessage(object $model, object $notifiable, string $releasedStatus): array
     {
         // Prefer the notifiable's route helper so numbers are normalized (+63, etc.)
-        $mobile = method_exists($notifiable, 'routeNotificationForTwilio')
-            ? $notifiable->routeNotificationForTwilio()
-            : ($notifiable->mobile_number ?? null);
+        $mobile = method_exists($notifiable, 'routeNotificationForSemaphore')
+            ? $notifiable->routeNotificationForSemaphore()
+            : (method_exists($notifiable, 'routeNotificationForSemaphore')
+                ? $notifiable->routeNotificationForSemaphore()
+                : ($notifiable->mobile_number ?? null));
 
         if (!$mobile) {
             return [];
@@ -20,10 +22,12 @@ trait FormatSmsMessage
             ?? $notifiable->first_name
             ?? 'Resident';
 
-        $subject = $model->cert_request_type
-            ?? $model->incident_title
-            ?? $model->incident_type
-            ?? 'request';
+        $subject = strtoupper(
+            ($model->cert_request_type ? $model->cert_request_type . ' certificate request' : null)
+            ?? ($model->incident_title ? $model->incident_title . ' report' : null)
+            ?? ($model->incident_type ? $model->incident_type . ' report' : null)
+            ?? 'request'
+        );
 
         $status = strtoupper($model->status ?? '');
         $cta = ($model->status ?? null) === $releasedStatus
