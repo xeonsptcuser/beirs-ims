@@ -163,6 +163,9 @@ class BlotterReportRepositoryImpl implements BlotterReportRepositoryInterface
             }
 
             $blotterReport->status = $status;
+            if (array_key_exists('remarks', $blotterReportData)) {
+                $blotterReport->remarks = $blotterReportData['remarks'];
+            }
             $blotterReport->handled_by = $blotterReportData['handled_by'];
             $blotterReport->save();
 

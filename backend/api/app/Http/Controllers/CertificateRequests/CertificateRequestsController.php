@@ -111,11 +111,12 @@ class CertificateRequestsController extends Controller
         }
 
         $validated = $request->validate([
-            'status' => ['required', 'string', 'max:255']
+            'status' => ['required', 'string', 'max:255'],
+            'remarks' => ['nullable', 'string', 'max:65535', 'required_if:status,rejected'],
         ]);
 
         $certificateData = collect($validated)
-            ->only(['status'])
+            ->only(['status', 'remarks'])
             ->filter(fn($value) => !is_null($value))
             ->toArray();
         $certificateData['handled_by'] = $handlerProfileId;
