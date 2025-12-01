@@ -54,7 +54,7 @@ type FieldPosition = {
 
 const basePositions: CertificateFieldMap = {
   full_name: { x: 290, y: 536, size: 12 },
-  last_name: { x: 420, y: 402, size: 10 },
+  last_name: { x: 417, y: 402, size: 10 },
   age: { x: 495, y: 536, size: 12 },
   address: { x: 295, y: 515, size: 7.8 },
   month: { x: 215, y: 218, size: 12 },
