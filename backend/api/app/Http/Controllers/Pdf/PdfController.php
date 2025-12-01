@@ -14,7 +14,7 @@ class PdfController extends Controller
     {
         $certificate = CertificateRequest::with('profile')->findOrFail($id);
         $profile = $certificate->profile;
-        Log::info('date.of.birth', [$certificate->profile->date_of_birth]);
+
         $data = [
             'full_name' => $this->formatName($profile?->first_name, $profile?->middle_name, $profile?->last_name),
             'address' => $this->formatAddress($profile?->street_address, $profile?->address_line),
@@ -37,7 +37,7 @@ class PdfController extends Controller
     {
         $report = BlotterReport::with(['profile', 'handler'])->findOrFail($id);
         $profile = $report->profile;
-        Log::info('blotter.report', [$report]);
+
         $data = [
             'case_number' => sprintf('BR-%05d', $report->id),
             'complainant' => $this->formatName($profile?->first_name, $profile?->middle_name, $profile?->last_name),
