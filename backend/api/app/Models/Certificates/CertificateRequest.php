@@ -24,6 +24,7 @@ class CertificateRequest extends Model
         'start_residency_date',
         'end_residency_date',
         'cert_request_reason',
+        'remarks',
         'is_current',
         'status',
         'handled_by'
