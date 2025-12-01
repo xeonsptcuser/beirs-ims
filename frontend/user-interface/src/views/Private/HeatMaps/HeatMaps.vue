@@ -11,12 +11,46 @@ const imageURL = brgyMap
 const imageWidth = 1650
 const imageHeight = 1500
 
-const { initializeMap, drawHeatmap, fetchSections, isLoadingSections, sectionsError } = useHeatMap();
+const { initializeMap, drawHeatmap, fetchSections, isLoadingSections, sectionsError, sections } = useHeatMap();
 const { incidentTypeOptions } = useBlotterReports();
 
 const selectedIncidentTypes = ref<CaseType[]>([]);
 
 const sortedIncidentTypeOptions = orderedOptionsIncidentType(incidentTypeOptions);
+
+const downloadCsv = () => {
+  const headers = ['Sitio', ...sortedIncidentTypeOptions.map((option) => option.label)];
+
+  const sectionRows = sections.value.map((section) => [
+    section.name,
+    ...sortedIncidentTypeOptions.map((option) => section.cases?.[option.id as CaseType] ?? 0),
+  ]);
+
+  const totals = sortedIncidentTypeOptions.map((option) =>
+    sections.value.reduce(
+      (sum, section) => sum + (section.cases?.[option.id as CaseType] ?? 0),
+      0,
+    ),
+  );
+
+  const csvContent = [
+    headers,
+    ...sectionRows,
+    ['Total', ...totals],
+  ]
+    .map((row) => row.join(','))
+    .join('\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', 'heatmap-data.csv');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+};
 
 const setType = (type: CaseType, isChecked: boolean) => {
   const nextSelectedTypes = isChecked
@@ -72,6 +106,9 @@ onMounted(async () => {
             <section style="margin-top: 3rem;">
               <p class="h5 text-center">Filters</p>
               <hr class="col-9 mx-auto">
+              <div class="d-grid gap-2 col-9 mx-auto mb-3">
+                <button class="btn btn-primary" type="button" @click="downloadCsv">Download CSV</button>
+              </div>
               <div class="row">
                 <div class="mt-2">
                   <ul class="list-group-flush">
