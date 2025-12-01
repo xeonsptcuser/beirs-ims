@@ -159,10 +159,13 @@ class CertificateRepositoryImpl implements CertificateRepositoryInterface
             }
 
             $certificate->status = $status;
+            if (array_key_exists('remarks', $certificateData)) {
+                $certificate->remarks = $certificateData['remarks'];
+            }
             $certificate->handled_by = $certificateData['handled_by'];
             $certificate->save();
 
-            return $certificate->load('profile');
+            return $certificate->load(['profile', 'handler.user']);
         });
     }
 }

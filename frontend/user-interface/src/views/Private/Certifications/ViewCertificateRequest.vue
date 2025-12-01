@@ -57,16 +57,36 @@ const fetchCertificateRequestInfo = async () => {
   }
 }
 
-const handleApproveRejectReleaseCertRequest = async (status: StatusOptions) => {
+const rejectionDialogVisible = ref(false);
+const rejectionComment = ref('');
+const rejectionError = ref('');
+
+const closeRejectionDialog = () => {
+  rejectionDialogVisible.value = false;
+  rejectionError.value = '';
+};
+
+const openRejectionDialog = () => {
+  rejectionComment.value = certificateInfo.value?.remarks || '';
+  rejectionError.value = '';
+  rejectionDialogVisible.value = true;
+};
+
+const handleApproveRejectReleaseCertRequest = async (status: StatusOptions, remarks?: string) => {
   if (status === 'cancelled') {
     const userConfirmed = globalThis.confirm('Are you sure you want to cancel request?');
     if (!userConfirmed) return;
   }
 
   navigation.startNavigation();
+  hasError.value = false;
+  errorMessage.value = '';
   try {
     // HANDLE CANCEL, APPROVE & REJECT FUNCTIONALITY HERE
     const requestPayload: UpdateCertificateRequestPayload = { status };
+    if (remarks) {
+      requestPayload.remarks = remarks;
+    }
 
     const response = await updateCertificateRequest(certificateInfo.value?.id.toString() ?? '', requestPayload)
 
@@ -76,8 +96,6 @@ const handleApproveRejectReleaseCertRequest = async (status: StatusOptions) => {
 
     certificateInfo.value = response.data;
 
-    globalThis.location.reload()
-
     if (status === 'approved') {
       hasApproval.value = true;
       successMessage.value = 'Certificate request has been approved!'
@@ -86,6 +104,7 @@ const handleApproveRejectReleaseCertRequest = async (status: StatusOptions) => {
     if (status === 'rejected') {
       hasRejection.value = true;
       successMessage.value = 'Certificate request has been rejected!'
+      closeRejectionDialog();
     }
 
     if (status === 'released') {
@@ -114,6 +133,9 @@ const handleApproveRejectReleaseCertRequest = async (status: StatusOptions) => {
     }
 
     hasError.value = true;
+    if (status === 'rejected') {
+      rejectionError.value = errorMessage.value || 'Unable to reject this request right now.';
+    }
   } finally {
     navigation.endNavigation();
   }
@@ -173,6 +195,18 @@ const showReleaseButton = computed(() => {
 const showDoneButton = computed(() => {
   return isReleased.value && (useSession.isRoleStaff() || useSession.isRoleAdmin());
 });
+
+const staffRemarks = computed(() => certificateInfo.value?.remarks?.trim());
+
+const submitRejectionComment = async () => {
+  const trimmed = rejectionComment.value.trim();
+  if (!trimmed) {
+    rejectionError.value = 'Please add a short note before rejecting the request.';
+    return;
+  }
+
+  await handleApproveRejectReleaseCertRequest('rejected', trimmed);
+};
 
 const statusLabelMap: Record<StatusOptions, string> = {
   pending: 'Pending Review',
@@ -300,6 +334,21 @@ onMounted(() => {
           </div>
         </div>
 
+        <div class="card shadow-sm border-0 mb-4">
+          <div class="card-body d-flex gap-3 align-items-start">
+            <div class="rounded-circle bg-light text-danger d-flex align-items-center justify-content-center flex-shrink-0"
+              style="width: 46px; height: 46px;">
+              <i class="bi bi-chat-dots-fill"></i>
+            </div>
+            <div>
+              <p class="text-muted small mb-1">Staff/Admin Comment</p>
+              <p class="mb-1 fw-semibold text-dark" v-if="staffRemarks">{{ staffRemarks }}</p>
+              <p class="mb-1 text-secondary" v-else>No staff remarks have been added yet.</p>
+              <small class="text-secondary">Comments appear here when a request is rejected.</small>
+            </div>
+          </div>
+        </div>
+
         <div class="card shadow-sm border-0">
           <div class="card-body row g-3">
             <div class="col-md-6">
@@ -343,7 +392,7 @@ onMounted(() => {
               <button v-if="showApproveRejectBtn" class="btn btn-primary w-100"
                 @click="() => handleApproveRejectReleaseCertRequest('approved')">Approve</button>
               <button v-if="showApproveRejectBtn" class="btn btn-outline-danger w-100"
-                @click="() => handleApproveRejectReleaseCertRequest('rejected')">Reject</button>
+                @click="openRejectionDialog">Reject</button>
               <button v-if="showReleaseButton" class="btn btn-info w-100 text-white"
                 @click="() => handleApproveRejectReleaseCertRequest('released')">Mark for Release</button>
               <button v-if="showDoneButton" class="btn btn-success w-100"
@@ -359,6 +408,29 @@ onMounted(() => {
         </div>
       </div>
     </div>
+
+    <dialog v-if="rejectionDialogVisible" class="modal fade show d-block" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" style="font-size: 16px;">Add a rejection comment</h5>
+            <button type="button" class="btn-close" aria-label="Close" @click="closeRejectionDialog"></button>
+          </div>
+          <div class="modal-body">
+            <p class="text-secondary mb-2">Share a short note to let the resident know why this request is being rejected.</p>
+            <textarea v-model="rejectionComment" class="form-control" rows="4"
+              placeholder="Provide a clear reason for rejecting this certificate request"></textarea>
+            <small v-if="rejectionError" class="text-danger d-block mt-2">{{ rejectionError }}</small>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" @click="closeRejectionDialog">Cancel</button>
+            <button type="button" class="btn btn-danger" @click="submitRejectionComment">
+              Submit Comment & Reject
+            </button>
+          </div>
+        </div>
+      </div>
+    </dialog>
   </div>
 </template>
 
@@ -387,5 +459,9 @@ onMounted(() => {
 
 .timeline-item.active::before {
   background: #0d6efd;
+}
+
+dialog.modal.show.d-block {
+  background: rgba(0, 0, 0, 0.25);
 }
 </style>

@@ -18,6 +18,7 @@ export interface CreateCertificateRequestPayload {
 
 export interface UpdateCertificateRequestPayload {
   status: StatusOptions
+  remarks?: string | null
 }
 export interface CertificateRequestsResponse {
   id: number
@@ -26,6 +27,7 @@ export interface CertificateRequestsResponse {
   start_residency_date?: string
   end_residency_date?: string
   cert_request_reason: string
+  remarks?: string | null
   handler: UserProfile
   is_current?: boolean
   created_at: string
