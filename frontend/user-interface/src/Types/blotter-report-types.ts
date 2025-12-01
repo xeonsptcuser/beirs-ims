@@ -73,4 +73,5 @@ export interface BlotterReportResponse {
 
 export interface UpdateBlotterReportRequestPayload {
   status: BlotterReportStatus
+  remarks?: string | null
 }

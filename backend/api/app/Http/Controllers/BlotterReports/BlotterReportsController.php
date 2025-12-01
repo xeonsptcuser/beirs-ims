@@ -34,7 +34,7 @@ class BlotterReportsController extends Controller
         $statuses = $this->resolveStatuses($request);
         $user = $request->user()?->loadMissing('profile');
 
-        if ($user && $user->role === 'staff') {
+        if ($user && in_array($user->role, ['staff', 'admin'], true)) {
             $handlerProfileId = $user->profile?->id;
             $staffStatuses = $this->resolveStaffStatuses($statuses);
             $certificates = $this->withSignedEvidenceUrls(
@@ -157,11 +157,12 @@ class BlotterReportsController extends Controller
         }
 
         $validated = $request->validate([
-            'status' => ['required', 'string', 'max:255']
+            'status' => ['required', 'string', 'max:255'],
+            'remarks' => ['nullable', 'string', 'max:65535', 'required_if:status,rejected'],
         ]);
 
         $certificateData = collect($validated)
-            ->only(['status'])
+            ->only(['status', 'remarks'])
             ->filter(fn($value) => !is_null($value))
             ->toArray();
         $certificateData['handled_by'] = $handlerProfileId;
@@ -224,16 +225,27 @@ class BlotterReportsController extends Controller
     {
         $allowedStatuses = [
             BlotterReport::STATUS_PENDING,
+            BlotterReport::STATUS_PROCESSING,
+            BlotterReport::STATUS_APPROVED,
+            BlotterReport::STATUS_REJECTED,
+            BlotterReport::STATUS_CANCELLED,
+            BlotterReport::STATUS_RELEASED,
+            BlotterReport::STATUS_DONE,
+        ];
+
+        $defaultStaffStatuses = [
+            BlotterReport::STATUS_PENDING,
+            BlotterReport::STATUS_PROCESSING,
             BlotterReport::STATUS_APPROVED,
         ];
 
         if (is_null($statuses)) {
-            return $allowedStatuses;
+            return $defaultStaffStatuses;
         }
 
         $filtered = array_values(array_intersect($statuses, $allowedStatuses));
 
-        return !empty($filtered) ? $filtered : $allowedStatuses;
+        return !empty($filtered) ? $filtered : $defaultStaffStatuses;
     }
 
     private function validateStorePayload(Request $request): array

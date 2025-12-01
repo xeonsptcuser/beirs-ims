@@ -26,7 +26,7 @@ const hasError = ref<boolean>(false);
 const errorMessage = ref<string>('');
 const isHistoryScreen = ref<boolean>(false);
 const selectedStatusFilter = ref<StatusOptions | null>(null);
-const isStaffView = computed(() => useSession.isRoleStaff());
+const isStaffView = computed(() => useSession.isRoleStaff() || useSession.isRoleAdmin());
 const userProfile = ref<User | null>(null);
 const isLoadingProfile = ref<boolean>(false);
 const profileErrorMessage = ref<string>('');
@@ -36,7 +36,7 @@ const transactionStatuses = computed<StatusOptions[]>(() => isStaffView.value
   : ['pending', 'approved', 'released']
 );
 const historyStatuses = computed<StatusOptions[]>(() => isStaffView.value
-  ? []
+  ? ['rejected', 'done']
   : ['rejected', 'cancelled', 'done']
 );
 
@@ -224,9 +224,6 @@ const resetSearch = () => {
 }
 
 const toggleFetchHistoryTransactions = () => {
-  if (isStaffView.value) {
-    return
-  }
   isHistoryScreen.value = !isHistoryScreen.value
   selectedStatusFilter.value = null
   pagination.current = 1
@@ -264,8 +261,7 @@ onMounted(() => {
       </div>
       <div class="d-flex flex-column align-items-end gap-2">
         <div class="d-flex flex-wrap gap-2">
-          <button class="btn btn-link text-decoration-none" type="button" v-if="!isStaffView"
-            @click.prevent="toggleFetchHistoryTransactions">
+          <button class="btn btn-link text-decoration-none" type="button" @click.prevent="toggleFetchHistoryTransactions">
             <i class="bi bi-journal-text me-2"></i>{{ toggleHistoryBtn }}
           </button>
           <router-link v-if="createCertificateRoute" :to="createCertificateRoute" class="btn btn-primary"

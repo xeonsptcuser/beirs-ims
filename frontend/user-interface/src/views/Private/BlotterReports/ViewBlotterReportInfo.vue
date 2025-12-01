@@ -10,7 +10,8 @@ import type {
   BlotterEvidence,
   BlotterReportResponse,
   BlotterReportStatus,
-  CommonResponse
+  CommonResponse,
+  UpdateBlotterReportRequestPayload
 } from '@/Types';
 import type { AxiosError } from 'axios';
 import { computed, onMounted, ref, watch } from 'vue';
@@ -30,6 +31,9 @@ const hasError = ref<boolean>(false);
 const errorMessage = ref<string>('');
 const successMessage = ref<string>('');
 const previewEvidence = ref<BlotterEvidence | null>(null);
+const remarksModalVisible = ref(false);
+const rejectionRemarks = ref('');
+const remarksError = ref('');
 
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '');
 const storageBaseUrl =
@@ -175,7 +179,18 @@ const statusActions = computed<BlotterReportStatus[]>(() => {
   return Array.from(actions);
 });
 
-const handleStatusChange = async (status: BlotterReportStatus) => {
+const closeRemarksModal = () => {
+  remarksModalVisible.value = false;
+  remarksError.value = '';
+};
+
+const openRemarksModal = () => {
+  rejectionRemarks.value = blotterReport.value?.remarks || '';
+  remarksError.value = '';
+  remarksModalVisible.value = true;
+};
+
+const handleStatusChange = async (status: BlotterReportStatus, remarks?: string) => {
   if (!blotterReport.value) return;
 
   if (status === 'cancelled') {
@@ -188,13 +203,22 @@ const handleStatusChange = async (status: BlotterReportStatus) => {
   errorMessage.value = '';
 
   try {
-    const response = await updateBlotterReport(blotterReport.value.id.toString(), { status });
+    const payload: UpdateBlotterReportRequestPayload = { status };
+
+    if (remarks) {
+      payload.remarks = remarks;
+    }
+
+    const response = await updateBlotterReport(blotterReport.value.id.toString(), payload);
     if (response.status !== 'success') {
       throw response;
     }
 
     blotterReport.value = response.data;
     successMessage.value = `Status updated to ${statusLabels[status] || status}.`;
+    if (status === 'rejected') {
+      closeRemarksModal();
+    }
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
     const fallbackResponse = error as CommonResponse;
@@ -208,9 +232,31 @@ const handleStatusChange = async (status: BlotterReportStatus) => {
       errorMessage.value = 'Failed to update blotter report.';
     }
     hasError.value = true;
+    if (status === 'rejected') {
+      remarksError.value = errorMessage.value || 'Unable to reject this report right now.';
+    }
   } finally {
     navigation.endNavigation();
   }
+};
+
+const submitRejectionRemarks = async () => {
+  const trimmed = rejectionRemarks.value.trim();
+  if (!trimmed) {
+    remarksError.value = 'Please add a short explanation before rejecting.';
+    return;
+  }
+
+  await handleStatusChange('rejected', trimmed);
+};
+
+const handleStatusAction = (status: BlotterReportStatus) => {
+  if (status === 'rejected') {
+    openRemarksModal();
+    return;
+  }
+
+  handleStatusChange(status);
 };
 
 const incidentDate = computed(() => {
@@ -416,6 +462,21 @@ watch(
             </div>
           </div>
         </div>
+
+        <div class="card shadow-sm border-0 mb-4">
+          <div class="card-body d-flex gap-3 align-items-start">
+            <div class="rounded-circle bg-light text-danger d-flex align-items-center justify-content-center flex-shrink-0"
+              style="width: 48px; height: 48px;">
+              <i class="bi bi-chat-dots-fill"></i>
+            </div>
+            <div>
+              <p class="text-muted small mb-1">Staff/Admin Comment</p>
+              <p class="mb-1 fw-semibold text-dark" v-if="blotterReport?.remarks?.trim()">{{ blotterReport?.remarks }}</p>
+              <p class="mb-1 text-secondary" v-else>No remarks have been provided for this report yet.</p>
+              <small class="text-secondary">Rejection notes will appear here for quick reference.</small>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="col-lg-4">
@@ -482,7 +543,7 @@ watch(
                 Preview PDF
               </button>
               <button v-else v-for="status in statusActions" :key="status" type="button"
-                :class="actionButtonClass(status)" @click="() => handleStatusChange(status)">
+                :class="actionButtonClass(status)" @click="() => handleStatusAction(status)">
                 {{ statusLabels[status] || status }}
               </button>
 
@@ -491,6 +552,27 @@ watch(
         </div>
       </div>
     </div>
+
+    <dialog v-if="remarksModalVisible" class="modal fade show d-block" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" style="font-size: 16px;">Add a rejection comment</h5>
+            <button type="button" class="btn-close" aria-label="Close" @click="closeRemarksModal"></button>
+          </div>
+          <div class="modal-body">
+            <p class="text-secondary mb-2">Explain why this blotter report is being rejected so the resident is informed.</p>
+            <textarea v-model="rejectionRemarks" class="form-control" rows="4"
+              placeholder="Share a clear reason for rejecting this report"></textarea>
+            <small v-if="remarksError" class="text-danger d-block mt-2">{{ remarksError }}</small>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" @click="closeRemarksModal">Cancel</button>
+            <button type="button" class="btn btn-danger" @click="submitRejectionRemarks">Submit Comment & Reject</button>
+          </div>
+        </div>
+      </div>
+    </dialog>
 
     <dialog v-if="previewEvidence" class="modal fade show d-block" tabindex="-1">
       <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -558,6 +640,7 @@ watch(
 
 .modal.show.d-block {
   z-index: 1050 !important;
+  background: rgba(0, 0, 0, 0.25);
 }
 </style>
 
