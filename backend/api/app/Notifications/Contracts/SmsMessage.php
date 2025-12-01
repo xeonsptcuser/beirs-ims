@@ -2,13 +2,13 @@
 
 namespace App\Notifications\Contracts;
 
-interface ITextMoMessage
+interface SmsMessage
 {
     /**
-     * Build the SMS payload for iTextMo.
+     * Build the SMS payload.
      *
      * @param object $notifiable The notifiable entity (e.g., UserProfile)
      * @return array{to: string|null, message: string}
      */
-    public function toItextMo(object $notifiable): array;
+    public function toSms(object $notifiable): array;
 }

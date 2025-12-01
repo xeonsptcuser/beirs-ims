@@ -4,17 +4,17 @@ namespace App\Notifications;
 
 use App\Models\Certificates\CertificateRequest;
 use App\Models\Users\User;
-use App\Notifications\Channels\ITextMoChannel;
-use App\Notifications\Contracts\ITextMoMessage;
-use App\Notifications\Traits\FormatITextMoMessage;
+use App\Notifications\Channels\TwilioChannel;
+use App\Notifications\Contracts\SmsMessage;
+use App\Notifications\Traits\FormatSmsMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class CertificateRequestStatusUpdated extends Notification implements ShouldQueue, ITextMoMessage
+class CertificateRequestStatusUpdated extends Notification implements ShouldQueue, SmsMessage
 {
-    use Queueable, FormatITextMoMessage;
+    use Queueable, FormatSmsMessage;
 
     /**
      * Create a new notification instance.
@@ -33,7 +33,7 @@ class CertificateRequestStatusUpdated extends Notification implements ShouldQueu
      */
     public function via(object $notifiable): array
     {
-        return ['database', ITextMoChannel::class];
+        return ['database', TwilioChannel::class];
     }
 
     /**
@@ -70,10 +70,9 @@ class CertificateRequestStatusUpdated extends Notification implements ShouldQueu
         ];
     }
 
-    // Update the name
-    public function toItextMo(object $notifiable): array
+    public function toSms(object $notifiable): array
     {
-        return $this->buildItextMoMessage(
+        return $this->buildSmsMessage(
             model: $this->certificate,
             notifiable: $notifiable,
             releasedStatus: CertificateRequest::STATUS_RELEASED

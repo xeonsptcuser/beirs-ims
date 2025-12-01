@@ -62,7 +62,7 @@ class UserProfile extends Model
         return $this->hasOne(GovernmentIdentity::class, 'user_profile_id');
     }
 
-    public function routeNotificationForItextmo(): ?string
+    public function routeNotificationForTwilio(): ?string
     {
         if (!$this->mobile_number) {
             return null;

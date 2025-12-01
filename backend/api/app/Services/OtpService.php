@@ -53,7 +53,7 @@ class OtpService
             ];
         }
 
-        $recipient = $user->profile?->routeNotificationForItextmo();
+        $recipient = $user->profile?->routeNotificationForTwilio();
         if (!$recipient) {
             return [
                 'ok' => false,
