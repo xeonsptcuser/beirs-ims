@@ -23,7 +23,7 @@ class CertificateRequestsController extends Controller
         $statuses = $this->resolveStatuses($request);
         $user = $request->user()?->loadMissing('profile');
 
-        if ($user && $user->role === 'staff') {
+        if ($user && in_array($user->role, ['staff', 'admin'], true)) {
             $handlerProfileId = $user->profile?->id;
             $staffStatuses = $this->resolveStaffStatuses($statuses);
             $certificates = $this->certificate->getAllHandledByStaff(['profile', 'handler.user'], $handlerProfileId, $perPage, $staffStatuses, $search);
@@ -169,14 +169,23 @@ class CertificateRequestsController extends Controller
         $allowedStatuses = [
             CertificateRequest::STATUS_PENDING,
             CertificateRequest::STATUS_APPROVED,
+            CertificateRequest::STATUS_REJECTED,
+            CertificateRequest::STATUS_CANCELLED,
+            CertificateRequest::STATUS_RELEASED,
+            CertificateRequest::STATUS_DONE,
+        ];
+
+        $defaultStaffStatuses = [
+            CertificateRequest::STATUS_PENDING,
+            CertificateRequest::STATUS_APPROVED,
         ];
 
         if (is_null($statuses)) {
-            return $allowedStatuses;
+            return $defaultStaffStatuses;
         }
 
         $filtered = array_values(array_intersect($statuses, $allowedStatuses));
 
-        return !empty($filtered) ? $filtered : $allowedStatuses;
+        return !empty($filtered) ? $filtered : $defaultStaffStatuses;
     }
 }

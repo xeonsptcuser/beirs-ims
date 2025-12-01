@@ -43,19 +43,59 @@ class BlotterReportRepositoryImpl implements BlotterReportRepositoryInterface
     {
         $allowedStatuses = [
             BlotterReport::STATUS_PENDING,
+            BlotterReport::STATUS_PROCESSING,
+            BlotterReport::STATUS_APPROVED,
+            BlotterReport::STATUS_REJECTED,
+            BlotterReport::STATUS_CANCELLED,
+            BlotterReport::STATUS_RELEASED,
+            BlotterReport::STATUS_DONE,
+        ];
+
+        $defaultStaffStatuses = [
+            BlotterReport::STATUS_PENDING,
+            BlotterReport::STATUS_PROCESSING,
             BlotterReport::STATUS_APPROVED,
         ];
 
-        $statuses = $statuses ? array_values(array_intersect($statuses, $allowedStatuses)) : $allowedStatuses;
+        $statuses = $statuses ? array_values(array_intersect($statuses, $allowedStatuses)) : $defaultStaffStatuses;
 
         if (empty($statuses)) {
-            $statuses = $allowedStatuses;
+            $statuses = $defaultStaffStatuses;
         }
+
+        $handlerStatuses = array_values(array_intersect($statuses, [
+            BlotterReport::STATUS_PROCESSING,
+            BlotterReport::STATUS_APPROVED,
+            BlotterReport::STATUS_REJECTED,
+            BlotterReport::STATUS_CANCELLED,
+            BlotterReport::STATUS_RELEASED,
+            BlotterReport::STATUS_DONE,
+        ]));
+        $includePending = in_array(BlotterReport::STATUS_PENDING, $statuses, true);
 
         $query = BlotterReport::with($relations)
             ->orderBy('created_at', 'desc')
-            ->where(function ($builder) use ($statuses, $handlerProfileId) {
-                $this->applyStatusesFilter($builder, $statuses, $handlerProfileId);
+            ->where(function ($builder) use ($includePending, $handlerStatuses, $handlerProfileId) {
+                if (!$includePending && empty($handlerStatuses)) {
+                    $builder->whereRaw('1 = 0');
+                    return;
+                }
+
+                if ($includePending) {
+                    $builder->where('status', BlotterReport::STATUS_PENDING);
+                }
+
+                if (!empty($handlerStatuses)) {
+                    $method = $includePending ? 'orWhere' : 'where';
+
+                    $builder->{$method}(function ($handledQuery) use ($handlerStatuses, $handlerProfileId) {
+                        $handledQuery->whereIn('status', $handlerStatuses);
+
+                        if (!is_null($handlerProfileId)) {
+                            $handledQuery->where('handled_by', $handlerProfileId);
+                        }
+                    });
+                }
             });
 
         $search = $search ? Str::lower($search) : null;
@@ -70,35 +110,6 @@ class BlotterReportRepositoryImpl implements BlotterReportRepositoryInterface
         }
 
         return $perPage ? $query->paginate($perPage) : $query->get();
-    }
-
-    private function applyStatusesFilter($builder, array $statuses, ?int $handlerProfileId): void
-    {
-        $includePending = \in_array(BlotterReport::STATUS_PENDING, $statuses, true);
-        $includeApproved = \in_array(BlotterReport::STATUS_APPROVED, $statuses, true);
-
-        if (!$includePending && !$includeApproved) {
-            $builder->whereRaw('1 = 0');
-        } elseif ($includePending && $includeApproved) {
-            if ($handlerProfileId === null) {
-                $builder->whereIn('status', [BlotterReport::STATUS_PENDING, BlotterReport::STATUS_APPROVED]);
-            } else {
-                $builder->where(function ($q) use ($handlerProfileId) {
-                    $q->where('status', BlotterReport::STATUS_PENDING)
-                        ->orWhere(function ($q2) use ($handlerProfileId) {
-                            $q2->where('status', BlotterReport::STATUS_APPROVED)
-                                ->where('handled_by', $handlerProfileId);
-                        });
-                });
-            }
-        } elseif ($includePending) {
-            $builder->where('status', BlotterReport::STATUS_PENDING);
-        } else {
-            $builder->where('status', BlotterReport::STATUS_APPROVED);
-            if ($handlerProfileId !== null) {
-                $builder->where('handled_by', $handlerProfileId);
-            }
-        }
     }
 
     public function getAllById(array $relations = [], ?int $userId = null, ?int $perPage = null, ?array $statuses = null, ?string $search = null): Collection|LengthAwarePaginator
