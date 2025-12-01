@@ -479,11 +479,12 @@ onBeforeUnmount(() => {
                 v-model="form.govtIdentityType" :error-message="errorMessages.govtIdentityType.error"
                 :has-error="errors.govtIdentityType" :is-capitalized="false" />
             </div>
-            <UploadFiles
-              v-if="form.govtIdentityType && form.govtIdentityType !== '...' && [...primaryGovernmentIds, ...secondaryGovernmentIds].includes(form.govtIdentityType)"
-              v-model="form.governmentIdentity" :has-error="errors.governmentIdentity"
-              :error-message="errorMessages.governmentIdentity.error"
-              :is-disabled="isNotEditableUser.governmentIdentity" accept=".png,.jpg,.jpeg,.pdf" :multiple="false" />
+              <UploadFiles
+                v-if="form.govtIdentityType && form.govtIdentityType !== '...' && [...primaryGovernmentIds, ...secondaryGovernmentIds].includes(form.govtIdentityType)"
+                v-model="form.governmentIdentity" :has-error="errors.governmentIdentity"
+                :error-message="errorMessages.governmentIdentity.error"
+                :is-disabled="isNotEditableUser.governmentIdentity" accept=".png,.jpg,.jpeg,.pdf" :multiple="false"
+                :enforce-evidence-rules="false" :max-files="1" />
           </div>
         </div>
       </div>

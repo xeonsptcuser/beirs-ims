@@ -230,7 +230,7 @@ const filteredErrors = computed(() => {
               </li>
               <li class="d-flex align-items-start gap-2 mb-2">
                 <i class="bi bi-check-circle-fill text-primary"></i>
-                Upload photos, screenshots, or PDFs for evidence.
+                Upload photos, screenshots, or short MP4 clips for evidence.
               </li>
               <li class="d-flex align-items-start gap-2 mb-0">
                 <i class="bi bi-check-circle-fill text-primary"></i>
@@ -398,7 +398,7 @@ const filteredErrors = computed(() => {
                   <p class="eyebrow text-muted mb-1">Narrative & evidences</p>
                   <h5 class="mb-0 text-dark">Tell us what happened</h5>
                 </div>
-                <span class="text-muted small">Accepted: JPEG, PNG, PDF, MP4</span>
+                <span class="text-muted small">Accepted: JPEG/PNG (max 5MB each) or MP4 (max 100MB each)</span>
               </div>
               <div class="row g-4">
                 <div class="col-12">
