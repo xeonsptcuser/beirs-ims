@@ -2,13 +2,13 @@
 
 namespace App\Notifications\Traits;
 
-trait FormatITextMoMessage
+trait FormatSmsMessage
 {
-    public function buildItextMoMessage(object $model, object $notifiable, string $releasedStatus): array
+    public function buildSmsMessage(object $model, object $notifiable, string $releasedStatus): array
     {
         // Prefer the notifiable's route helper so numbers are normalized (+63, etc.)
-        $mobile = method_exists($notifiable, 'routeNotificationForItextmo')
-            ? $notifiable->routeNotificationForItextmo()
+        $mobile = method_exists($notifiable, 'routeNotificationForTwilio')
+            ? $notifiable->routeNotificationForTwilio()
             : ($notifiable->mobile_number ?? null);
 
         if (!$mobile) {

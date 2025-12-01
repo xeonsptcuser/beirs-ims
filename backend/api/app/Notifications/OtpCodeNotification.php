@@ -3,11 +3,12 @@
 namespace App\Notifications;
 
 use App\Models\Users\UserProfile;
-use App\Notifications\Channels\ITextMoChannel;
+use App\Notifications\Channels\TwilioChannel;
+use App\Notifications\Contracts\SmsMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
-class OtpCodeNotification extends Notification
+class OtpCodeNotification extends Notification implements SmsMessage
 {
     use Queueable;
 
@@ -22,17 +23,17 @@ class OtpCodeNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return [ITextMoChannel::class];
+        return [TwilioChannel::class];
     }
 
     /**
      * @param UserProfile $notifiable
      * @return array<string, string|null>
      */
-    public function toItextMo($notifiable): array
+    public function toSms($notifiable): array
     {
         return [
-            'to' => $notifiable->routeNotificationForItextmo(),
+            'to' => $notifiable->routeNotificationForTwilio(),
             'message' => sprintf('Your OTP code is %s. It expires in %d minutes.', $this->code, $this->ttlMinutes),
         ];
     }

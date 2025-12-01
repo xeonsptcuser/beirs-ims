@@ -35,10 +35,10 @@ return [
         ],
     ],
 
-    'itextmo' => [
-        'code' => env('ITEXTMO_API_CODE'),
-        'password' => env('ITEXTMO_API_PASSWORD'),
-        'sender' => env('ITEXTMO_SENDER_ID'),
+    'twilio' => [
+        'sid' => env('TWILIO_ACCOUNT_SID'),
+        'token' => env('TWILIO_AUTH_TOKEN'),
+        'from' => env('TWILIO_FROM'),
     ],
 
     'otp' => [

@@ -2,34 +2,34 @@
 
 namespace App\Notifications\Channels;
 
-use App\Notifications\Contracts\ITextMoMessage;
-use App\Services\ITextMoClient;
+use App\Notifications\Contracts\SmsMessage;
+use App\Services\TwilioClient;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class ITextMoChannel
+class TwilioChannel
 {
-    public function __construct(private readonly ITextMoClient $client)
+    public function __construct(private readonly TwilioClient $client)
     {
     }
 
     /**
      * @param object $notifiable The notifiable entity (e.g., UserProfile)
-     * @param Notification&ITextMoMessage $notification Notification that can format an iTextMo payload
+     * @param Notification&SmsMessage $notification Notification that can format an SMS payload
      */
     public function send(object $notifiable, Notification $notification): void
     {
-        if (!$notification instanceof ITextMoMessage) {
+        if (!$notification instanceof SmsMessage) {
             return;
         }
 
-        $data = $notification->toItextMo($notifiable);
+        $data = $notification->toSms($notifiable);
         if (!empty($data['to']) && !empty($data['message'])) {
             try {
                 $this->client->sendSms($data['to'], $data['message']);
             } catch (Throwable $e) {
-                Log::warning('iTextMo SMS skipped; continuing without SMS delivery.', [
+                Log::warning('SMS delivery skipped; continuing without SMS.', [
                     'notifiable' => get_class($notifiable),
                     'to' => $data['to'],
                     'message' => $data['message'],
