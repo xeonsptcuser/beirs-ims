@@ -9,8 +9,8 @@ trait FormatSmsMessage
         // Prefer the notifiable's route helper so numbers are normalized (+63, etc.)
         $mobile = method_exists($notifiable, 'routeNotificationForSemaphore')
             ? $notifiable->routeNotificationForSemaphore()
-            : (method_exists($notifiable, 'routeNotificationForTwilio')
-                ? $notifiable->routeNotificationForTwilio()
+            : (method_exists($notifiable, 'routeNotificationForSemaphore')
+                ? $notifiable->routeNotificationForSemaphore()
                 : ($notifiable->mobile_number ?? null));
 
         if (!$mobile) {

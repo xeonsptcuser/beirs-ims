@@ -72,11 +72,6 @@ class UserProfile extends Model
         return str_starts_with($digits, '+') ? $digits : '+63' . ltrim($digits, '0');
     }
 
-    public function routeNotificationForTwilio(): ?string
-    {
-        return $this->routeNotificationForSemaphore();
-    }
-
     /**
      * The attributes that should be cast to native types.
      *
