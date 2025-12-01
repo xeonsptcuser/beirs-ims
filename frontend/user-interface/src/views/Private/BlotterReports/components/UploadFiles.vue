@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import DragAndDropUploadFiles from './DragAndDropUploadFiles.vue'
 
 type FilePreview = {
@@ -10,18 +10,34 @@ type FilePreview = {
   url: string | null
 }
 
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
   isDisabled?: boolean
   multiple?: boolean
   accept?: string
+  maxFiles?: number
+  enforceEvidenceRules?: boolean
+  maxImageSizeBytes?: number
+  maxVideoSizeBytes?: number
+  allowedImageTypes?: string[]
+  allowedVideoTypes?: string[]
 }>(), {
   isDisabled: false,
   multiple: true,
-  accept: '.png,.jpg,.jpeg,.pdf,.mp4'
+  accept: '.png,.jpg,.jpeg,.mp4',
+  maxFiles: 10,
+  enforceEvidenceRules: true,
+  maxImageSizeBytes: 5 * 1024 * 1024,
+  maxVideoSizeBytes: 100 * 1024 * 1024,
+  allowedImageTypes: () => ['image/jpeg', 'image/png', 'image/jpg'],
+  allowedVideoTypes: () => ['video/mp4'],
 })
 
 const files = defineModel<File[]>({ default: [] })
 const filePreviews = ref<FilePreview[]>([])
+const uploadError = ref<string>('')
+
+const allowedMimeTypes = computed(() => [...props.allowedImageTypes, ...props.allowedVideoTypes])
+const slotsRemaining = computed(() => Math.max(0, props.maxFiles - files.value.length))
 
 const buildPreviewId = (file: File, index: number) =>
   `${file.name}-${file.lastModified}-${file.size}-${index}`
@@ -61,7 +77,48 @@ const updatePreviews = () => {
 
 const handleFiles = (selectedFiles: FileList | File[]) => {
   const uploads = Array.from(selectedFiles)
-  files.value = [...files.value, ...uploads]
+
+  if (slotsRemaining.value === 0) {
+    uploadError.value = `You have reached the maximum of ${props.maxFiles} file(s).`
+    return
+  }
+
+  if (!props.enforceEvidenceRules) {
+    const allowed = uploads.slice(0, slotsRemaining.value)
+    files.value = [...files.value, ...allowed]
+    uploadError.value = uploads.length > allowed.length ? `Only ${slotsRemaining.value} more file(s) can be added.` : ''
+    return
+  }
+
+  const validFiles: File[] = []
+  const rejected: string[] = []
+
+  for (const file of uploads) {
+    if (!allowedMimeTypes.value.includes(file.type)) {
+      rejected.push(`${file.name}: Only JPEG/PNG images or MP4 videos are allowed.`)
+      continue
+    }
+
+    if (props.allowedImageTypes.includes(file.type) && file.size > props.maxImageSizeBytes) {
+      rejected.push(`${file.name}: Images must be 5MB or smaller.`)
+      continue
+    }
+
+    if (props.allowedVideoTypes.includes(file.type) && file.size > props.maxVideoSizeBytes) {
+      rejected.push(`${file.name}: Videos must be 100MB or smaller.`)
+      continue
+    }
+
+    validFiles.push(file)
+  }
+
+  if (validFiles.length > slotsRemaining.value) {
+    rejected.push(`Only ${slotsRemaining.value} more file(s) can be added.`)
+    validFiles.splice(slotsRemaining.value)
+  }
+
+  files.value = [...files.value, ...validFiles]
+  uploadError.value = rejected.join(' ')
 }
 
 const removeFile = (index: number) => {
@@ -99,6 +156,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="bg-white p-3 border rounded">
     <DragAndDropUploadFiles :accept :multiple @files-selected="handleFiles" :is-disabled="isDisabled" />
+    <p v-if="uploadError" class="text-danger small mt-2 mb-0">{{ uploadError }}</p>
 
     <div v-if="filePreviews.length" class="mt-3">
       <p class="fw-semibold text-secondary mb-2">Selected files</p>
