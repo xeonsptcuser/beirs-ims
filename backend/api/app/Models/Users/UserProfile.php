@@ -80,6 +80,7 @@ class UserProfile extends Model
     protected $casts = [
         'email_verified_at' => 'datetime',
         'mobile_verified_at' => 'datetime',
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
+        'date_of_birth' => 'date'
     ];
 }
