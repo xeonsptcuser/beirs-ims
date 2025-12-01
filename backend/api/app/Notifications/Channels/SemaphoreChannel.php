@@ -3,14 +3,14 @@
 namespace App\Notifications\Channels;
 
 use App\Notifications\Contracts\SmsMessage;
-use App\Services\TwilioClient;
+use App\Services\SemaphoreClient;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class TwilioChannel
+class SemaphoreChannel
 {
-    public function __construct(private readonly TwilioClient $client)
+    public function __construct(private readonly SemaphoreClient $client)
     {
     }
 

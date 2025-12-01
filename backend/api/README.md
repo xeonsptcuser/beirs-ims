@@ -26,6 +26,8 @@ The BEIRS API powers the Barangay E-Information & Reporting System. It is built 
 ## Environment variables
 Use `.env.example` as the source of truth for both local development and Render deployment.
 
+- Configure SMS by setting `SEMAPHORE_API_KEY` (and optionally `SEMAPHORE_SENDER_NAME`) so residents receive status texts for OTPs, certificates, and blotter updates.
+
 ### Local development
 - Copy `.env.example` to `.env` and update the Postgres credentials under the _Local development settings_ block if needed.
 - Set `FRONTEND_URL`, `CORS_ALLOWED_ORIGINS`, and `SANCTUM_STATEFUL_DOMAINS` to your Vite dev server URL (default `http://localhost:5173`).
