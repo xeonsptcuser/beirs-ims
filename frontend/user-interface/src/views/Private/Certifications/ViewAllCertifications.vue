@@ -35,10 +35,7 @@ const transactionStatuses = computed<StatusOptions[]>(() => isStaffView.value
   ? ['pending', 'approved']
   : ['pending', 'approved', 'released']
 );
-const historyStatuses = computed<StatusOptions[]>(() => isStaffView.value
-  ? ['rejected', 'done']
-  : ['rejected', 'cancelled', 'done']
-);
+const historyStatuses = computed<StatusOptions[]>(() => ['rejected', 'done']);
 
 const summaryStats = computed(() => {
   const items = certificationRequestItems.value;
