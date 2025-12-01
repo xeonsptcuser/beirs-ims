@@ -42,21 +42,53 @@ type CertificateData = Record<string, any>
 
 const iframeSrc = computed(() => (pdfUrl.value ? `${pdfUrl.value}#toolbar=0&navpanes=0&statusbar=0` : ''))
 
-const positions = {
+type CertificateField = 'full_name' | 'address' | 'purpose' | 'issued_at'
+
+type FieldPosition = {
+  x: number,
+  y: number,
+  size: number,
+}
+
+const basePositions: Record<CertificateField, FieldPosition> = {
   full_name: { x: 140, y: 640, size: 14 },
   address: { x: 140, y: 610, size: 12 },
   purpose: { x: 140, y: 580, size: 12 },
   issued_at: { x: 140, y: 550, size: 12 },
 }
 
+const positionMap: Record<string, Record<CertificateField, FieldPosition>> = {
+  clearance: basePositions,
+  indigency: {
+    full_name: { x: 160, y: 620, size: 14 },
+    address: { x: 160, y: 590, size: 12 },
+    purpose: { x: 160, y: 560, size: 12 },
+    issued_at: { x: 160, y: 530, size: 12 },
+  },
+  residency: {
+    full_name: { x: 130, y: 655, size: 14 },
+    address: { x: 130, y: 625, size: 12 },
+    purpose: { x: 130, y: 595, size: 12 },
+    issued_at: { x: 130, y: 565, size: 12 },
+  },
+}
+
+const resolvedPositions = computed(() => {
+  const payloadType = payload.value?.cert_request_type?.toLowerCase()
+  const requestedType = props.certificateType?.toLowerCase()
+  const certificateType = requestedType || payloadType
+
+  return (certificateType && positionMap[certificateType]) || basePositions
+})
+
 const drawText = (
   page: any,
   font: any,
-  key: keyof typeof positions,
+  key: CertificateField,
   value: string | undefined | null
 ) => {
   if (!value) return
-  const pos = positions[key]
+  const pos = resolvedPositions.value[key]
   page.drawText(String(value), {
     x: pos.x,
     y: pos.y,
