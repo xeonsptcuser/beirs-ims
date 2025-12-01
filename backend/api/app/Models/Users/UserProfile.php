@@ -68,8 +68,16 @@ class UserProfile extends Model
             return null;
         }
 
-        $digits = preg_replace('/[^0-9+]/', '', $this->mobile_number);
-        return str_starts_with($digits, '+') ? $digits : '+63' . ltrim($digits, '0');
+        // Keep only digits (remove + and everything else)
+        $digits = preg_replace('/\D/', '', $this->mobile_number);
+
+        // If it starts with 63 already, return as-is
+        if (str_starts_with($digits, '63')) {
+            return $digits;
+        }
+
+        // Otherwise prepend 63 and trim leading zeros
+        return '63' . ltrim($digits, '0');
     }
 
     /**

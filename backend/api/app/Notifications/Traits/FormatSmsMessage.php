@@ -24,8 +24,8 @@ trait FormatSmsMessage
 
         $subject = strtoupper(
             ($model->cert_request_type ? $model->cert_request_type . ' certificate request' : null)
-            ?? ($model->incident_title ? $model->incident_title . ' report' : null)
             ?? ($model->incident_type ? $model->incident_type . ' report' : null)
+            ?? ($model->incident_title ? $model->incident_title . ' report' : null)
             ?? 'request'
         );
 
