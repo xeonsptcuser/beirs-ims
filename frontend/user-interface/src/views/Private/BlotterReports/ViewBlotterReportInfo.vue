@@ -363,7 +363,7 @@ watch(
           {{ blotterReport?.status }}
         </span>
         <p class="text-secondary small mt-2 mb-0">Filed on {{ formatDateToHuman(blotterReport?.created_at ?? '') || '—'
-          }}</p>
+        }}</p>
       </div>
     </div>
 
@@ -439,7 +439,7 @@ watch(
           </div>
         </div>
 
-        <div class="card shadow-sm border-0">
+        <div class="card shadow-sm border-0 mb-4">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <h5 class="card-title fw-semibold mb-0">Evidence Attachments</h5>
@@ -465,13 +465,15 @@ watch(
 
         <div class="card shadow-sm border-0 mb-4">
           <div class="card-body d-flex gap-3 align-items-start">
-            <div class="rounded-circle bg-light text-danger d-flex align-items-center justify-content-center flex-shrink-0"
+            <div
+              class="rounded-circle bg-light text-danger d-flex align-items-center justify-content-center flex-shrink-0"
               style="width: 48px; height: 48px;">
               <i class="bi bi-chat-dots-fill"></i>
             </div>
             <div>
               <p class="text-muted small mb-1">Staff/Admin Comment</p>
-              <p class="mb-1 fw-semibold text-dark" v-if="blotterReport?.remarks?.trim()">{{ blotterReport?.remarks }}</p>
+              <p class="mb-1 fw-semibold text-dark" v-if="blotterReport?.remarks?.trim()">{{ blotterReport?.remarks }}
+              </p>
               <p class="mb-1 text-secondary" v-else>No remarks have been provided for this report yet.</p>
               <small class="text-secondary">Rejection notes will appear here for quick reference.</small>
             </div>
@@ -561,14 +563,17 @@ watch(
             <button type="button" class="btn-close" aria-label="Close" @click="closeRemarksModal"></button>
           </div>
           <div class="modal-body">
-            <p class="text-secondary mb-2">Explain why this blotter report is being rejected so the resident is informed.</p>
+            <p class="text-secondary mb-2">Explain why this blotter report is being rejected so the resident is
+              informed.
+            </p>
             <textarea v-model="rejectionRemarks" class="form-control" rows="4"
               placeholder="Share a clear reason for rejecting this report"></textarea>
             <small v-if="remarksError" class="text-danger d-block mt-2">{{ remarksError }}</small>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-secondary" @click="closeRemarksModal">Cancel</button>
-            <button type="button" class="btn btn-danger" @click="submitRejectionRemarks">Submit Comment & Reject</button>
+            <button type="button" class="btn btn-danger" @click="submitRejectionRemarks">Submit Comment &
+              Reject</button>
           </div>
         </div>
       </div>
@@ -643,5 +648,3 @@ watch(
   background: rgba(0, 0, 0, 0.25);
 }
 </style>
-
-

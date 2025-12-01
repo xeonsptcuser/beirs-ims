@@ -12,6 +12,7 @@ import { useRouter } from 'vue-router';
 const session = useSessionStore();
 const router = useRouter();
 const isLoggedIn = computed(() => session.isLoggedIn());
+
 const navItems = computed(() => {
   if (!isLoggedIn.value) {
     return [
@@ -39,7 +40,6 @@ const navItems = computed(() => {
       { path: buildPath('dashboard'), label: 'Dashboard' },
       { path: buildPath('certifications'), label: 'Certificates' },
       { path: buildPath('blotter-reports'), label: 'Reports' },
-      { path: buildPath('heat-maps'), label: 'Heat Map' },
     ];
   }
 
