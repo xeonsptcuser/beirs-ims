@@ -95,7 +95,7 @@ const handleFiles = (selectedFiles: FileList | File[]) => {
 
   for (const file of uploads) {
     if (!allowedMimeTypes.value.includes(file.type)) {
-      rejected.push(`${file.name}: Only JPEG/PNG images or MP4 videos are allowed.`)
+      rejected.push(`${file.name}: Only JPG/JPEG/PNG images or MP4 videos are allowed.`)
       continue
     }
 
