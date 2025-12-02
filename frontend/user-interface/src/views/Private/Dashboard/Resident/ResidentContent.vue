@@ -166,6 +166,7 @@ const profileCompletionMessage = computed(() => {
 .action-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.08);
+  color: white;
 }
 
 .action-card.disabled {
