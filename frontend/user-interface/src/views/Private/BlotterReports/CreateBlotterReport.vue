@@ -41,6 +41,7 @@ const complainantFullName = ref<string>('')
 const complainantAge = ref<string>('')
 const complainantContactInfo = ref<string>('')
 const address = ref<string>('')
+const showConfirmationModal = ref<boolean>(false)
 
 const sortedIncidentTypeOptions = orderedOptionsIncidentType(incidentTypeOptions);
 
@@ -98,10 +99,14 @@ watch(() => props.id, (newId, oldId) => {
   }
 }, { immediate: true })
 
-const handleCreateBlotterReport = async () => {
+const handleFormSubmit = () => {
   hasError.value = !validateForm();
   if (hasError.value) return;
 
+  showConfirmationModal.value = true;
+}
+
+const handleCreateBlotterReport = async () => {
   if (!props.id) {
     setServerErrors(undefined, 'Missing resident identifier for this request.');
     hasError.value = true;
@@ -128,6 +133,7 @@ const handleCreateBlotterReport = async () => {
     evidences: form.value.evidences,
   }
 
+  showConfirmationModal.value = false;
   navigation.startNavigation();
   try {
     const response = await submitBlotterReport(requestPayload, props.id);
@@ -155,6 +161,10 @@ const handleCreateBlotterReport = async () => {
   } finally {
     navigation.endNavigation();
   }
+}
+
+const closeConfirmationModal = () => {
+  showConfirmationModal.value = false
 }
 
 const addPersonInvolvedField = () => {
@@ -260,7 +270,7 @@ const filteredErrors = computed(() => {
 
           <WarningLabel :has-error="hasError && filteredErrors.length > 0" :errors="filteredErrors" />
 
-          <form class="d-flex flex-column gap-4" @submit.prevent="handleCreateBlotterReport">
+          <form class="d-flex flex-column gap-4" @submit.prevent="handleFormSubmit">
             <div class="section-card">
               <div class="section-heading">
                 <div>
@@ -421,6 +431,30 @@ const filteredErrors = computed(() => {
         </div>
       </div>
     </div>
+    <dialog v-if="showConfirmationModal" class="modal fade show d-block" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" style="font-size: 16px;">Submit blotter report?</h5>
+            <button type="button" class="btn-close" aria-label="Close" @click="closeConfirmationModal"></button>
+          </div>
+          <div class="modal-body">
+            <p class="text-secondary mb-3">
+              Double-check the incident details, people involved, and any uploaded evidence before sending your report.
+            </p>
+            <ul class="text-secondary small ps-3 mb-0">
+              <li>Confirm the time, date, and location are accurate.</li>
+              <li>Ensure names of people involved or witnesses are spelled correctly.</li>
+              <li>Verify your description clearly explains what happened.</li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" @click="closeConfirmationModal">Review again</button>
+            <button type="button" class="btn btn-primary" @click="handleCreateBlotterReport">Submit report</button>
+          </div>
+        </div>
+      </div>
+    </dialog>
   </section>
 </template>
 
@@ -503,5 +537,14 @@ const filteredErrors = computed(() => {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+.modal-backdrop {
+  z-index: 1040 !important;
+}
+
+.modal.show.d-block {
+  z-index: 1050 !important;
+  background: rgba(0, 0, 0, 0.25);
 }
 </style>
