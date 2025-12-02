@@ -95,7 +95,7 @@ const handleFiles = (selectedFiles: FileList | File[]) => {
 
   for (const file of uploads) {
     if (!allowedMimeTypes.value.includes(file.type)) {
-      rejected.push(`${file.name}: Only JPEG/PNG images or MP4 videos are allowed.`)
+      rejected.push(`${file.name}: Only JPG/JPEG/PNG images or MP4 videos are allowed.`)
       continue
     }
 
@@ -130,7 +130,7 @@ const formatFileSize = (bytes: number) => {
     return '0 B'
   }
 
-  const units = ['B', 'KB', 'MB', 'GB']
+  const units = ['B', 'KB', 'MB']
   let size = bytes
   let unitIndex = 0
 
@@ -177,6 +177,7 @@ onBeforeUnmount(() => {
             <p class="mb-1 text-truncate text-wrap" style="font-size: 0.9rem;" :title="preview.name">
               {{ preview.displayName }}
             </p>
+
             <small class="text-muted">{{ formatFileSize(preview.size) }}</small>
           </div>
         </div>

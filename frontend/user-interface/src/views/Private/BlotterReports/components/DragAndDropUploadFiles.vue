@@ -56,6 +56,7 @@ const onDrop = (event: DragEvent) => {
       <p class="mt-2 mb-0">
         <strong>Drag & Drop</strong> your file here or <span class="text-primary">browser</span>
       </p>
+      <span class="text-muted small"> (e.g jpg, jpeg, png (max 5MB each) or mp4 (max 100MB each)) </span>
     </div>
   </div>
 </template>
