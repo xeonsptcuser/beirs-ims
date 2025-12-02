@@ -408,7 +408,6 @@ const filteredErrors = computed(() => {
                   <p class="eyebrow text-muted mb-1">Narrative & evidences</p>
                   <h5 class="mb-0 text-dark">Tell us what happened</h5>
                 </div>
-                <span class="text-muted small">Accepted: JPEG/PNG (max 5MB each) or MP4 (max 100MB each)</span>
               </div>
               <div class="row g-4">
                 <div class="col-12">
