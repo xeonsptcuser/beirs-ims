@@ -41,12 +41,12 @@ const storageBaseUrl =
   (apiBaseUrl ? `${apiBaseUrl}/storage` : '/storage');
 
 const statusLabels: Record<BlotterReportStatus, string> = {
-  pending: 'Pending Review',
+  pending: 'Reviewing',
   approved: 'Approved',
   processing: 'Processing',
   rejected: 'Rejected',
   cancelled: 'Cancelled',
-  released: 'Ready for Release',
+  released: 'Released',
   done: 'Completed',
 };
 
@@ -380,7 +380,7 @@ watch(
           {{ blotterReport?.status }}
         </span>
         <p class="text-secondary small mt-2 mb-0">Filed on {{ formatDateToHuman(blotterReport?.created_at ?? '') || '—'
-        }}</p>
+          }}</p>
       </div>
     </div>
 

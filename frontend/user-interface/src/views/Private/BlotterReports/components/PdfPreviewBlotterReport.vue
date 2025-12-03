@@ -29,7 +29,7 @@ const positions = {
   case_number: { x: 460, y: 840, size: 12 },
   complainant: { x: 80, y: 840, size: 14 },
   people_involved: { x: 75, y: 728, size: 12 },
-  incident_type: { x: 390, y: 812, size: 12 },
+  incident_type: { x: 385, y: 811, size: 11 },
   location: { x: 140, y: 290, size: 12 },
   description: { x: 115, y: 562, size: 12 },
   incident_month: { x: 350, y: 230, size: 12 },

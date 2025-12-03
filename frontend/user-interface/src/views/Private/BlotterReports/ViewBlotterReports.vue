@@ -46,9 +46,9 @@ const pagination = reactive({
 const isStaffView = computed(() => session.isRoleStaff() || session.isRoleAdmin());
 const isResidentView = computed(() => session.isRoleResident());
 
-const residentTransactionStatuses: BlotterReportStatus[] = ['pending', 'processing', 'approved', 'released'];
+const residentTransactionStatuses: BlotterReportStatus[] = ['pending', 'approved', 'processing', 'released'];
 const residentHistoryStatuses: BlotterReportStatus[] = ['rejected', 'done'];
-const staffTransactionStatuses: BlotterReportStatus[] = ['pending', 'processing', 'approved'];
+const staffTransactionStatuses: BlotterReportStatus[] = ['pending', 'approved', 'processing'];
 const staffHistoryStatuses: BlotterReportStatus[] = ['rejected', 'done'];
 
 const transactionStatuses = computed<BlotterReportStatus[]>(() => {
