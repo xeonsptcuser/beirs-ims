@@ -207,13 +207,5 @@ onBeforeUnmount(() => {
         style="border: 1px solid #ccc;"></iframe>
       <p v-else class="text-muted mb-0">No preview available.</p>
     </div>
-
-    <div v-if="payload" class="card border-0 shadow-sm">
-      <div class="card-body">
-        <h6 class="fw-semibold mb-3">Certificate Data (from backend)</h6>
-        <pre class="mb-0 bg-light p-3 rounded"
-          style="white-space: pre-wrap;">{{ JSON.stringify(payload, null, 2) }}</pre>
-      </div>
-    </div>
   </div>
 </template>

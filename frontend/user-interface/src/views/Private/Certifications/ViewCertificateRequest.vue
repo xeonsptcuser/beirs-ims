@@ -185,7 +185,17 @@ const showCancelButton = computed(() => {
 })
 
 const showPreviewButton = computed(() => {
-  return showIfCertificateRequestOwner.value && isApproved.value || isReleased.value
+  const status = certificateInfo.value?.status;
+  const allowedStatuses: StatusOptions[] = ['approved', 'released', 'done'];
+  const hasAllowedStatus = status ? allowedStatuses.includes(status) : false;
+
+  if (!hasAllowedStatus) return false;
+
+  if (useSession.isRoleStaff() || useSession.isRoleAdmin()) {
+    return true;
+  }
+
+  return showIfCertificateRequestOwner.value;
 })
 
 const showReleaseButton = computed(() => {

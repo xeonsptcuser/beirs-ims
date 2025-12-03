@@ -324,7 +324,8 @@ onMounted(() => {
             </div>
             <p class="text-muted text-uppercase fw-semibold small mt-2 mb-1">{{ report.incident_type }}</p>
             <h5 class="card-title text-dark">{{ report.incident_title || 'Untitled Incident' }}</h5>
-            <p class="mb-2 text-secondary"><i class="bi bi-geo-alt me-2 text-primary"></i>{{ report.location }}</p>
+            <p class="mb-2 text-secondary text-capitalize"><i class="bi bi-geo-alt me-2 text-primary"></i>{{
+              report.location }}</p>
             <p class="card-text text-muted grow">
               {{ truncatedDescription(report.description) }}
             </p>

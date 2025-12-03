@@ -5,8 +5,9 @@ import FormTextAreaInput from '@/components/common/FormTextAreaInput/FormTextAre
 import FormCheckboxInput from '@/components/common/FormCheckboxInput/FormCheckboxInput.vue';
 import FormButton from '@/components/common/FormButton/FormButton.vue';
 import { useBarangayAddresses } from '@/composables/useBarangayAddresses';
-import { createBarangayAddress, updateBarangayAddress } from '@/Utils/addressServices';
+import { createBarangayAddress, updateBarangayAddress, deleteBarangayAddress } from '@/Utils/addressServices';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
+import FormInputField from '@/components/common/FormInputField/FormInputField.vue';
 
 defineProps<{ role: string }>();
 
@@ -20,6 +21,13 @@ const formError = ref('');
 const formSuccess = ref('');
 const isSubmitting = ref(false);
 const togglingAddresses = ref(new Set<number>());
+const deletingAddresses = ref(new Set<number>());
+const editingAddressId = ref<number | null>(null);
+const editDraft = reactive({
+  name: '',
+  description: '',
+});
+const isSavingEdit = ref(false);
 
 const navigation = useGlobalLoadingStore();
 const {
@@ -92,6 +100,81 @@ const handleToggleStatus = async (addressId: number, currentStatus: boolean) => 
 };
 
 const isToggling = (id: number) => togglingAddresses.value.has(id);
+
+const toggleDeletingFlag = (id: number, enable: boolean) => {
+  const updated = new Set(deletingAddresses.value);
+  if (enable) {
+    updated.add(id);
+  } else {
+    updated.delete(id);
+  }
+  deletingAddresses.value = updated;
+};
+
+const isDeleting = (id: number) => deletingAddresses.value.has(id);
+
+const beginEdit = (address: { id: number; name: string; description?: string | null }) => {
+  formError.value = '';
+  formSuccess.value = '';
+  editingAddressId.value = address.id;
+  editDraft.name = address.name;
+  editDraft.description = address.description || '';
+};
+
+const cancelEdit = () => {
+  editingAddressId.value = null;
+  editDraft.name = '';
+  editDraft.description = '';
+};
+
+const saveEdit = async (addressId: number) => {
+  formError.value = '';
+  formSuccess.value = '';
+
+  if (!editDraft.name.trim()) {
+    formError.value = 'Street or zone name is required.';
+    return;
+  }
+
+  isSavingEdit.value = true;
+  try {
+    await updateBarangayAddress(addressId, {
+      name: editDraft.name.trim(),
+      description: editDraft.description?.trim() || null,
+    });
+    formSuccess.value = 'Address updated successfully.';
+    cancelEdit();
+    await refreshBarangayAddresses();
+  } catch (error: any) {
+    formError.value = error?.message ?? 'Failed to update address.';
+  } finally {
+    isSavingEdit.value = false;
+  }
+};
+
+const handleDeleteAddress = async (addressId: number) => {
+  formError.value = '';
+  formSuccess.value = '';
+
+  const confirmed = window.confirm('Delete this address? Residents will no longer see it.');
+  if (!confirmed) return;
+
+  toggleDeletingFlag(addressId, true);
+  try {
+    await deleteBarangayAddress(addressId);
+    if (editingAddressId.value === addressId) {
+      cancelEdit();
+    }
+    formSuccess.value = 'Address deleted successfully.';
+    await refreshBarangayAddresses();
+  } catch (error: any) {
+    formError.value = error?.message ?? 'Failed to delete address.';
+  } finally {
+    toggleDeletingFlag(addressId, false);
+  }
+};
+
+const isEditing = (id: number) => editingAddressId.value === id;
 </script>
 
 <template>
@@ -152,22 +235,52 @@ const isToggling = (id: number) => togglingAddresses.value.has(id);
                 <ul v-else class="list-group list-group-flush address-list">
                   <li v-for="address in addresses" :key="address.id" class="list-group-item py-3 px-0">
                     <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
-                      <div>
-                        <p class="mb-1 fw-semibold text-capitalize">{{ address.name }}</p>
-                        <p class="mb-0 text-muted small">
-                          {{ address.description || 'No description provided.' }}
-                        </p>
+                      <div class="flex-grow-1">
+                        <template v-if="isEditing(address.id)">
+                          <FormFloatingInput id="street-address" type="text" label="Street / Zone name"
+                            v-model="editDraft.name" />
+                          <FormTextAreaInput id="address-desc" rows="2" v-model="editDraft.description"
+                            placeholder="Notes or description (optional)" :is-resizeable="false" />
+                          <div class="d-flex gap-2 mt-2 flex-wrap">
+                            <button class="btn btn-primary btn-sm" type="button" :disabled="isSavingEdit"
+                              @click="saveEdit(address.id)">
+                              <span v-if="isSavingEdit" class="spinner-border spinner-border-sm me-1" />
+                              Save
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" type="button" :disabled="isSavingEdit"
+                              @click="cancelEdit">
+                              Cancel
+                            </button>
+                          </div>
+                        </template>
+                        <template v-else>
+                          <p class="mb-1 fw-semibold text-capitalize" @dblclick="beginEdit(address)"
+                            title="Double-click to edit name and description">
+                            {{ address.name }}
+                          </p>
+                          <p class="mb-0 text-muted small" @dblclick="beginEdit(address)"
+                            title="Double-click to edit name and description">
+                            {{ address.description || 'No description provided.' }}
+                          </p>
+                        </template>
                       </div>
                       <span class="badge rounded-pill"
                         :class="address.is_active ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'">
                         {{ address.is_active ? 'Active' : 'Hidden' }}
                       </span>
                     </div>
-                    <div class="mt-3 d-flex gap-2 flex-wrap">
+                    <div class="mt-3 d-flex gap-2 flex-wrap" v-if="!isEditing(address.id)">
                       <button class="btn btn-outline-secondary btn-sm" type="button"
-                        @click="handleToggleStatus(address.id, address.is_active)" :disabled="isToggling(address.id)">
+                        @click="handleToggleStatus(address.id, address.is_active)"
+                        :disabled="isToggling(address.id) || isSavingEdit || isDeleting(address.id)">
                         <span v-if="isToggling(address.id)" class="spinner-border spinner-border-sm me-1" />
                         {{ address.is_active ? 'Hide from dropdowns' : 'Mark as active' }}
+                      </button>
+                      <button class="btn btn-outline-danger btn-sm" type="button"
+                        @click="handleDeleteAddress(address.id)"
+                        :disabled="isDeleting(address.id) || isSavingEdit || isToggling(address.id)">
+                        <span v-if="isDeleting(address.id)" class="spinner-border spinner-border-sm me-1" />
+                        Delete
                       </button>
                     </div>
                   </li>

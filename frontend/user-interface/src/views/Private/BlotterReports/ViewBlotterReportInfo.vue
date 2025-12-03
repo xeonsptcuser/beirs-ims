@@ -291,7 +291,17 @@ const formattedWitnesses = computed(() => {
 });
 
 const showBlotterPreviewButton = computed(() => {
-  return blotterReport.value?.status === 'approved' && isOwner.value && session.isRoleResident();
+  const status = blotterReport.value?.status;
+  const allowedStatuses: BlotterReportStatus[] = ['approved', 'released', 'done'];
+  const hasAllowedStatus = status ? allowedStatuses.includes(status) : false;
+
+  if (!hasAllowedStatus) return false;
+
+  if (isStaff.value) {
+    return true;
+  }
+
+  return isOwner.value && session.isRoleResident();
 })
 
 const statusTimeline = computed(() => {

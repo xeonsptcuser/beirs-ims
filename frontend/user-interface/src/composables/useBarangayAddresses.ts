@@ -28,7 +28,7 @@ export function useBarangayAddresses() {
 
   const addressOptions = computed(() => {
     const activeAddresses = addresses.value
-      .filter((address) => address.is_active)
+      .filter((address) => address.is_active && !address.deleted_at)
       .map((address) => address.name)
 
     return orderedOptions(activeAddresses)

@@ -35,7 +35,11 @@ class BlotterReportsController extends Controller
         $statuses = $this->resolveStatuses($request);
         $user = $request->user()?->loadMissing('profile');
 
-        if ($user && in_array($user->role, ['staff', 'admin'], true)) {
+        if ($user && $user->role === 'admin') {
+            $certificates = $this->withSignedEvidenceUrls(
+                $this->blotter_report->getAll(['profile', 'handler.user', 'evidence'], $perPage, $statuses, $search)
+            );
+        } elseif ($user && $user->role === 'staff') {
             $handlerProfileId = $user->profile?->id;
             $staffStatuses = $this->resolveStaffStatuses($statuses);
             $certificates = $this->withSignedEvidenceUrls(
