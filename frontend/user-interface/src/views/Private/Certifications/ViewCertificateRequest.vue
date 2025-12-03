@@ -187,7 +187,7 @@ const showCancelButton = computed(() => {
 const showPreviewButton = computed(() => {
   const status = certificateInfo.value?.status;
   const allowedStatuses: StatusOptions[] = ['approved', 'released', 'done'];
-  const hasAllowedStatus = status ? allowedStatuses.includes(status) : false;
+  const hasAllowedStatus = status ? allowedStatuses.includes(status as StatusOptions) : false;
 
   if (!hasAllowedStatus) return false;
 
