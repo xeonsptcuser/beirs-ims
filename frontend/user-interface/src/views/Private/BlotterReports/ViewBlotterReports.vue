@@ -46,9 +46,9 @@ const pagination = reactive({
 const isStaffView = computed(() => session.isRoleStaff() || session.isRoleAdmin());
 const isResidentView = computed(() => session.isRoleResident());
 
-const residentTransactionStatuses: BlotterReportStatus[] = ['pending', 'processing', 'approved', 'released'];
+const residentTransactionStatuses: BlotterReportStatus[] = ['pending', 'approved', 'processing', 'released'];
 const residentHistoryStatuses: BlotterReportStatus[] = ['rejected', 'done'];
-const staffTransactionStatuses: BlotterReportStatus[] = ['pending', 'processing', 'approved'];
+const staffTransactionStatuses: BlotterReportStatus[] = ['pending', 'approved', 'processing'];
 const staffHistoryStatuses: BlotterReportStatus[] = ['rejected', 'done'];
 
 const transactionStatuses = computed<BlotterReportStatus[]>(() => {
@@ -285,7 +285,7 @@ onMounted(() => {
           </div>
           <div class="col-md-3 text-md-end">
             <button class="btn btn-link text-decoration-none" type="button" @click="toggleHistoryView">
-              {{ isHistoryScreen ? 'View Active Reports' : 'View History' }}
+              {{ isHistoryScreen ? 'View Reports' : 'View History' }}
             </button>
           </div>
         </div>
@@ -324,7 +324,8 @@ onMounted(() => {
             </div>
             <p class="text-muted text-uppercase fw-semibold small mt-2 mb-1">{{ report.incident_type }}</p>
             <h5 class="card-title text-dark">{{ report.incident_title || 'Untitled Incident' }}</h5>
-            <p class="mb-2 text-secondary"><i class="bi bi-geo-alt me-2 text-primary"></i>{{ report.location }}</p>
+            <p class="mb-2 text-secondary text-capitalize"><i class="bi bi-geo-alt me-2 text-primary"></i>{{
+              report.location }}</p>
             <p class="card-text text-muted grow">
               {{ truncatedDescription(report.description) }}
             </p>

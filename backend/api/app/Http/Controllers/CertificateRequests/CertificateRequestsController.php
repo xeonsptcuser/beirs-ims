@@ -23,7 +23,9 @@ class CertificateRequestsController extends Controller
         $statuses = $this->resolveStatuses($request);
         $user = $request->user()?->loadMissing('profile');
 
-        if ($user && in_array($user->role, ['staff', 'admin'], true)) {
+        if ($user && $user->role === 'admin') {
+            $certificates = $this->certificate->getAll(['profile', 'handler.user'], $perPage, $statuses, $search);
+        } elseif ($user && $user->role === 'staff') {
             $handlerProfileId = $user->profile?->id;
             $staffStatuses = $this->resolveStaffStatuses($statuses);
             $certificates = $this->certificate->getAllHandledByStaff(['profile', 'handler.user'], $handlerProfileId, $perPage, $staffStatuses, $search);

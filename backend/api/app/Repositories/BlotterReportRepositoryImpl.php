@@ -162,6 +162,7 @@ class BlotterReportRepositoryImpl implements BlotterReportRepositoryInterface
             if (
                 !in_array($status, [
                     BlotterReport::STATUS_APPROVED,
+                    BlotterReport::STATUS_PROCESSING,
                     BlotterReport::STATUS_REJECTED,
                     BlotterReport::STATUS_CANCELLED,
                     BlotterReport::STATUS_RELEASED,
@@ -169,7 +170,7 @@ class BlotterReportRepositoryImpl implements BlotterReportRepositoryInterface
                 ], true)
             ) {
                 throw ValidationException::withMessages([
-                    'status' => "Status must only be approved, rejected, cancelled or released",
+                    'status' => "Status must only be approved, processing, rejected, cancelled, released, or done",
                 ]);
             }
 

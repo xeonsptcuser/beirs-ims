@@ -41,16 +41,16 @@ const storageBaseUrl =
   (apiBaseUrl ? `${apiBaseUrl}/storage` : '/storage');
 
 const statusLabels: Record<BlotterReportStatus, string> = {
-  pending: 'Pending Review',
-  processing: 'Being Reviewed',
+  pending: 'Reviewing',
   approved: 'Approved',
+  processing: 'Processing',
   rejected: 'Rejected',
   cancelled: 'Cancelled',
-  released: 'Ready for Release',
+  released: 'Released',
   done: 'Completed',
 };
 
-const statusTimelineOrder: BlotterReportStatus[] = ['pending', 'processing', 'approved', 'released', 'done'];
+const statusTimelineOrder: BlotterReportStatus[] = ['pending', 'approved', 'processing', 'released', 'done'];
 const statusTimestamps = ref<Partial<Record<BlotterReportStatus, string>>>({});
 
 const statusBadgeClass = (status?: BlotterReportStatus) => {
@@ -147,6 +147,10 @@ const previewBlotterReport = async () => {
   }
 }
 
+const returnToList = async () => {
+  await router.push({ name: 'BlotterReports', params: { role: props.role } });
+};
+
 const statusActions = computed<BlotterReportStatus[]>(() => {
   const reportStatus = blotterReport.value?.status;
   if (!reportStatus) return [];
@@ -156,11 +160,14 @@ const statusActions = computed<BlotterReportStatus[]>(() => {
   if (isStaff.value) {
     switch (reportStatus) {
       case 'pending':
-      case 'processing':
         actions.add('approved');
         actions.add('rejected');
         break;
       case 'approved':
+        actions.add('processing');
+        actions.add('cancelled');
+        break;
+      case 'processing':
         actions.add('released');
         actions.add('cancelled');
         break;
@@ -291,7 +298,17 @@ const formattedWitnesses = computed(() => {
 });
 
 const showBlotterPreviewButton = computed(() => {
-  return blotterReport.value?.status === 'approved' && isOwner.value && session.isRoleResident();
+  const status = blotterReport.value?.status;
+  const allowedStatuses: BlotterReportStatus[] = ['approved', 'released', 'done'];
+  const hasAllowedStatus = status ? allowedStatuses.includes(status) : false;
+
+  if (!hasAllowedStatus) return false;
+
+  if (isStaff.value) {
+    return true;
+  }
+
+  return isOwner.value && session.isRoleResident();
 })
 
 const statusTimeline = computed(() => {
@@ -543,8 +560,8 @@ watch(
                 @click="previewBlotterReport">
                 Preview PDF
               </button>
-              <button v-else v-for="status in statusActions" :key="status" type="button"
-                :class="actionButtonClass(status)" @click="() => handleStatusAction(status)">
+              <button v-for="status in statusActions" :key="status" type="button" :class="actionButtonClass(status)"
+                @click="() => handleStatusAction(status)">
                 {{ statusLabels[status] || status }}
               </button>
 

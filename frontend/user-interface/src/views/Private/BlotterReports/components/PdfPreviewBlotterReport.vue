@@ -29,7 +29,7 @@ const positions = {
   case_number: { x: 460, y: 840, size: 12 },
   complainant: { x: 80, y: 840, size: 14 },
   people_involved: { x: 75, y: 728, size: 12 },
-  incident_type: { x: 390, y: 812, size: 12 },
+  incident_type: { x: 385, y: 811, size: 11 },
   location: { x: 140, y: 290, size: 12 },
   description: { x: 115, y: 562, size: 12 },
   incident_month: { x: 350, y: 230, size: 12 },
@@ -221,17 +221,9 @@ onBeforeUnmount(() => {
       <div v-else-if="errorMessage" class="alert alert-danger" role="alert">
         {{ errorMessage }}
       </div>
-      <iframe v-else-if="pdfUrl" :src="iframeSrc" title="pdf" width="100%" height="800"
+      <iframe v-else-if="pdfUrl" :src="iframeSrc" title="pdf" width="100%" height="1000"
         style="border: 1px solid #ccc;"></iframe>
       <p v-else class="text-muted mb-0">No preview available.</p>
-    </div>
-
-    <div v-if="payload" class="card border-0 shadow-sm">
-      <div class="card-body">
-        <h6 class="fw-semibold mb-3">Blotter Report Data (from backend)</h6>
-        <pre class="mb-0 bg-light p-3 rounded"
-          style="white-space: pre-wrap;">{{ JSON.stringify(payload, null, 2) }}</pre>
-      </div>
     </div>
   </div>
 </template>
