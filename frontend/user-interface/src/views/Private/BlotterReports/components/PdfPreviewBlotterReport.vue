@@ -6,6 +6,7 @@ import { PdfRelatedService } from '@/services/api/http/pdf-service'
 import blotterForm from '../../../../assets/pdf/blotter-form.pdf'
 import { useBlotterReports } from '../composable/useBlotterReport'
 import { addOrdinalSuffix } from '@/Utils/helpers/formatters'
+import { useRouter } from 'vue-router'
 
 const props = defineProps<{
   blotterId: string
@@ -22,6 +23,7 @@ const pdfUrl = ref<string | null>(null)
 const isLoading = ref<boolean>(false)
 const errorMessage = ref<string | null>(null)
 const payload = ref<Record<string, any> | null>(null)
+const router = useRouter()
 
 type BlotterData = Record<string, any>
 
@@ -212,16 +214,26 @@ onBeforeUnmount(() => {
     globalThis.URL.revokeObjectURL(pdfUrl.value)
   }
 })
+
+const goBack = () => {
+  router.back()
+}
 </script>
 
 <template>
   <div class="mt-3 d-flex flex-column gap-3">
-    <div>
+    <div class="d-flex justify-content-between align-items-center">
+      <button class="btn btn-outline-secondary btn-sm" type="button" @click="goBack">
+        <i class="bi bi-arrow-left me-1"></i>
+        Back to blotter report
+      </button>
+    </div>
+    <div class="d-flex justify-content-center mb-4">
       <p v-if="isLoading" class="text-muted mb-2">Loading PDF preview…</p>
       <div v-else-if="errorMessage" class="alert alert-danger" role="alert">
         {{ errorMessage }}
       </div>
-      <iframe v-else-if="pdfUrl" :src="iframeSrc" title="pdf" width="100%" height="1000"
+      <iframe v-else-if="pdfUrl" :src="iframeSrc" title="pdf" width="100%" height="1380"
         style="border: 1px solid #ccc;"></iframe>
       <p v-else class="text-muted mb-0">No preview available.</p>
     </div>

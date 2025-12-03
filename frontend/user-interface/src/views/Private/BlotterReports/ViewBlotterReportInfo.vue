@@ -369,18 +369,26 @@ watch(
 
 <template>
   <div class="my-5">
+    <div class="mb-4">
+      <button class="btn btn-outline-secondary btn-sm" type="button" @click="returnToList">
+        <i class="bi bi-arrow-left me-1"></i>
+        Back to list
+      </button>
+    </div>
     <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
       <div>
         <p class="text-uppercase text-muted mb-1">Case reference</p>
         <h2 class="fw-bold mb-0">{{ formatCaseId(blotterReport?.id) }}</h2>
-        <p class="text-secondary mb-0">{{ blotterReport?.incident_title || 'Untitled blotter report' }}</p>
+        <p class="text-secondary mb-0 text-capitalize">
+          {{ blotterReport?.incident_title || 'untitled blotter report' }}
+        </p>
       </div>
       <div class="text-lg-end">
         <span class="badge px-3 py-2 text-uppercase" :class="statusBadgeClass(blotterReport?.status)">
           {{ blotterReport?.status }}
         </span>
         <p class="text-secondary small mt-2 mb-0">Filed on {{ formatDateToHuman(blotterReport?.created_at ?? '') || '—'
-          }}</p>
+        }}</p>
       </div>
     </div>
 

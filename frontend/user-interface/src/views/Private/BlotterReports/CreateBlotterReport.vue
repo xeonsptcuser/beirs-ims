@@ -414,7 +414,7 @@ const filteredErrors = computed(() => {
                   <FormTextAreaInput label="Detailed Description" id="incident-description"
                     v-model="form.incidentDescription" :error-message="errorMessages.incidentDescription.error"
                     :has-error="errors.incidentDescription" :is-resizeable="false" max-rows="6" placeholder="..."
-                    maxLength="700" />
+                    maxLength="500" />
                 </div>
                 <div class="col-12">
                   <UploadFiles v-model="form.evidences" />
@@ -448,7 +448,8 @@ const filteredErrors = computed(() => {
             </ul>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" @click="closeConfirmationModal">Review again</button>
+            <button type="button" class="btn btn-outline-secondary" @click="closeConfirmationModal">Review
+              again</button>
             <button type="button" class="btn btn-primary" @click="handleCreateBlotterReport">Submit report</button>
           </div>
         </div>

@@ -280,12 +280,19 @@ onMounted(() => {
 </script>
 <template>
   <div class="my-5">
+    <div class="mb-4">
+      <button class="btn btn-outline-secondary btn-sm" type="button" @click="navigateToTopPage">
+        <i class="bi bi-arrow-left me-2"></i>Back to list
+      </button>
+    </div>
     <div
       class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center mb-4 gap-3">
       <div>
         <p class="text-muted text-uppercase small mb-1">Case Reference</p>
         <h2 class="fw-bold mb-1">{{ certificateCaseId }}</h2>
-        <p class="text-secondary small mb-0">{{ certificateInfo?.cert_request_type || 'Certificate Request' }}</p>
+        <p class="text-secondary small mb-0 text-capitalize">
+          {{ certificateInfo?.cert_request_type || 'Certificate Request' }}
+        </p>
       </div>
       <div class="text-lg-end">
         <span class="badge px-3 py-2" :class="statusBadgeClass(certificateInfo?.status as StatusOptions)">
@@ -297,9 +304,7 @@ onMounted(() => {
     </div>
 
     <div class="d-flex flex-column flex-lg-row gap-3 mb-3">
-      <button class="btn btn-link text-decoration-none p-0" type="button" @click="navigateToTopPage">
-        <i class="bi bi-arrow-left me-2"></i>Back to list
-      </button>
+
       <div class="ms-auto d-flex flex-wrap gap-2">
         <SuccessLabel v-if="hasApproval" :is-success="hasApproval" :message="successMessage" alert-type="primary" />
         <SuccessLabel v-if="hasRejection" :is-success="hasRejection" :message="successMessage" alert-type="warning" />

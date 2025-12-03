@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { PDFDocument, StandardFonts } from 'pdf-lib'
 import { endpoints } from '@/services/api/endpoints'
 import { PdfRelatedService } from '@/services/api/http/pdf-service'
@@ -38,6 +39,7 @@ const pdfUrl = ref<string | null>(null)
 const isLoading = ref<boolean>(false)
 const errorMessage = ref<string | null>(null)
 const payload = ref<Record<string, any> | null>(null)
+const router = useRouter()
 
 type CertificateData = Record<string, any>
 
@@ -194,16 +196,26 @@ onBeforeUnmount(() => {
     globalThis.URL.revokeObjectURL(pdfUrl.value)
   }
 })
+
+const goBack = () => {
+  router.back()
+}
 </script>
 
 <template>
   <div class="my-4 d-flex flex-column gap-3">
-    <div>
+    <div class="d-flex justify-content-between align-items-center">
+      <button class="btn btn-outline-secondary btn-sm" type="button" @click="goBack">
+        <i class="bi bi-arrow-left me-1"></i>
+        Back to certificate
+      </button>
+    </div>
+    <div class="d-flex justify-content-center mb-4">
       <p v-if="isLoading" class="text-muted mb-2">Loading PDF preview…</p>
       <div v-else-if="errorMessage" class="alert alert-danger" role="alert">
         {{ errorMessage }}
       </div>
-      <iframe v-else-if="pdfUrl" :src="iframeSrc" title="pdf" width="100%" height="800"
+      <iframe v-else-if="pdfUrl" :src="iframeSrc" title="pdf" width="100%" height="1080"
         style="border: 1px solid #ccc;"></iframe>
       <p v-else class="text-muted mb-0">No preview available.</p>
     </div>
