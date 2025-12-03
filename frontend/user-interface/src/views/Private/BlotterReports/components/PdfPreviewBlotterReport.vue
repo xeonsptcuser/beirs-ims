@@ -137,11 +137,6 @@ const buildPdfWithData = async (data: BlotterData) => {
 
 
   const incidentType = incidentTypeOptions.find(type => type.id === data.incident_type)
-  const incidentDateTime = data.incident_datetime.split(/[ ,]+/);
-  const month = incidentDateTime[0];
-  const day = incidentDateTime[1];
-  const year = incidentDateTime[2].match(/.{1,2}/g)[1];
-
   const dateToday = new Date();
   const file_month = dateToday.toLocaleString('en-US', { month: 'long' }); // e.g. "December"
   const file_day = String(dateToday.getDate());                           // e.g. "30"
@@ -157,9 +152,9 @@ const buildPdfWithData = async (data: BlotterData) => {
   drawWrappedText(page, font, 'description', data.description.toUpperCase(), 420, 27)
   drawWrappedText(page, font, 'people_involved', formatPeopleInvolved(data.person_involved), 220, 26)
   drawText(page, font, 'location', formattedLocation.value.toUpperCase())
-  drawText(page, font, 'incident_month', month)
-  drawText(page, font, 'incident_day', addOrdinalSuffix(day))
-  drawText(page, font, 'incident_year', year)
+  drawText(page, font, 'incident_month', file_month)
+  drawText(page, font, 'incident_day', addOrdinalSuffix(file_day))
+  drawText(page, font, 'incident_year', file_year)
   drawText(page, font, 'file_month', file_month)
   drawText(page, font, 'file_day', addOrdinalSuffix(file_day))
   drawText(page, font, 'file_year', file_year)
