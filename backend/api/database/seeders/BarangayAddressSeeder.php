@@ -10,7 +10,7 @@ class BarangayAddressSeeder extends Seeder
     public function run(): void
     {
         $addresses = [
-            'sapang daan',
+            'sapang-daan',
             'abbra',
             'liong',
             'mabolo',
@@ -20,7 +20,7 @@ class BarangayAddressSeeder extends Seeder
             'tinago',
             'sudlon',
             'perez compd.',
-            
+
         ];
 
         foreach ($addresses as $name) {

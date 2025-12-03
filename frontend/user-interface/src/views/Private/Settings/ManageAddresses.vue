@@ -189,12 +189,15 @@ const isEditing = (id: number) => editingAddressId.value === id;
               <p class="text-muted mb-4">Keep the address directory updated so residents can quickly locate their
                 area when filing requests and reports.</p>
 
+
               <div v-if="formError" class="alert alert-danger py-2">{{ formError }}</div>
               <div v-if="formSuccess" class="alert alert-success py-2">{{ formSuccess }}</div>
 
-              <form class="d-flex flex-column gap-3" @submit.prevent="handleSaveAddress">
+              <form class="d-flex flex-column" @submit.prevent="handleSaveAddress">
                 <FormFloatingInput id="address-name" label="Street / Zone name" v-model="form.name"
                   :has-error="!form.name && !!formError" />
+                <small class="text-muted mb-3">Note: For addresses with spaces, please add hyphen(-) instead of
+                  space to separate them.</small>
                 <FormTextAreaInput id="address-description" label="Notes or description" v-model="form.description"
                   :optional="true" :is-resizeable="false" max-rows="4" />
                 <FormCheckboxInput id="address-active" label="Set as active" v-model="form.is_active" />
