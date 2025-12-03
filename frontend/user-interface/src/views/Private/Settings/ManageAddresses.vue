@@ -7,7 +7,6 @@ import FormButton from '@/components/common/FormButton/FormButton.vue';
 import { useBarangayAddresses } from '@/composables/useBarangayAddresses';
 import { createBarangayAddress, updateBarangayAddress, deleteBarangayAddress } from '@/Utils/addressServices';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
-import FormInputField from '@/components/common/FormInputField/FormInputField.vue';
 
 defineProps<{ role: string }>();
 
@@ -46,12 +45,23 @@ const resetForm = () => {
   form.is_active = true;
 };
 
+const validateName = (value: string): string | null => {
+  const trimmed = value.trim();
+  if (!trimmed) return 'Street or zone name is required.';
+  if (/\s/.test(trimmed)) return 'Use hyphen (-) instead of spaces';
+  if (!/^[A-Za-z0-9]+(-[A-Za-z0-9]+)*$/.test(trimmed)) {
+    return 'Only letters, numbers, and hyphens are allowed.';
+  }
+  return null;
+};
+
 const handleSaveAddress = async () => {
   formError.value = '';
   formSuccess.value = '';
 
-  if (!form.name.trim()) {
-    formError.value = 'Street or zone name is required.';
+  const validationError = validateName(form.name);
+  if (validationError) {
+    formError.value = validationError;
     return;
   }
 
@@ -131,8 +141,9 @@ const saveEdit = async (addressId: number) => {
   formError.value = '';
   formSuccess.value = '';
 
-  if (!editDraft.name.trim()) {
-    formError.value = 'Street or zone name is required.';
+  const validationError = validateName(editDraft.name);
+  if (validationError) {
+    formError.value = validationError;
     return;
   }
 
@@ -156,7 +167,7 @@ const handleDeleteAddress = async (addressId: number) => {
   formError.value = '';
   formSuccess.value = '';
 
-  const confirmed = window.confirm('Delete this address? Residents will no longer see it.');
+  const confirmed = globalThis.confirm('Delete this address? Residents will no longer see it.');
   if (!confirmed) return;
 
   toggleDeletingFlag(addressId, true);
@@ -196,8 +207,8 @@ const isEditing = (id: number) => editingAddressId.value === id;
               <form class="d-flex flex-column" @submit.prevent="handleSaveAddress">
                 <FormFloatingInput id="address-name" label="Street / Zone name" v-model="form.name"
                   :has-error="!form.name && !!formError" />
-                <small class="text-muted mb-3">Note: For addresses with spaces, please add hyphen(-) instead of
-                  space to separate them.</small>
+                <small class="text-muted mb-3">Tip: Use a hyphen (-) instead of spaces for multi-word names (e.g.,
+                  green-hills).</small>
                 <FormTextAreaInput id="address-description" label="Notes or description" v-model="form.description"
                   :optional="true" :is-resizeable="false" max-rows="4" />
                 <FormCheckboxInput id="address-active" label="Set as active" v-model="form.is_active" />
