@@ -5,7 +5,7 @@ import { computed } from 'vue';
 
 const props = withDefaults(defineProps<{
   id: string
-  options: Array<IncidentType | string>
+  options: Array<IncidentType | string | { label: string; value?: string; disabled?: boolean; isDivider?: boolean }>
   label?: string
   errorMessage?: string
   hasError?: boolean
@@ -30,10 +30,20 @@ const formatOptionalLabel = computed(() => {
 })
 
 const formattedOptions = computed(() =>
-  props.options.map((option) => ({
-    value: typeof option === 'object' ? option.id : option,
-    label: typeof option === 'object' ? (props.isCapitalized ? capitalizeWords(option.label) : option.label) : (props.isCapitalized ? capitalizeWords(option) : option)
-  }))
+  props.options.map((option) => {
+    if (typeof option === 'object' && 'id' in option) {
+      const label = props.isCapitalized ? capitalizeWords(option.label) : option.label
+      return { value: option.id, label, disabled: false }
+    }
+
+    if (typeof option === 'object' && 'label' in option) {
+      const label = props.isCapitalized ? capitalizeWords(option.label) : option.label
+      return { value: option.value ?? '', label, disabled: option.disabled ?? false, isDivider: option.isDivider ?? false }
+    }
+
+    const label = props.isCapitalized ? capitalizeWords(option) : option
+    return { value: option, label, disabled: false }
+  })
 )
 </script>
 <template>
@@ -42,7 +52,8 @@ const formattedOptions = computed(() =>
     <select :id :name="id" class="form-select" :class="{ 'is-invalid': hasError }" v-model="model"
       :disabled="isDisabled">
       <option value="" selected>...</option>
-      <option :value="option.value" v-for="option in formattedOptions" :key="option.value">
+      <option :value="option.value" v-for="option in formattedOptions" :key="option.label"
+        :disabled="option.disabled" :class="{ 'text-muted fst-italic': option.disabled }">
         {{ option.label }}
       </option>
     </select>

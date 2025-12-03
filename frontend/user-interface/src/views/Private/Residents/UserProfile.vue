@@ -88,7 +88,12 @@ const secondaryGovernmentIds = [
 const govtIdCollapseId = 'govt-id-accepted-list'
 const isGovtIdListOpen = ref(false)
 
-const govtIdentityTypeOption = [...primaryGovernmentIds, '...', ...secondaryGovernmentIds]
+const govtIdentityTypeOption = computed(() => [
+  { label: 'Primary IDs', value: '', disabled: true, isDivider: true },
+  ...primaryGovernmentIds.map((id) => ({ label: id, value: id })),
+  { label: 'Secondary IDs', value: '', disabled: true, isDivider: true },
+  ...secondaryGovernmentIds.map((id) => ({ label: id, value: id })),
+])
 
 const governmentIdUrl = computed(() => {
   const doc = responseData.value?.profile?.government_identity;
@@ -479,12 +484,12 @@ onBeforeUnmount(() => {
                 v-model="form.govtIdentityType" :error-message="errorMessages.govtIdentityType.error"
                 :has-error="errors.govtIdentityType" :is-capitalized="false" />
             </div>
-              <UploadFiles
-                v-if="form.govtIdentityType && form.govtIdentityType !== '...' && [...primaryGovernmentIds, ...secondaryGovernmentIds].includes(form.govtIdentityType)"
-                v-model="form.governmentIdentity" :has-error="errors.governmentIdentity"
-                :error-message="errorMessages.governmentIdentity.error"
-                :is-disabled="isNotEditableUser.governmentIdentity" accept=".png,.jpg,.jpeg,.pdf" :multiple="false"
-                :enforce-evidence-rules="false" :max-files="1" />
+            <UploadFiles
+              v-if="form.govtIdentityType && form.govtIdentityType !== 'Secondary Ids' && [...primaryGovernmentIds, ...secondaryGovernmentIds].includes(form.govtIdentityType)"
+              v-model="form.governmentIdentity" :has-error="errors.governmentIdentity"
+              :error-message="errorMessages.governmentIdentity.error"
+              :is-disabled="isNotEditableUser.governmentIdentity" accept=".png,.jpg,.jpeg,.pdf" :multiple="false"
+              :enforce-evidence-rules="false" :max-files="1" />
           </div>
         </div>
       </div>
