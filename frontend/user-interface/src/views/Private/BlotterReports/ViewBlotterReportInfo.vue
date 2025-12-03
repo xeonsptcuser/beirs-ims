@@ -42,15 +42,15 @@ const storageBaseUrl =
 
 const statusLabels: Record<BlotterReportStatus, string> = {
   pending: 'Pending Review',
-  processing: 'Being Reviewed',
   approved: 'Approved',
+  processing: 'Processing',
   rejected: 'Rejected',
   cancelled: 'Cancelled',
   released: 'Ready for Release',
   done: 'Completed',
 };
 
-const statusTimelineOrder: BlotterReportStatus[] = ['pending', 'processing', 'approved', 'released', 'done'];
+const statusTimelineOrder: BlotterReportStatus[] = ['pending', 'approved', 'processing', 'released', 'done'];
 const statusTimestamps = ref<Partial<Record<BlotterReportStatus, string>>>({});
 
 const statusBadgeClass = (status?: BlotterReportStatus) => {
@@ -147,6 +147,10 @@ const previewBlotterReport = async () => {
   }
 }
 
+const returnToList = async () => {
+  await router.push({ name: 'BlotterReports', params: { role: props.role } });
+};
+
 const statusActions = computed<BlotterReportStatus[]>(() => {
   const reportStatus = blotterReport.value?.status;
   if (!reportStatus) return [];
@@ -156,11 +160,14 @@ const statusActions = computed<BlotterReportStatus[]>(() => {
   if (isStaff.value) {
     switch (reportStatus) {
       case 'pending':
-      case 'processing':
         actions.add('approved');
         actions.add('rejected');
         break;
       case 'approved':
+        actions.add('processing');
+        actions.add('cancelled');
+        break;
+      case 'processing':
         actions.add('released');
         actions.add('cancelled');
         break;
@@ -373,7 +380,7 @@ watch(
           {{ blotterReport?.status }}
         </span>
         <p class="text-secondary small mt-2 mb-0">Filed on {{ formatDateToHuman(blotterReport?.created_at ?? '') || '—'
-          }}</p>
+        }}</p>
       </div>
     </div>
 
@@ -553,8 +560,8 @@ watch(
                 @click="previewBlotterReport">
                 Preview PDF
               </button>
-              <button v-else v-for="status in statusActions" :key="status" type="button"
-                :class="actionButtonClass(status)" @click="() => handleStatusAction(status)">
+              <button v-for="status in statusActions" :key="status" type="button" :class="actionButtonClass(status)"
+                @click="() => handleStatusAction(status)">
                 {{ statusLabels[status] || status }}
               </button>
 

@@ -208,6 +208,7 @@ class BlotterReportsController extends Controller
 
         $allowedStatuses = [
             BlotterReport::STATUS_PENDING,
+            BlotterReport::STATUS_PROCESSING,
             BlotterReport::STATUS_APPROVED,
             BlotterReport::STATUS_REJECTED,
             BlotterReport::STATUS_CANCELLED,

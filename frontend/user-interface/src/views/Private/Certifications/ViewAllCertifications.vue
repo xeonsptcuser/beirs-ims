@@ -204,7 +204,7 @@ const toggleHistoryBtn = computed(() => {
   if (!isHistoryScreen.value) {
     return 'View History'
   }
-  return 'View Transactions'
+  return 'View Requests'
 })
 
 const handleSearchCertificates = () => {
@@ -258,7 +258,8 @@ onMounted(() => {
       </div>
       <div class="d-flex flex-column align-items-end gap-2">
         <div class="d-flex flex-wrap gap-2">
-          <button class="btn btn-link text-decoration-none" type="button" @click.prevent="toggleFetchHistoryTransactions">
+          <button class="btn btn-link text-decoration-none" type="button"
+            @click.prevent="toggleFetchHistoryTransactions">
             <i class="bi bi-journal-text me-2"></i>{{ toggleHistoryBtn }}
           </button>
           <router-link v-if="createCertificateRoute" :to="createCertificateRoute" class="btn btn-primary"
@@ -375,7 +376,7 @@ onMounted(() => {
                   <span class="badge" :class="statusBadgeClass(status)"></span>
                   <span class="fw-bold">{{
                     certificationRequestItems.filter((item) => item.status === status).length
-                  }}</span>
+                    }}</span>
                 </div>
               </div>
             </div>

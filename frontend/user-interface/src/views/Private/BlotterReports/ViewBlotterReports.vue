@@ -285,7 +285,7 @@ onMounted(() => {
           </div>
           <div class="col-md-3 text-md-end">
             <button class="btn btn-link text-decoration-none" type="button" @click="toggleHistoryView">
-              {{ isHistoryScreen ? 'View Active Reports' : 'View History' }}
+              {{ isHistoryScreen ? 'View Reports' : 'View History' }}
             </button>
           </div>
         </div>
