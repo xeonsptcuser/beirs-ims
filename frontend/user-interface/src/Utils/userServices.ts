@@ -60,6 +60,16 @@ export const toggleUserAccountStatus = async (userId: number, isActive: boolean)
   return response
 }
 
+export const softDeleteUserAccount = async (userId: number | string) => {
+  const response = await userRelatedService.deleteUserAccount(endpoints.TOGGLE_USER_ACCOUNT(userId))
+
+  if (!response?.status || response.status !== 'success') {
+    throw new Error('Failed to delete user account...')
+  }
+
+  return response
+}
+
 export const fetchSingleUserProfile = async (userId: string) => {
   const response = await userRelatedService.getSingleUserAccount(endpoints.GET_SINGLE_USER(userId))
 

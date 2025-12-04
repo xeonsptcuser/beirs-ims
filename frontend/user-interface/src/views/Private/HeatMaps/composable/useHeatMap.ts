@@ -74,11 +74,18 @@ export function useHeatMap() {
     return x - Math.floor(x)
   }
 
+  const getLevelLabel = (value: number) => {
+    if (value >= 21) return 'High'
+    if (value >= 11) return 'Moderate'
+    if (value >= 1) return 'Low'
+    return 'None'
+  }
+
   const getMarkerColor = (value: number) => {
-    if (value >= 8) return '#dc2626' // high
-    if (value >= 4) return '#f59e0b' // orange
-    if (value >= 1) return '#f6d750' // yellow
-    return '#9ca3af' // empty / unknown
+    if (value >= 21) return '#dc2626' // High
+    if (value >= 11) return '#f59e0b' // Moderate
+    if (value >= 1) return '#f6d750' // Low
+    return '#9ca3af' // None / unknown
   }
 
   const typeOrder: CaseType[] = [
@@ -139,13 +146,15 @@ export function useHeatMap() {
     return [latOffset, lngOffset]
   }
 
-  const buildMarkerIcon = (value: number) =>
-    L.divIcon({
+  const buildMarkerIcon = (value: number) => {
+    const levelLabel = getLevelLabel(value)
+    return L.divIcon({
       className: 'heatmap-pin',
-      html: `<div class="heatmap-pin__body" style="background:${getMarkerColor(value)}"><span class="heatmap-pin__label">${value}</span></div>`,
-      iconSize: [28, 28],
-      iconAnchor: [14, 14],
+      html: `<div class="heatmap-pin__body" style="background:${getMarkerColor(value)}"><span class="heatmap-pin__label">${value}</span><span class="heatmap-pin__level">${levelLabel}</span></div>`,
+      iconSize: [36, 36],
+      iconAnchor: [18, 18],
     })
+  }
 
   // -----------------------------------------------------------------
   // 2. MAIN HEATMAP DRAWING FUNCTION
@@ -204,8 +213,9 @@ export function useHeatMap() {
           icon: buildMarkerIcon(value),
         })
 
+        const levelLabel = getLevelLabel(value)
         marker.bindPopup(
-          `<div class="heatmap-popup"><strong>${section.name}</strong><br/>${activeType}: ${value} case${value > 1 ? 's' : ''}<div class="heatmap-popup__meta">Updated data</div></div>`
+          `<div class="heatmap-popup"><strong>${section.name}</strong><br/>${activeType}: ${value} case${value > 1 ? 's' : ''} (${levelLabel})<div class="heatmap-popup__meta">Updated data</div></div>`
         )
 
         marker.addTo(markerLayerGroup)

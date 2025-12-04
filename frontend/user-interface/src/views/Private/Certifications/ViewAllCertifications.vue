@@ -32,7 +32,7 @@ const isLoadingProfile = ref<boolean>(false);
 const profileErrorMessage = ref<string>('');
 
 const transactionStatuses = computed<StatusOptions[]>(() => isStaffView.value
-  ? ['pending', 'approved']
+  ? ['pending', 'approved', 'released']
   : ['pending', 'approved', 'released']
 );
 const historyStatuses = computed<StatusOptions[]>(() => ['rejected', 'done']);
@@ -58,7 +58,7 @@ const statusBadgeClass = (status: StatusOptions | string) => {
   const mapping: Record<string, string> = {
     pending: 'bg-warning text-dark',
     approved: 'bg-primary',
-    released: 'bg-success',
+    released: 'bg-info text-dark',
     rejected: 'bg-danger',
     cancelled: 'bg-secondary',
     done: 'bg-success',
@@ -214,12 +214,6 @@ const handleSearchCertificates = () => {
   searchByNameKeyWord.value = ''
 }
 
-const resetSearch = () => {
-  searchByNameKeyWord.value = ''
-  pagination.current = 1
-  fetchCertificateRequests()
-}
-
 const toggleFetchHistoryTransactions = () => {
   isHistoryScreen.value = !isHistoryScreen.value
   selectedStatusFilter.value = null
@@ -253,7 +247,7 @@ onMounted(() => {
       class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center mb-4 gap-3">
       <div>
         <p class="text-muted text-uppercase mb-1 small">Requests</p>
-        <h2 class="fw-bold mb-0">Certificate Center</h2>
+        <h2 class="fw-bold mb-0">{{ !isHistoryScreen ? 'Certificate Center' : 'History' }}</h2>
         <p class="text-secondary small mb-0">Track certificate requests, review statuses, and manage releases.</p>
       </div>
       <div class="d-flex flex-column align-items-end gap-2">
@@ -275,8 +269,7 @@ onMounted(() => {
     </div>
 
     <WarningLabel :has-error="hasError" :errors="hasError ? [{ error: errorMessage }] : []" />
-
-    <div class="row g-3 mb-4">
+    <div class="row g-3 mb-4" v-if="!useSession.isRoleResident() && !isHistoryScreen">
       <div class="col-md-3" v-for="stat in summaryStats" :key="stat.label">
         <div class="card shadow-sm border-0 h-100">
           <div class="card-body">
@@ -286,16 +279,14 @@ onMounted(() => {
         </div>
       </div>
     </div>
-
     <div class="card shadow-sm border-0 mb-4">
       <div class="card-body">
         <form class="row gy-3 align-items-center " @submit.prevent="handleSearchCertificates">
-          <div class="col-md-6 col-lg-4">
+          <div class="col-md-6">
             <FormSearchInput v-model="searchByNameKeyWord" />
           </div>
-          <div class="col-md-6 col-lg-4 d-flex gap-2 ms-auto">
-            <button class="btn btn-primary w-100" type="submit">Search</button>
-            <button class="btn btn-outline-secondary w-100" type="button" @click="resetSearch">Reset</button>
+          <div class="col-md-3 d-flex gap-2 ms-auto">
+            <button class="btn btn-primary ms-auto w-100" type="submit">Search</button>
           </div>
         </form>
       </div>

@@ -111,7 +111,13 @@ const governmentIdType = computed(() => {
   return responseData.value?.profile?.government_identity?.identity_type ?? ''
 });
 
+const isProfileOwner = computed(() => {
+  return responseData.value?.id === useSession.id
+})
+
 const hasMobileChanged = computed(() => form.mobileNumber !== originalMobileNumber.value)
+const canEditProfile = computed(() => isProfileOwner.value || useSession.isRoleAdmin())
+const canEditRole = computed(() => useSession.isRoleAdmin())
 
 const handleUpdateUserAccount = async () => {
   navigation.startNavigation();
@@ -157,14 +163,16 @@ const handleUpdateUserAccount = async () => {
         message: response.message ?? 'User updated successfully.',
       })
 
-      setisNotEditableUser()
+      setisNotEditableUser(canEditRole.value)
       if (useSession.id === response.data.id) {
         const profile = response.data.profile
         useSession.updateUserName(formatName(profile.first_name, profile.middle_name, profile.last_name))
       }
 
-      if (mobileChanged && response.data.profile.mobile_number) {
+      if (mobileChanged && response.data.profile.mobile_number && isProfileOwner.value) {
         await requestOtpForMobileVerification()
+      } else if (!isProfileOwner.value) {
+        mobileVerificationPending.value = !response.data.profile.mobile_verified_at
       }
 
     } else {
@@ -288,10 +296,6 @@ const age = computed(() => {
   return computeAge(form.date_of_birth)
 });
 
-const isProfileOwner = computed(() => {
-  return responseData.value?.id === useSession.id
-})
-
 const toTitleCase = (value?: string | null) => {
   if (!value) return ''
   const lower = value.toLowerCase()
@@ -409,7 +413,7 @@ onBeforeUnmount(() => {
                   {{ mobileVerificationPending ? 'Verification required' : 'Verified' }}
                 </span>
               </div>
-              <button v-if="mobileVerificationPending && responseData?.profile?.mobile_number"
+              <button v-if="isProfileOwner && mobileVerificationPending && responseData?.profile?.mobile_number"
                 class="btn btn-link p-0 mt-1 text-sm" type="button" @click="requestOtpForMobileVerification">
                 Verify this number via OTP
               </button>
@@ -426,7 +430,7 @@ onBeforeUnmount(() => {
               <span>Date of Birth</span>
               <span>{{ formatDateToHuman(form.date_of_birth) || '—' }} ({{ age }} yrs)</span>
             </div>
-            <div class="mt-3" v-if="isProfileOwner">
+            <div class="mt-3" v-if="canEditProfile">
               <button class="btn btn-outline-secondary w-100" type="button" @click="handleShowPasswordChange">
                 <i class="bi bi-shield-lock me-2"></i>
                 {{ isPasswordChangeable ? 'Cancel Password Update' : 'Change Password' }}
@@ -479,13 +483,13 @@ onBeforeUnmount(() => {
               <img :src="governmentIdUrl || nationalId" alt="Government ID" class="img-fluid" />
               <p class="text-muted small mb-0 mt-2">Uploading a new file will replace the existing ID.</p>
             </div>
-            <div class="mb-2" v-if="isProfileOwner && !isEditableSubmit">
+            <div class="mb-2" v-if="canEditProfile && !isEditableSubmit">
               <DropdownInput :options="govtIdentityTypeOption" label="Type" id="govt-id-type"
                 v-model="form.govtIdentityType" :error-message="errorMessages.govtIdentityType.error"
                 :has-error="errors.govtIdentityType" :is-capitalized="false" />
             </div>
             <UploadFiles
-              v-if="form.govtIdentityType && form.govtIdentityType !== 'Secondary Ids' && [...primaryGovernmentIds, ...secondaryGovernmentIds].includes(form.govtIdentityType)"
+              v-if="canEditProfile && form.govtIdentityType && form.govtIdentityType !== 'Secondary Ids' && [...primaryGovernmentIds, ...secondaryGovernmentIds].includes(form.govtIdentityType)"
               v-model="form.governmentIdentity" :has-error="errors.governmentIdentity"
               :error-message="errorMessages.governmentIdentity.error"
               :is-disabled="isNotEditableUser.governmentIdentity" accept=".png,.jpg,.jpeg,.pdf" :multiple="false"
@@ -496,14 +500,15 @@ onBeforeUnmount(() => {
 
       <div class="col-lg-8">
         <div class="card shadow-sm border-0">
-          <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <h5 class="mb-0">Profile Details</h5>
-            <div class="d-flex gap-2" v-if="isProfileOwner">
-              <button class="btn btn-outline-danger btn-sm" type="button" @click.prevent="setisNotEditableUser">
-                <i class="bi bi-pencil-square me-1"></i>{{ isNotEditableUser.name ? 'Enable Editing' : 'Cancel' }}
-              </button>
+            <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
+              <h5 class="mb-0">Profile Details</h5>
+              <div class="d-flex gap-2" v-if="canEditProfile">
+                <button class="btn btn-outline-danger btn-sm" type="button"
+                  @click.prevent="setisNotEditableUser(canEditRole)">
+                  <i class="bi bi-pencil-square me-1"></i>{{ isNotEditableUser.name ? 'Enable Editing' : 'Cancel' }}
+                </button>
+              </div>
             </div>
-          </div>
           <div class="card-body">
             <form class="d-flex flex-column gap-3" @submit.prevent="handleUpdateUserAccount">
               <div>
@@ -586,7 +591,7 @@ onBeforeUnmount(() => {
                 </div>
               </div>
 
-              <div class="d-flex flex-column flex-md-row justify-content-center gap-3 mt-3" v-if="isProfileOwner">
+              <div class="d-flex flex-column flex-md-row justify-content-center gap-3 mt-3" v-if="canEditProfile">
                 <FormButton label="Save Changes" :is-disabled="isEditableSubmit"
                   :btn-display="isEditableSubmit ? 'secondary' : 'primary'" />
               </div>

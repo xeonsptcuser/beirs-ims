@@ -51,4 +51,8 @@ export class UserRelatedService {
 
     return this.apiService.patch(url, data)
   }
+
+  async deleteUserAccount(url: string): Promise<ApiResponse<User>> {
+    return this.apiService.delete<ApiResponse<User>>(url)
+  }
 }

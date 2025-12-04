@@ -388,7 +388,7 @@ watch(
           {{ blotterReport?.status }}
         </span>
         <p class="text-secondary small mt-2 mb-0">Filed on {{ formatDateToHuman(blotterReport?.created_at ?? '') || '—'
-        }}</p>
+          }}</p>
       </div>
     </div>
 
@@ -537,7 +537,7 @@ watch(
           </div>
         </div>
 
-        <div class="card shadow-sm border-0 mb-4">
+        <div class="card shadow-sm border-0 mb-4" v-if="blotterReport?.status !== 'rejected'">
           <div class="card-body">
             <h5 class="card-title fw-semibold mb-3">Status Timeline</h5>
             <ul class="list-unstyled mb-0 timeline">

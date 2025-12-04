@@ -80,7 +80,10 @@ class UsersRepositoryImpl implements UsersRepositoryInterface
         DB::transaction(function () use ($user) {
             if ($user->profile) {
                 $user->profile->update(['is_active' => false]);
+                $user->profile->delete();
             }
+
+            $user->delete();
         });
     }
 }

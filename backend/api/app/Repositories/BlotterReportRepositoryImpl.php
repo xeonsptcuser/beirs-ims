@@ -31,7 +31,7 @@ class BlotterReportRepositoryImpl implements BlotterReportRepositoryInterface
                     $profileQuery->where(DB::raw("LOWER(CONCAT_WS(' ', first_name, last_name))"), 'like', "%{$search}%")
                         ->orWhere(DB::raw("LOWER(first_name)"), 'like', "%{$search}%")
                         ->orWhere(DB::raw("LOWER(last_name)"), 'like', "%{$search}%");
-                })->orWhere(DB::raw('LOWER(cert_request_type)'), 'like', "%{$search}%");
+                })->orWhere(DB::raw('LOWER(incident_type)'), 'like', "%{$search}%");
             });
         }
 
@@ -105,7 +105,7 @@ class BlotterReportRepositoryImpl implements BlotterReportRepositoryInterface
                     $profileQuery->where(DB::raw("LOWER(CONCAT_WS(' ', first_name, last_name))"), 'like', "%{$search}%")
                         ->orWhere(DB::raw("LOWER(first_name)"), 'like', "%{$search}%")
                         ->orWhere(DB::raw("LOWER(last_name)"), 'like', "%{$search}%");
-                })->orWhere(DB::raw('LOWER(cert_request_type)'), 'like', "%{$search}%");
+                })->orWhere(DB::raw('LOWER(incident_type)'), 'like', "%{$search}%");
             });
         }
 
@@ -135,7 +135,7 @@ class BlotterReportRepositoryImpl implements BlotterReportRepositoryInterface
                     $profileQuery->where(DB::raw("LOWER(CONCAT_WS(' ', first_name, last_name))"), 'like', "%{$search}%")
                         ->orWhere(DB::raw("LOWER(first_name)"), 'like', "%{$search}%")
                         ->orWhere(DB::raw("LOWER(last_name)"), 'like', "%{$search}%");
-                })->orWhere(DB::raw('LOWER(cert_request_type)'), 'like', "%{$search}%");
+                })->orWhere(DB::raw('LOWER(incident_type)'), 'like', "%{$search}%");
             });
         }
         return $perPage ? $query->paginate($perPage) : $query->get();

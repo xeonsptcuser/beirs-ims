@@ -90,16 +90,25 @@ onMounted(async () => {
               <p class="h5 text-center mb-4">Legends</p>
               <div class="d-flex align-items-center justify-content-between col-8 mx-auto">
                 <div class="d-flex align-items-center">
-                  <div class="border bg-level-low" style="width: 20px; height: 20px;"></div>
-                  <p class="mb-0 ms-2">Low</p>
+                  <div class="border bg-level-low legend-square"></div>
+                  <div class="ms-2">
+                    <p class="mb-0">Low</p>
+                    <small class="text-muted">1 - 10 reports</small>
+                  </div>
                 </div>
                 <div class="d-flex align-items-center">
-                  <div class="border bg-level-medium" style="width: 20px; height: 20px;"></div>
-                  <p class="mb-0 ms-2">Moderate</p>
+                  <div class="border bg-level-medium legend-square"></div>
+                  <div class="ms-2">
+                    <p class="mb-0">Moderate</p>
+                    <small class="text-muted">11 - 20 reports</small>
+                  </div>
                 </div>
                 <div class="d-flex align-items-center">
-                  <div class="border bg-level-high" style="width: 20px; height: 20px;"></div>
-                  <p class="mb-0 ms-2">High</p>
+                  <div class="border bg-level-high legend-square"></div>
+                  <div class="ms-2">
+                    <p class="mb-0">High</p>
+                    <small class="text-muted">21+ reports</small>
+                  </div>
                 </div>
               </div>
             </section>
@@ -144,19 +153,29 @@ onMounted(async () => {
 }
 
 :global(.heatmap-pin__body) {
-  width: 28px;
-  height: 28px;
+  min-width: 34px;
+  min-height: 34px;
   border-radius: 50%;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   color: #fff;
   font-weight: 700;
   border: 2px solid #ffffffaa;
+  padding: 4px 6px;
+  line-height: 1;
 }
 
 :global(.heatmap-pin__label) {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   line-height: 1;
+}
+
+:global(.heatmap-pin__level) {
+  font-size: 0.65rem;
+  font-weight: 600;
+  opacity: 0.9;
 }
 
 :global(.heatmap-popup) {
@@ -181,5 +200,11 @@ onMounted(async () => {
 
 .bg-level-high {
   background-color: rgb(255, 91, 2);
+}
+
+.legend-square {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
 }
 </style>

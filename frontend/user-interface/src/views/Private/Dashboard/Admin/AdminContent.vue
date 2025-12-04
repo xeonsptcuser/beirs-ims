@@ -58,7 +58,8 @@ const quickActions = [
 
 <template>
   <div class="mb-5">
-    <div class="d-flex justify-content-between align-items-start align-items-lg-center flex-column flex-lg-row gap-3 mb-4">
+    <div
+      class="d-flex justify-content-between align-items-start align-items-lg-center flex-column flex-lg-row gap-3 mb-4">
       <div>
         <p class="text-muted text-uppercase small mb-1">Administration</p>
         <h2 class="fw-bold mb-1">Barangay Command Center</h2>
@@ -67,10 +68,7 @@ const quickActions = [
     </div>
 
     <div class="row g-4 mb-4 align-items-center">
-      <div class="col-lg-5">
-        <img :src="AdminDashboardImage" alt="Admin dashboard illustration" class="img-fluid rounded-4 shadow-sm" />
-      </div>
-      <div class="col-lg-7">
+      <div class="">
         <div class="row g-3">
           <div class="col-md-4" v-for="card in overviewHighlights" :key="card.label">
             <div class="card border-0 shadow-sm h-100">

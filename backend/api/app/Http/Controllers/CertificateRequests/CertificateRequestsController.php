@@ -180,6 +180,7 @@ class CertificateRequestsController extends Controller
         $defaultStaffStatuses = [
             CertificateRequest::STATUS_PENDING,
             CertificateRequest::STATUS_APPROVED,
+            CertificateRequest::STATUS_RELEASED,
         ];
 
         if (is_null($statuses)) {
