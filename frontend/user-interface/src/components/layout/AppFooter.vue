@@ -30,12 +30,12 @@
             <li class="mb-2">
               <router-link to="/about" class="text-white-50 text-decoration-none">About the Barangay</router-link>
             </li>
-            <li class="mb-2">
+            <!-- <li class="mb-2">
               <router-link to="/services" class="text-white-50 text-decoration-none">Services</router-link>
             </li>
             <li>
               <router-link to="/contact" class="text-white-50 text-decoration-none">Contact Us</router-link>
-            </li>
+            </li> -->
           </ul>
         </div>
       </div>
