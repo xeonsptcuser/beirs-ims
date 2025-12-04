@@ -255,7 +255,12 @@ onMounted(() => {
         <h2 class="fw-bold mb-0">Blotter Report Overview</h2>
         <p class="text-secondary small mb-0">Track ongoing cases, follow their status, and stay informed.</p>
       </div>
-      <div class="text-end">
+      <div class="d-flex align-items-center">
+        <div class=" text-md-end">
+          <button class="btn btn-link text-decoration-none" type="button" @click="toggleHistoryView">
+            {{ isHistoryScreen ? 'View Reports' : 'View History' }}
+          </button>
+        </div>
         <router-link v-if="isResidentView && createReportRoute" class="btn btn-primary mt-3 mt-lg-0"
           :class="{ disabled: shouldBlockActions }" :aria-disabled="shouldBlockActions"
           :tabindex="shouldBlockActions ? -1 : 0" :to="createReportRoute" @click="handleBlockedNavigation">
@@ -271,24 +276,17 @@ onMounted(() => {
 
     <div class="card shadow-sm mb-4">
       <div class="card-body">
-        <div class="row gy-3 align-items-center">
+        <form class="row gy-3 align-items-center" @submit.prevent="handleSearch">
           <div class="col-md-6">
             <FormSearchInput v-model="searchKeyword" />
           </div>
-          <div class="col-md-3 d-flex gap-2">
-            <button class="btn btn-outline-primary w-100" type="button" @click="handleSearch">
+          <div class="col-md-3 ms-auto">
+            <button class="btn btn-outline-primary w-100" type="submit">
               Search
             </button>
-            <button class="btn btn-outline-secondary w-100" type="button" @click="() => fetchBlotterRecords(1)">
-              Reset
-            </button>
           </div>
-          <div class="col-md-3 text-md-end">
-            <button class="btn btn-link text-decoration-none" type="button" @click="toggleHistoryView">
-              {{ isHistoryScreen ? 'View Reports' : 'View History' }}
-            </button>
-          </div>
-        </div>
+
+        </form>
         <hr />
         <div class="row gx-4 gy-2">
           <div class="col-md-6 col-lg-3" v-for="status in (isHistoryScreen ? historyStatuses : transactionStatuses)"

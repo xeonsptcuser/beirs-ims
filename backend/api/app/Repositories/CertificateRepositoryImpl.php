@@ -33,6 +33,8 @@ class CertificateRepositoryImpl implements CertificateRepositoryInterface
                     $profileQuery->where(DB::raw("LOWER(CONCAT_WS(' ', first_name, last_name))"), 'like', "%{$search}%")
                         ->orWhere(DB::raw("LOWER(first_name)"), 'like', "%{$search}%")
                         ->orWhere(DB::raw("LOWER(last_name)"), 'like', "%{$search}%");
+                })->orWhereHas('profile.user', function ($userQuery) use ($search) {
+                    $userQuery->where(DB::raw('LOWER(email)'), 'like', "%{$search}%");
                 })->orWhere(DB::raw('LOWER(cert_request_type)'), 'like', "%{$search}%");
             });
         }
@@ -54,6 +56,7 @@ class CertificateRepositoryImpl implements CertificateRepositoryInterface
         $defaultStaffStatuses = [
             CertificateRequest::STATUS_PENDING,
             CertificateRequest::STATUS_APPROVED,
+            CertificateRequest::STATUS_RELEASED,
         ];
 
         $statuses = $statuses ? array_values(array_intersect($statuses, $allowedStatuses)) : $defaultStaffStatuses;
@@ -103,6 +106,8 @@ class CertificateRepositoryImpl implements CertificateRepositoryInterface
                     $profileQuery->where(DB::raw("LOWER(CONCAT_WS(' ', first_name, last_name))"), 'like', "%{$search}%")
                         ->orWhere(DB::raw("LOWER(first_name)"), 'like', "%{$search}%")
                         ->orWhere(DB::raw("LOWER(last_name)"), 'like', "%{$search}%");
+                })->orWhereHas('profile.user', function ($userQuery) use ($search) {
+                    $userQuery->where(DB::raw('LOWER(email)'), 'like', "%{$search}%");
                 })->orWhere(DB::raw('LOWER(cert_request_type)'), 'like', "%{$search}%");
             });
         }
@@ -134,6 +139,8 @@ class CertificateRepositoryImpl implements CertificateRepositoryInterface
                     $profileQuery->where(DB::raw("LOWER(CONCAT_WS(' ', first_name, last_name))"), 'like', "%{$search}%")
                         ->orWhere(DB::raw("LOWER(first_name)"), 'like', "%{$search}%")
                         ->orWhere(DB::raw("LOWER(last_name)"), 'like', "%{$search}%");
+                })->orWhereHas('profile.user', function ($userQuery) use ($search) {
+                    $userQuery->where(DB::raw('LOWER(email)'), 'like', "%{$search}%");
                 })->orWhere(DB::raw('LOWER(cert_request_type)'), 'like', "%{$search}%");
             });
         }

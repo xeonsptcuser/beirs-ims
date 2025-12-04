@@ -33,9 +33,9 @@ export function useEditUserAccount() {
 
   const isEditableSubmit = ref<boolean>(true)
 
-  const setisNotEditableUser = () => {
+  const setisNotEditableUser = (allowRoleToggle = false) => {
     for (const key of Object.keys(isNotEditableUser.value) as (keyof UserProfileEditStatus)[]) {
-      if (key === 'role') continue
+      if (key === 'role' && !allowRoleToggle) continue
       isNotEditableUser.value[key] = !isNotEditableUser.value[key]
     }
     isEditableSubmit.value = !isEditableSubmit.value

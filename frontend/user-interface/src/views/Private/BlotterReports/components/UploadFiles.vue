@@ -27,7 +27,7 @@ const props = withDefaults(defineProps<{
   maxFiles: 10,
   enforceEvidenceRules: true,
   maxImageSizeBytes: 5 * 1024 * 1024,
-  maxVideoSizeBytes: 100 * 1024 * 1024,
+  maxVideoSizeBytes: 25 * 1024 * 1024,
   allowedImageTypes: () => ['image/jpeg', 'image/png', 'image/jpg'],
   allowedVideoTypes: () => ['video/mp4'],
 })
@@ -105,7 +105,7 @@ const handleFiles = (selectedFiles: FileList | File[]) => {
     }
 
     if (props.allowedVideoTypes.includes(file.type) && file.size > props.maxVideoSizeBytes) {
-      rejected.push(`${file.name}: Videos must be 100MB or smaller.`)
+      rejected.push(`${file.name}: Videos must be 25MB or smaller.`)
       continue
     }
 

@@ -6,7 +6,7 @@ import type { PageInfo, PaginationLink, User } from '@/Types';
 import { formatName } from '@/Utils/helpers/formatters';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
-import { fetchAllUsers, toggleUserAccountStatus } from '@/Utils/userServices';
+import { fetchAllUsers, toggleUserAccountStatus, softDeleteUserAccount } from '@/Utils/userServices';
 import { computed, onMounted, reactive, ref } from 'vue';
 
 defineProps<{ role: string }>();
@@ -88,6 +88,22 @@ const handleToggleUserStatus = async (resident: User) => {
   }
 };
 
+const handleSoftDelete = async (resident: User) => {
+  const shouldProceed = globalThis.confirm(`Soft delete ${resident.email}? This will hide their account without permanent removal.`);
+  if (!shouldProceed) return;
+
+  navigation.startNavigation();
+  try {
+    await softDeleteUserAccount(resident.id);
+    await fetchResidentUsers(pagination.current);
+  } catch (error: any) {
+    hasError.value = true;
+    errorMessage.value = error?.message ?? 'Failed to delete user.';
+  } finally {
+    navigation.endNavigation();
+  }
+};
+
 const handleSearchResidentByName = () => {
   pagination.current = 1;
   fetchResidentUsers(pagination.current, searchByNameKeyWord.value.trim() || undefined);
@@ -160,9 +176,8 @@ onMounted(() => {
           <div class="col-md-6 col-lg-4">
             <FormSearchInput v-model="searchByNameKeyWord" />
           </div>
-          <div class="col-md-6 col-lg-4 d-flex gap-2">
+          <div class="col-md-3 d-flex gap-2 ms-auto">
             <button class="btn btn-primary w-100" type="submit">Search</button>
-            <button class="btn btn-outline-secondary w-100" type="button" @click="resetSearch">Reset</button>
           </div>
           <div class="col-12 col-lg-4 d-flex justify-content-lg-end">
             <button class="btn" :class="sortMode === 'address' ? 'btn-outline-secondary' : 'btn-outline-primary'"
@@ -224,6 +239,10 @@ onMounted(() => {
                 @click="handleToggleUserStatus(resident)">
                 <span v-if="resident.profile.is_active"><i class="bi bi-slash-circle me-1"></i>Deactivate</span>
                 <span v-else><i class="bi bi-check-circle me-1"></i>Activate</span>
+              </button>
+              <button v-if="isAdmin" class="btn btn-sm btn-outline-secondary" type="button"
+                @click="handleSoftDelete(resident)">
+                <i class="bi bi-trash me-1"></i>Delete
               </button>
             </div>
           </div>
