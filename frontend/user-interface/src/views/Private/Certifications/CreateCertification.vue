@@ -192,7 +192,7 @@ watchEffect(() => {
         <div class="col-12">
           <FormTextAreaInput label="Purpose of Certificate" id="certificate-request-purpose"
             v-model="form.certificateRequestReason" :error-message="errorMessages.certificateRequestReason.error"
-            :has-error="errors.certificateRequestReason" :is-resizeable="false" />
+            :has-error="errors.certificateRequestReason" :is-resizeable="false" maxLength="200" />
         </div>
         <div class="col-md-6 col-sm-12 mx-auto">
           <FormButton label="Submit" />
