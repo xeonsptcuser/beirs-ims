@@ -31,7 +31,7 @@ const welcomeSubtitle = computed(() => {
     return 'Review requests, coordinate with residents, and track assignments at a glance.';
   }
   if (isResident.value) {
-    return 'Track your certificate and blotter requests, and stay updated with barangay announcements.';
+    return 'Certificate filing, including blotter report requests, is limited to one (1) application every 24 hours per applicant to ensure orderly processing and efficient service.';
   }
   return 'Sign in to access the barangay services tailored for you.';
 });

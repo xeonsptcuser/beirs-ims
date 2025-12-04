@@ -54,7 +54,7 @@ router.beforeEach(async (to, _from, next) => {
 
   const title = to.meta.title
   if (typeof title === 'string' && title) {
-    document.title = `BEIRS-IMS - ${title}`
+    document.title = `BEIRS - ${title}`
   }
   next()
 })
