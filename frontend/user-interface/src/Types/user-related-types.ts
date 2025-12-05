@@ -72,6 +72,7 @@ export type UpdateAccountRequestPayload = Partial<
     password_confirmation: string
     government_identity_type: string
     government_identity: File[] | FileList | null
+    is_active: boolean
   }
 >
 

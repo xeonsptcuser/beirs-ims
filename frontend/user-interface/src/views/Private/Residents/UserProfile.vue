@@ -130,6 +130,7 @@ const handleUpdateUserAccount = async () => {
     if (isValid) {
       hasError.value = false
       const mobileChanged = hasMobileChanged.value
+      const addressChanged = hasStreetAddressChanged.value
       const requestPayload: UpdateAccountRequestPayload = {
         first_name: form.name.firstName,
         middle_name: form.name.middleName,
@@ -142,6 +143,10 @@ const handleUpdateUserAccount = async () => {
         date_of_birth: form.date_of_birth,
         government_identity_type: form.govtIdentityType,
         government_identity: form.governmentIdentity,
+      }
+
+      if (addressChanged) {
+        requestPayload.is_active = false
       }
 
       const trimmedPassword = form.password.trim()
@@ -158,9 +163,13 @@ const handleUpdateUserAccount = async () => {
       originalMobileNumber.value = response.data.profile.mobile_number ?? ''
       mobileVerificationPending.value = mobileChanged || !response.data.profile.mobile_verified_at
 
+      const successMessage = addressChanged
+        ? 'Address updated. Account set to inactive pending admin reactivation.'
+        : response.message ?? 'User updated successfully.'
+
       setSuccessResponse({
         status: response.status ?? 'success',
-        message: response.message ?? 'User updated successfully.',
+        message: successMessage,
       })
 
       setisNotEditableUser(canEditRole.value)
@@ -308,12 +317,22 @@ const fullName = computed(() => {
   return formatName(profile.first_name, profile.middle_name, profile.last_name)
 })
 
+const hasStreetAddressChanged = computed(() => {
+  const currentStreet = form.streetAddress ?? ''
+  const originalStreet = responseData.value?.profile?.street_address ?? ''
+  return currentStreet !== originalStreet
+})
+
+const isProfileInactive = computed(() => {
+  return hasStreetAddressChanged.value || !responseData.value?.profile?.is_active
+})
+
 const profileStatusClass = computed(() => {
-  return responseData.value?.profile?.is_active ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-muted'
+  return isProfileInactive.value ? 'bg-secondary-subtle text-muted' : 'bg-success-subtle text-success'
 })
 
 const profileStatusLabel = computed(() => {
-  return responseData.value?.profile?.is_active ? 'Active Account' : 'Inactive Account'
+  return isProfileInactive.value ? 'Inactive Account' : 'Active Account'
 })
 
 const formattedAddress = computed(() => {

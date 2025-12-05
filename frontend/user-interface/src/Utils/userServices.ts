@@ -100,6 +100,9 @@ export const updateUserAccount = async (userId: string, data: UpdateAccountReque
   appendIfPresent('password', data.password)
   appendIfPresent('password_confirmation', data.password_confirmation)
   appendIfPresent('government_identity_type', data.government_identity_type)
+  if (data.is_active !== undefined) {
+    formData.append('is_active', data.is_active ? '1' : '0')
+  }
 
   const governmentIdentityRaw = data.government_identity ?? []
   const governmentIdentity = Array.isArray(governmentIdentityRaw)
