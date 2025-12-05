@@ -45,7 +45,7 @@ type CertificateData = Record<string, any>
 
 const iframeSrc = computed(() => (pdfUrl.value ? `${pdfUrl.value}#toolbar=0&navpanes=0&statusbar=0` : ''))
 
-type CertificateField = 'full_name' | 'address' | 'age' | 'month' | 'day' | 'last_name'
+type CertificateField = 'full_name' | 'address' | 'age' | 'month' | 'day' | 'last_name' | 'purpose'
 type CertificateFieldMap = Partial<Record<CertificateField, FieldPosition>>
 
 type FieldPosition = {
@@ -69,15 +69,17 @@ const positionMap: Record<string, CertificateFieldMap> = {
   indigency: {
     full_name: { x: 270, y: 532, size: 12 },
     address: { x: 160, y: 510, size: 7.7 },
-    month: { x: 380, y: 361, size: 12 },
-    day: { x: 305, y: 361, size: 10 },
+    purpose: { x: 200, y: 402, size: 12 },
+    month: { x: 380, y: 305, size: 12 },
+    day: { x: 305, y: 305, size: 10 },
   },
   residency: {
     full_name: { x: 300, y: 515, size: 12 },
     address: { x: 238, y: 500, size: 9 },
     age: { x: 480, y: 515, size: 12 },
-    month: { x: 275, y: 302, size: 12 },
-    day: { x: 223, y: 302, size: 12 },
+    purpose: { x: 200, y: 415, size: 12 },
+    month: { x: 275, y: 260, size: 12 },
+    day: { x: 223, y: 260, size: 12 },
   },
 }
 
@@ -103,6 +105,68 @@ const drawText = (
     y: pos.y,
     size: pos.size,
     font,
+  })
+}
+
+const wrapText = (text: string, maxWidth: number, font: any, size: number): string[] => {
+  const words = text.split(/\s+/)
+  const lines: string[] = []
+  let currentLine = ''
+
+  for (const word of words) {
+    const testLine = currentLine ? `${currentLine} ${word}` : word
+    if (font.widthOfTextAtSize(testLine, size) <= maxWidth) {
+      currentLine = testLine
+      continue
+    }
+
+    if (currentLine) {
+      lines.push(currentLine)
+    }
+
+    if (font.widthOfTextAtSize(word, size) > maxWidth) {
+      let chunk = ''
+      for (const char of word) {
+        const testChunk = `${chunk}${char}`
+        if (font.widthOfTextAtSize(testChunk, size) <= maxWidth) {
+          chunk = testChunk
+        } else {
+          lines.push(chunk)
+          chunk = char
+        }
+      }
+      currentLine = chunk
+    } else {
+      currentLine = word
+    }
+  }
+
+  if (currentLine) {
+    lines.push(currentLine)
+  }
+
+  return lines
+}
+
+const drawWrappedText = (
+  page: any,
+  font: any,
+  key: CertificateField,
+  value: string | undefined | null,
+  maxWidth: number,
+  lineHeight: number
+) => {
+  if (!value) return
+  const pos = resolvedPositions.value[key]
+  if (!pos) return
+  const lines = wrapText(String(value), maxWidth, font, pos.size)
+  lines.forEach((line, index) => {
+    page.drawText(line, {
+      x: pos.x,
+      y: pos.y - index * lineHeight,
+      size: pos.size,
+      font,
+    })
   })
 }
 
@@ -134,10 +198,12 @@ const buildPdfWithData = async (data: CertificateData) => {
   const fullDate = data.issued_at;
   const age = computeAge(data.date_of_birth)
   const splitDate = separateDate(fullDate);
+  const purpose = data.purpose
 
   drawText(page, font, 'full_name', fullName)
   drawText(page, font, 'last_name', lastName.value)
   drawText(page, font, 'address', homeAddress)
+  drawWrappedText(page, font, 'purpose', purpose, 380, 14)
   drawText(page, font, 'day', addOrdinalSuffix(splitDate?.day ?? 0))
   drawText(page, font, 'month', splitDate?.month)
   drawText(page, font, 'age', age)
@@ -163,6 +229,7 @@ const loadCertificateData = async () => {
       throw new Error(response?.message || 'Failed to load certificate data.')
     }
     payload.value = response.data
+    console.log(payload.value)
     await buildPdfWithData(response.data)
   } catch (error: any) {
     errorMessage.value = error?.message ?? 'Failed to load certificate data.'
