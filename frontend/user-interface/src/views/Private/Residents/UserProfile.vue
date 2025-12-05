@@ -9,7 +9,7 @@ import type { AxiosError } from 'axios';
 import type { ApiErrorResponse, CommonResponse, UpdateAccountRequestPayload, User } from '@/Types';
 import { useSessionStore } from '@/Utils/store/useSessionStore';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
-import { computeAge, formatDateToHuman, formatName, orderedOptions } from '@/Utils/helpers/formatters';
+import { computeAge, formatDateToHuman, formatName, maxBirthDate, minBirthDate, orderedOptions } from '@/Utils/helpers/formatters';
 import { navigateToTopPage } from '@/Utils/helpers/common-helpers';
 import FormFloatingInput from '@/components/common/FormFloatingInput/FormFloatingInput.vue';
 import UploadFiles from '../BlotterReports/components/UploadFiles.vue';
@@ -541,7 +541,7 @@ onBeforeUnmount(() => {
                   <div class="col-md-3">
                     <FormFloatingInput v-if="!isNotEditableUser.dateOfBirth" type="date" label="Date Of Birth"
                       id="birthday" v-model="form.date_of_birth" :has-error="errors.date_of_birth"
-                      :error-message="errorMessages.date_of_birth.error" />
+                      :error-message="errorMessages.date_of_birth.error" :max="maxBirthDate()" :min="minBirthDate()" />
                     <FormFloatingInput v-else type="text" label="Age" id="user-age" v-model="age"
                       :is-disabled="isNotEditableUser.dateOfBirth" />
                   </div>
@@ -559,7 +559,8 @@ onBeforeUnmount(() => {
                   <div class="col-md-4">
                     <FormFloatingInput type="text" label="Mobile Number" id="phoneNumber" v-model="form.mobileNumber"
                       :has-error="errors.mobileNumber" :error-message="errorMessages.mobileNumber.error"
-                      :is-disabled="isNotEditableUser.mobileNumber" />
+                      :is-disabled="isNotEditableUser.mobileNumber" pattern="09[0-9]{9}" maxlength="11"
+                      inputmode="numeric" />
                   </div>
                   <div class="col-md-4">
                     <DropdownInput :options="orderedOptions(addressOptions)" label="Sitio" id="sitio-name"

@@ -12,6 +12,13 @@ export const formatName = (firstName?: string, middleName?: string, lastName?: s
   return `${firstName ?? ''} ${middleName ?? ''} ${lastName ?? ''} `
 }
 
+const formatAsDateInput = (date: Date) => {
+  const yyyy = date.getFullYear()
+  const mm = String(date.getMonth() + 1).padStart(2, '0')
+  const dd = String(date.getDate()).padStart(2, '0')
+  return `${yyyy}-${mm}-${dd}`
+}
+
 export const computeAge = (dateIsoStr: string) => {
   const age = Math.floor(
     (Date.now() - new Date(dateIsoStr).getTime()) / (1000 * 60 * 60 * 24 * 365.25)
@@ -23,12 +30,41 @@ export const computeAge = (dateIsoStr: string) => {
   return age.toString()
 }
 
+export const isAgeWithinRange = (dateIsoStr: string, minAge = 18, maxAge = 110) => {
+  const dob = new Date(dateIsoStr)
+  if (Number.isNaN(dob.getTime())) {
+    return false
+  }
+
+  const today = new Date()
+  let age = today.getFullYear() - dob.getFullYear()
+  const monthDiff = today.getMonth() - dob.getMonth()
+  const isBirthdayAheadThisYear = monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())
+  if (isBirthdayAheadThisYear) {
+    age -= 1
+  }
+
+  return age >= minAge && age <= maxAge
+}
+
+export const isValidPhilippineMobile = (mobile: string) => {
+  return /^09\d{9}$/.test(mobile.trim())
+}
+
 export const dateToday = () => {
+  return formatAsDateInput(new Date())
+}
+
+export const maxBirthDate = (minAgeYears = 18) => {
   const d = new Date()
-  const yyyy = d.getFullYear()
-  const mm = String(d.getMonth() + 1).padStart(2, '0')
-  const dd = String(d.getDate()).padStart(2, '0')
-  return `${yyyy}-${mm}-${dd}`
+  d.setFullYear(d.getFullYear() - minAgeYears)
+  return formatAsDateInput(d)
+}
+
+export const minBirthDate = (maxAgeYears = 110) => {
+  const d = new Date()
+  d.setFullYear(d.getFullYear() - maxAgeYears)
+  return formatAsDateInput(d)
 }
 
 export const maxDate = () => {

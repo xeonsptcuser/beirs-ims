@@ -57,6 +57,7 @@ class UsersController extends Controller
     public function store(Request $request)
     {
         $legalAgeDate = Carbon::now()->subYears(18)->toDateString();
+        $maxAgeDate = Carbon::now()->subYears(110)->toDateString();
 
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
@@ -65,10 +66,10 @@ class UsersController extends Controller
             'email' => ['required', 'email', 'unique:users,email'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'role' => ['required', Rule::in(['admin', 'staff', 'resident'])],
-            'date_of_birth' => ['required', 'date', "before_or_equal:{$legalAgeDate}"],
+            'date_of_birth' => ['required', 'date', "before_or_equal:{$legalAgeDate}", "after_or_equal:{$maxAgeDate}"],
             'street_address' => ['required', 'string', 'max:255'],
             'address_line' => ['nullable', 'string', 'max:255'],
-            'mobile_number' => ['nullable', 'string', 'max:20'],
+            'mobile_number' => ['nullable', 'regex:/^09\d{9}$/'],
         ]);
 
         $user = $this->users->createWithProfile(
@@ -106,6 +107,7 @@ class UsersController extends Controller
         }
 
         $legalAgeDate = Carbon::now()->subYears(18)->toDateString();
+        $maxAgeDate = Carbon::now()->subYears(110)->toDateString();
 
         $validated = $request->validate([
             'email' => ['sometimes', 'email', Rule::unique('users', 'email')->ignore($user->id)],
@@ -116,8 +118,8 @@ class UsersController extends Controller
             'middle_name' => ['sometimes', 'string', 'max:100'],
             'street_address' => ['sometimes', 'nullable', 'string', 'max:255'],
             'address_line' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'mobile_number' => ['sometimes', 'nullable', 'string', 'max:20'],
-            'date_of_birth' => ['sometimes', 'date', "before_or_equal:{$legalAgeDate}"],
+            'mobile_number' => ['sometimes', 'nullable', 'regex:/^09\d{9}$/'],
+            'date_of_birth' => ['sometimes', 'date', "before_or_equal:{$legalAgeDate}", "after_or_equal:{$maxAgeDate}"],
             'is_active' => ['sometimes', 'boolean'],
             'government_identity_type' => ['sometimes', 'string', 'max:255'],
             'government_identity' => ['sometimes', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
