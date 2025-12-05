@@ -1,6 +1,7 @@
 import { useSharedAuthResponse } from '@/composables/useSharedAuthResponse'
 import type { RegisterRequest } from '@/Types'
 import { reactive, ref } from 'vue'
+import { isAgeWithinRange, isValidPhilippineMobile } from '@/Utils/helpers/formatters'
 
 type RegisterErrorKey = keyof RegisterRequest | 'general'
 
@@ -104,12 +105,24 @@ export function useRegisterAccount() {
         error: 'Please enter your birthday.',
       }
       isValid = false
+    } else if (!isAgeWithinRange(form.date_of_birth)) {
+      errors.value.date_of_birth = true
+      errorMessages.value.date_of_birth = {
+        error: 'Age must be between 18 and 110 years old.',
+      }
+      isValid = false
     }
 
     if (!form.mobileNumber.trim()) {
       errors.value.mobileNumber = true
       errorMessages.value.mobileNumber = {
         error: 'Mobile number is required.',
+      }
+      isValid = false
+    } else if (!isValidPhilippineMobile(form.mobileNumber)) {
+      errors.value.mobileNumber = true
+      errorMessages.value.mobileNumber = {
+        error: 'Mobile number must start with 09 and be 11 digits.',
       }
       isValid = false
     }

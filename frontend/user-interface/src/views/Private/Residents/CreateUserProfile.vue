@@ -11,7 +11,7 @@ import { useRouter } from 'vue-router';
 import type { AxiosError } from 'axios';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import FormFloatingInput from '@/components/common/FormFloatingInput/FormFloatingInput.vue';
-import { orderedOptions } from '@/Utils/helpers/formatters';
+import { maxBirthDate, minBirthDate, orderedOptions } from '@/Utils/helpers/formatters';
 
 const props = defineProps<{
   role: string
@@ -130,6 +130,7 @@ const filteredErrors = computed(() => {
               <div class="col-md-3 col-sm-12">
                 <FormFloatingInput type="date" label="Date Of Birth" id="birthday" v-model="form.date_of_birth"
                   :has-error="errors.date_of_birth" :error-message="errorMessages.date_of_birth.error"
+                  :max="maxBirthDate()" :min="minBirthDate()"
                   :is-capitalized="false" />
               </div>
               <div class="col-md-3 col-sm-12">
@@ -140,7 +141,8 @@ const filteredErrors = computed(() => {
             <div class="row g-2">
               <div class="col-md-6 col-sm-12">
                 <FormFloatingInput type="text" label="Mobile Number" id="phoneNumber" v-model="form.mobileNumber"
-                  :has-error="errors.mobileNumber" :error-message="errorMessages.mobileNumber.error" :optional="true" />
+                  :has-error="errors.mobileNumber" :error-message="errorMessages.mobileNumber.error" :optional="true"
+                  pattern="09[0-9]{9}" maxlength="11" inputmode="numeric" />
               </div>
               <div class="col-md-6 col-sm-12">
                 <DropdownInput :options="addressOptions" label="Home Address" id="streetAddress"

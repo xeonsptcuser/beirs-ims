@@ -11,7 +11,7 @@ import FormButton from '@/components/common/FormButton/FormButton.vue';
 import { useGlobalLoadingStore } from '@/Utils/store/useGlobalLoadingStore';
 import FormFloatingInput from '@/components/common/FormFloatingInput/FormFloatingInput.vue';
 import DropdownInput from '@/components/common/DropdownInput/DropdownInput.vue';
-import { maxDate } from '@/Utils/helpers/formatters';
+import { maxBirthDate, minBirthDate } from '@/Utils/helpers/formatters';
 import { useBarangayAddresses } from '@/composables/useBarangayAddresses';
 
 const {
@@ -136,7 +136,7 @@ const filteredErrors = computed(() => {
                 </div>
                 <div class="col-md-6 col-sm-12">
                   <FormFloatingInput type="date" label="Date Of Birth" id="birthday" v-model="form.date_of_birth"
-                    :has-error="errors.date_of_birth" :max="maxDate()"
+                    :has-error="errors.date_of_birth" :max="maxBirthDate()" :min="minBirthDate()"
                     :error-message="errorMessages.date_of_birth.error" :is-capitalized="false" />
                 </div>
               </div>
@@ -156,7 +156,8 @@ const filteredErrors = computed(() => {
                 <div class="col-md-6 col-sm-12">
                   <FormFloatingInput type="text" label="Mobile Number" placeholder="09..." id="mobile-number"
                     v-model="form.mobileNumber" :has-error="errors.mobileNumber"
-                    :error-message="errorMessages.mobileNumber.error" :is-capitalized="false" />
+                    :error-message="errorMessages.mobileNumber.error" :is-capitalized="false"
+                    pattern="09[0-9]{9}" maxlength="11" inputmode="numeric" />
                 </div>
                 <div class="col-md-6 col-sm-12">
                   <DropdownInput :options="barangayAddressOptions" label="Home Address" id="street-address"
