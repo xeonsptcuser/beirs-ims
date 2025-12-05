@@ -32,6 +32,7 @@ const hasError = ref<boolean>(false);
 const errorMessage = ref<string>('');
 const isHistoryScreen = ref<boolean>(false);
 const selectedStatusFilter = ref<BlotterReportStatus | null>(null);
+const sortOrder = ref<'desc' | 'asc'>('desc');
 const isLoadingProfile = ref<boolean>(false);
 const profileErrorMessage = ref<string>('');
 
@@ -79,6 +80,15 @@ const truncatedDescription = (text?: string | null) => {
   if (text.length <= 140) return text;
   return `${text.substring(0, 140)}...`;
 };
+
+const sortedBlotterReports = computed(() => {
+  return [...blotterReports.value].sort((a, b) => {
+    const aTime = new Date(a.created_at ?? '').getTime();
+    const bTime = new Date(b.created_at ?? '').getTime();
+    if (Number.isNaN(aTime) || Number.isNaN(bTime)) return 0;
+    return sortOrder.value === 'desc' ? bTime - aTime : aTime - bTime;
+  });
+});
 
 const fetchBlotterRecords = async (
   page: number = pagination.current,
@@ -292,12 +302,21 @@ onMounted(() => {
 
         </form>
         <hr />
-        <div class="row gx-4 gy-2">
-          <div class="col-md-6 col-lg-3" v-for="status in (isHistoryScreen ? historyStatuses : transactionStatuses)"
-            :key="status">
-            <FormCheckboxInput :id="`status-${status}`" :label="status.toUpperCase()"
-              :model-value="selectedStatusFilter === status"
-              @change="(checked: boolean) => handleStatusFilter(status, checked)" />
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+          <div class="row gx-4 gy-2 flex-grow-1">
+            <div class="col-md-6 col-lg-3" v-for="status in (isHistoryScreen ? historyStatuses : transactionStatuses)"
+              :key="status">
+              <FormCheckboxInput :id="`status-${status}`" :label="status.toUpperCase()"
+                :model-value="selectedStatusFilter === status"
+                @change="(checked: boolean) => handleStatusFilter(status, checked)" />
+            </div>
+          </div>
+          <div class="col-md-3 col-lg-3 ms-md-auto">
+            <select class="form-select" v-model="sortOrder">
+              <option value="" disabled class="text-muted">Sort by date</option>
+              <option value="desc">Newest</option>
+              <option value="asc">Oldest</option>
+            </select>
           </div>
         </div>
       </div>
@@ -315,7 +334,7 @@ onMounted(() => {
     </div>
 
     <div class="row row-cols-1 row-cols-lg-2 g-4" v-else>
-      <div class="col" v-for="report in blotterReports" :key="report.id">
+      <div class="col" v-for="report in sortedBlotterReports" :key="report.id">
         <div class="card h-100 shadow-sm border-0">
           <div class="card-body d-flex flex-column">
             <div class="d-flex justify-content-between align-items-start">

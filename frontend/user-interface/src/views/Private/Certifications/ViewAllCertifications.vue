@@ -26,6 +26,7 @@ const hasError = ref<boolean>(false);
 const errorMessage = ref<string>('');
 const isHistoryScreen = ref<boolean>(false);
 const selectedStatusFilter = ref<StatusOptions | null>(null);
+const sortOrder = ref<'desc' | 'asc'>('desc');
 const isStaffView = computed(() => useSession.isRoleStaff() || useSession.isRoleAdmin());
 const userProfile = ref<User | null>(null);
 const isLoadingProfile = ref<boolean>(false);
@@ -75,6 +76,15 @@ const truncatedPurpose = (text?: string) => {
 };
 
 const formatCaseId = (id: number) => `CERT-${id.toString().padStart(4, '0')}`;
+
+const sortedCertificationRequestItems = computed(() => {
+  return [...certificationRequestItems.value].sort((a, b) => {
+    const aTime = new Date(a.created_at ?? '').getTime();
+    const bTime = new Date(b.created_at ?? '').getTime();
+    if (Number.isNaN(aTime) || Number.isNaN(bTime)) return 0;
+    return sortOrder.value === 'desc' ? bTime - aTime : aTime - bTime;
+  });
+});
 
 const createCertificateRoute = computed(() => {
   if (!useSession.isRoleResident() || !useSession.isLoggedIn()) {
@@ -317,7 +327,7 @@ onMounted(() => {
             </div>
 
             <div class="row gy-3" v-else>
-              <div class="col-12" v-for="request in certificationRequestItems" :key="request.id">
+              <div class="col-12" v-for="request in sortedCertificationRequestItems" :key="request.id">
                 <div class="card border-0 shadow-sm h-100">
                   <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start gap-3">
@@ -373,6 +383,15 @@ onMounted(() => {
             </div>
 
             <hr />
+
+            <div class="mb-3">
+              <h5 class="fw-bold mb-3">Quick Sort</h5>
+              <select class="form-select" v-model="sortOrder">
+                <option value="" disabled class="text-muted">Sort by date</option>
+                <option value="desc">Newest</option>
+                <option value="asc">Oldest</option>
+              </select>
+            </div>
 
             <h5 class="fw-bold mb-3">Quick Filters</h5>
             <div class="d-flex flex-wrap gap-2">
