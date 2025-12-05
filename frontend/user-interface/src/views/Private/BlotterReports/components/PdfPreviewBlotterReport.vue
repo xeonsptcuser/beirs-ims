@@ -3,10 +3,10 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { PDFDocument, StandardFonts } from 'pdf-lib'
 import { endpoints } from '@/services/api/endpoints'
 import { PdfRelatedService } from '@/services/api/http/pdf-service'
-import blotterForm from '../../../../assets/pdf/blotter-form.pdf'
 import { useBlotterReports } from '../composable/useBlotterReport'
 import { addOrdinalSuffix } from '@/Utils/helpers/formatters'
 import { useRouter } from 'vue-router'
+import { useSessionStore } from '@/Utils/store/useSessionStore'
 
 const props = defineProps<{
   blotterId: string
@@ -17,13 +17,14 @@ const pdfService = PdfRelatedService.getInstance()
 const { incidentTypeOptions } = useBlotterReports();
 
 // Static PDF template
-const pdfTemplateUrl = blotterForm
+const pdfTemplateUrl = new URL('../../../../assets/pdf/blotter-form.pdf', import.meta.url).href
 
 const pdfUrl = ref<string | null>(null)
 const isLoading = ref<boolean>(false)
 const errorMessage = ref<string | null>(null)
 const payload = ref<Record<string, any> | null>(null)
 const router = useRouter()
+const session = useSessionStore()
 
 type BlotterData = Record<string, any>
 
@@ -167,7 +168,7 @@ const buildPdfWithData = async (data: BlotterData) => {
   pdfUrl.value = globalThis.URL.createObjectURL(pdfBlob)
 }
 
-const iframeSrc = computed(() => (pdfUrl.value ? `${pdfUrl.value}#toolbar=0&navpanes=0&statusbar=0` : ''))
+const iframeSrc = computed(() => (pdfUrl.value && session.isRoleResident() ? `${pdfUrl.value}#toolbar=0&navpanes=0&statusbar=0` : `${pdfUrl.value}`))
 
 
 const loadBlotterData = async () => {

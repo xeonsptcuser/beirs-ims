@@ -255,20 +255,24 @@ onMounted(() => {
         <h2 class="fw-bold mb-0">Blotter Report Overview</h2>
         <p class="text-secondary small mb-0">Track ongoing cases, follow their status, and stay informed.</p>
       </div>
-      <div class="d-flex align-items-center">
-        <div class=" text-md-end">
-          <button class="btn btn-link text-decoration-none" type="button" @click="toggleHistoryView">
-            {{ isHistoryScreen ? 'View Reports' : 'View History' }}
-          </button>
+      <div>
+        <div class="d-flex align-items-center justify-content-end">
+          <div class="text-md-end">
+            <button class="btn btn-link text-decoration-none" type="button" @click="toggleHistoryView">
+              {{ isHistoryScreen ? 'View Reports' : 'View History' }}
+            </button>
+          </div>
+          <router-link v-if="isResidentView && createReportRoute" class="btn btn-primary mt-3 mt-lg-0"
+            :class="{ disabled: shouldBlockActions }" :aria-disabled="shouldBlockActions"
+            :tabindex="shouldBlockActions ? -1 : 0" :to="createReportRoute" @click="handleBlockedNavigation">
+            <i class="bi bi-plus-circle me-2"></i> File New Report
+          </router-link>
         </div>
-        <router-link v-if="isResidentView && createReportRoute" class="btn btn-primary mt-3 mt-lg-0"
-          :class="{ disabled: shouldBlockActions }" :aria-disabled="shouldBlockActions"
-          :tabindex="shouldBlockActions ? -1 : 0" :to="createReportRoute" @click="handleBlockedNavigation">
-          <i class="bi bi-plus-circle me-2"></i> File New Report
-        </router-link>
-        <p v-if="shouldBlockActions" class="fw-bold mt-2"><small class="text-danger">Please complete profile
-            verification
-            to file a blotter report.</small></p>
+        <p v-if="shouldBlockActions" class="fw-bold mt-2">
+          <small class="text-danger">
+            Please complete profile verification to file a blotter report.
+          </small>
+        </p>
       </div>
     </div>
 

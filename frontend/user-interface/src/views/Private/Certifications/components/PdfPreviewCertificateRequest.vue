@@ -5,9 +5,7 @@ import { PDFDocument, StandardFonts } from 'pdf-lib'
 import { endpoints } from '@/services/api/endpoints'
 import { PdfRelatedService } from '@/services/api/http/pdf-service'
 import { addOrdinalSuffix, computeAge } from '@/Utils/helpers/formatters'
-import certBrgyClearancePdf from '../../../../assets/pdf/cert-clearance.pdf'
-import certIndigencyPdf from '../../../../assets/pdf/cert-indigency.pdf'
-import certResidencyPdf from '../../../../assets/pdf/cert-residency.pdf'
+import { useSessionStore } from '@/Utils/store/useSessionStore'
 
 
 const props = defineProps<{
@@ -17,9 +15,9 @@ const props = defineProps<{
 
 const pdfService = PdfRelatedService.getInstance()
 
-const certBrgyClearance = certBrgyClearancePdf
-const certIndigency = certIndigencyPdf
-const certResidency = certResidencyPdf
+const certBrgyClearance = new URL('../../../../assets/pdf/cert-clearance.pdf', import.meta.url).href
+const certIndigency = new URL('../../../../assets/pdf/cert-indigency.pdf', import.meta.url).href
+const certResidency = new URL('../../../../assets/pdf/cert-residency.pdf', import.meta.url).href
 
 const templateMap: Record<string, string> = {
   clearance: certBrgyClearance,
@@ -40,10 +38,11 @@ const isLoading = ref<boolean>(false)
 const errorMessage = ref<string | null>(null)
 const payload = ref<Record<string, any> | null>(null)
 const router = useRouter()
+const session = useSessionStore();
 
 type CertificateData = Record<string, any>
 
-const iframeSrc = computed(() => (pdfUrl.value ? `${pdfUrl.value}#toolbar=0&navpanes=0&statusbar=0` : ''))
+const iframeSrc = computed(() => (pdfUrl.value && session.isRoleResident() ? `${pdfUrl.value}#toolbar=0&navpanes=0&statusbar=0` : `${pdfUrl.value}`))
 
 type CertificateField = 'full_name' | 'address' | 'age' | 'month' | 'day' | 'last_name' | 'purpose'
 type CertificateFieldMap = Partial<Record<CertificateField, FieldPosition>>
