@@ -28,6 +28,7 @@ const {
   setServerErrors
 } = useCreateUserAccount({
   requirePassword: false,
+  requireGovernmentId: false,
 });
 
 const hasError = ref<boolean>(false);
