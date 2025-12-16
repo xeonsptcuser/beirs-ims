@@ -34,7 +34,7 @@ class OtpCodeNotification extends Notification implements SmsMessage
     {
         return [
             'to' => $notifiable->routeNotificationForSemaphore(),
-            'message' => sprintf('Your OTP code is %s. It expires in %d minutes.', $this->code, $this->ttlMinutes),
+            'message' => sprintf('To ensure the security of your transactions, your BEIRS One-Time Password (OTP) is %s. Never disclose this code. It is valid for %d minutes.', $this->code, $this->ttlMinutes),
         ];
     }
 }
