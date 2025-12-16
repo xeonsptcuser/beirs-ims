@@ -141,8 +141,8 @@ const handleCreateBlotterReport = async () => {
       throw response;
     }
     hasError.value = false;
-    await router.push({ name: 'BlotterReports', params: { role: resolvedRole } });
-
+    // Update to redirect to new success page.
+    await router.replace({ name: 'SuccessBlotterTransaction', params: { role: props.role } })
     globalThis.location.reload();
   } catch (error) {
     const axiosError = error as AxiosError<ApiErrorResponse>;
