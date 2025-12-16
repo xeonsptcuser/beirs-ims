@@ -126,13 +126,13 @@ const filteredErrors = computed(() => {
             <div class="row g-2">
               <div class="col-md-6 col-sm-12">
                 <FormFloatingInput type="email" label="Email Address" placeholder="beirs@test.com" id="email"
-                  v-model="form.email" :has-error="errors.email" :error-message="errorMessages.email.error" />
+                  v-model="form.email" :has-error="errors.email" :error-message="errorMessages.email.error"
+                  :is-capitalized="false" />
               </div>
               <div class="col-md-3 col-sm-12">
                 <FormFloatingInput type="date" label="Date Of Birth" id="birthday" v-model="form.date_of_birth"
                   :has-error="errors.date_of_birth" :error-message="errorMessages.date_of_birth.error"
-                  :max="maxBirthDate()" :min="minBirthDate()"
-                  :is-capitalized="false" />
+                  :max="maxBirthDate()" :min="minBirthDate()" :is-capitalized="false" />
               </div>
               <div class="col-md-3 col-sm-12">
                 <DropdownInput :options="orderedOptions(roleOptions)" label="Roles" id="select-roles"

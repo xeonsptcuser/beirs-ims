@@ -1,3 +1,4 @@
+import SuccessBlotterReportPage from '@/views/Private/BlotterReports/components/SuccessBlotterReportPage/SuccessBlotterReportPage.vue'
 import SuccessTransactionPage from '@/views/Private/Certifications/components/SuccessTransactionPage/SuccessTransactionPage.vue'
 import SuccessResidentCreationPage from '@/views/Private/Residents/components/SuccessResidentCreationPage/SuccessResidentCreationPage.vue'
 import type { RouteRecordRaw } from 'vue-router'
@@ -26,6 +27,17 @@ export const successErrorRoutes: RouteRecordRaw[] = [
         props: (route) => ({ role: route.params.role as string }),
         meta: {
           title: 'Successful User Registration',
+          requiresAuth: true,
+        },
+      },
+      // Blotter Report Related
+      {
+        path: 'blotter-reports/success',
+        name: 'SuccessBlotterTransaction',
+        component: SuccessBlotterReportPage,
+        props: (route) => ({ role: route.params.role as string }),
+        meta: {
+          title: 'Successful Interaction',
           requiresAuth: true,
         },
       },

@@ -32,7 +32,7 @@ const {
 const requestorName = ref<string>('')
 const requestorAddress = ref<string>('')
 const requestorBirthDate = ref<string>('')
-
+const showConfirmationModal = ref<boolean>(false)
 
 const hasError = ref<boolean>(false)
 const navigation = useGlobalLoadingStore();
@@ -112,6 +112,17 @@ const fetchUserProfile = async () => {
   }
 }
 
+const handleFormSubmit = () => {
+  hasError.value = !validateCertificateForm();
+  if (hasError.value) return;
+
+  showConfirmationModal.value = true;
+}
+
+const closeConfirmationModal = () => {
+  showConfirmationModal.value = false
+}
+
 watch(() => form.isCurrent, (isCurrent) => {
   if (isCurrent) {
     // set the endResidencyDate field if Present checkbox is checked
@@ -148,7 +159,7 @@ watchEffect(() => {
   <div class="my-5">
     <FormContainer title="Certification Request Form" max-width="750px">
       <WarningLabel :has-error="hasError && filteredErrors.length > 0" :errors="filteredErrors" />
-      <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleCreateCertificateRequest">
+      <form class="d-flex flex-column gap-2 mt-auto mb-auto" @submit.prevent="handleFormSubmit">
         <div class="col-12">
           <p class="text-muted mb-2 small">Certificate Request Type</p>
           <div class="d-flex flex-wrap gap-2">
@@ -171,7 +182,7 @@ watchEffect(() => {
         <div class="col-12">
           <FormFloatingInput type="text" label="Address" id="address" v-model="requestorAddress" :is-disabled="true" />
         </div>
-        <div class="row gx-2 gy-2">
+        <div class="row gx-2 gy-2" v-if="form.certificateRequestType === 'residency'">
           <div class="col-12 col-md-5 ">
             <FormFloatingInput type="date" label="Start Residency Date" :optional="true" id="start-residency-date"
               v-model="form.startResidencyDate" :max="maxDate()" :is-capitalized="false" />
@@ -197,7 +208,42 @@ watchEffect(() => {
         <div class="col-md-6 col-sm-12 mx-auto">
           <FormButton label="Submit" />
         </div>
+
+        <dialog v-if="showConfirmationModal" class="modal fade show d-block" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" style="font-size: 16px;">Request Barangay Certificate?</h5>
+                <button type="button" class="btn-close" aria-label="Close" @click="closeConfirmationModal"></button>
+              </div>
+              <div class="modal-body">
+                <p class="text-secondary mb-3">
+                  **Double-check all information** (personal details, purpose, and required documents) before submitting
+                  your request for a Barangay Certificate.
+                </p>
+                <ul class=" text-secondary small ps-3 mb-0  ">
+                  <li class="mb-3">Confirm your **complete and correct personal information** (Name, Address, etc.).
+                  </li>
+                  <li class="mb-3">Ensure the **purpose of your request** is clearly and accurately stated (e.g., for
+                    employment,
+                    school, financial assistance).</li>
+                  <li class="mb-3">**For Certificate of Residency:** Ensure your length of stay in the Barangay is
+                    accurately
+                    reflected.</li>
+                </ul>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" @click="closeConfirmationModal">Review
+                  Again</button>
+                <button type="button" class="btn btn-primary" @click="handleCreateCertificateRequest">Submit
+                  Request</button>
+              </div>
+            </div>
+          </div>
+        </dialog>
+
       </form>
+
     </FormContainer>
   </div>
 </template>
@@ -214,5 +260,14 @@ watchEffect(() => {
 .option-pill:hover {
   transform: translateY(-1px);
   box-shadow: 0 0.4rem 1rem rgba(0, 0, 0, 0.08);
+}
+
+.modal-backdrop {
+  z-index: 1040 !important;
+}
+
+.modal.show.d-block {
+  z-index: 1050 !important;
+  background: rgba(0, 0, 0, 0.25);
 }
 </style>
