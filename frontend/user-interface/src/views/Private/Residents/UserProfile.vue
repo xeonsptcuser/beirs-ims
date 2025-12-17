@@ -341,7 +341,7 @@ const formattedAddress = computed(() => {
   const parts = [profile.street_address, profile.address_line]
     .filter(Boolean)
     .map((part) => toTitleCase(part as string))
-  return parts.length ? parts.join(', ') : 'No address on file'
+  return parts.length ? parts.join(', ') : 'N/A'
 })
 
 watchEffect(() => {
@@ -416,14 +416,15 @@ onBeforeUnmount(() => {
               </div>
               <div>
                 <h5 class="mb-0 text-capitalize">{{ fullName || 'Resident' }}</h5>
-                <span class="badge mt-2" :class="profileStatusClass">{{ profileStatusLabel }}</span>
+                <span class="badge mt-2" :class="profileStatusClass" v-if="!useSession.isRoleAdmin()">{{
+                  profileStatusLabel }}</span>
               </div>
             </div>
             <div class="mb-3">
               <p class="text-muted small mb-1">Email</p>
               <p class="fw-semibold mb-0">{{ responseData?.email || '—' }}</p>
             </div>
-            <div class="mb-3">
+            <div class="mb-3" v-if="!useSession.isRoleAdmin()">
               <p class="text-muted small mb-1">Mobile Number</p>
               <div class="d-flex align-items-center gap-2 flex-wrap">
                 <p class="fw-semibold mb-0">{{ responseData?.profile?.mobile_number || '—' }}</p>
@@ -458,7 +459,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <div class="card shadow-sm border-0">
+        <div class="card shadow-sm border-0" v-if="!useSession.isRoleAdmin()">
           <!-- inside the Government ID card -->
           <div class="card-body">
             <div class="d-flex align-items-center justify-content-between mb-2">
@@ -519,15 +520,15 @@ onBeforeUnmount(() => {
 
       <div class="col-lg-8">
         <div class="card shadow-sm border-0">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
-              <h5 class="mb-0">Profile Details</h5>
-              <div class="d-flex gap-2" v-if="canEditProfile">
-                <button class="btn btn-outline-danger btn-sm" type="button"
-                  @click.prevent="setisNotEditableUser(canEditRole)">
-                  <i class="bi bi-pencil-square me-1"></i>{{ isNotEditableUser.name ? 'Enable Editing' : 'Cancel' }}
-                </button>
-              </div>
+          <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h5 class="mb-0">Profile Details</h5>
+            <div class="d-flex gap-2" v-if="canEditProfile">
+              <button class="btn btn-outline-danger btn-sm" type="button"
+                @click.prevent="setisNotEditableUser(canEditRole)">
+                <i class="bi bi-pencil-square me-1"></i>{{ isNotEditableUser.name ? 'Enable Editing' : 'Cancel' }}
+              </button>
             </div>
+          </div>
           <div class="card-body">
             <form class="d-flex flex-column gap-3" @submit.prevent="handleUpdateUserAccount">
               <div>
