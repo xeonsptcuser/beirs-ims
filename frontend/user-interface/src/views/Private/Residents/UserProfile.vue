@@ -459,7 +459,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <div class="card shadow-sm border-0" v-if="!useSession.isRoleAdmin()">
+        <div class="card shadow-sm border-0">
           <!-- inside the Government ID card -->
           <div class="card-body">
             <div class="d-flex align-items-center justify-content-between mb-2">
