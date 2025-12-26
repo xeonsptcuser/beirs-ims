@@ -14,15 +14,34 @@ const props = defineProps<{
 }>()
 
 const pdfService = PdfRelatedService.getInstance()
+const session = useSessionStore();
 
-const certBrgyClearance = new URL('../../../../assets/pdf/cert-clearance.pdf', import.meta.url).href
-const certIndigency = new URL('../../../../assets/pdf/cert-indigency.pdf', import.meta.url).href
-const certResidency = new URL('../../../../assets/pdf/cert-residency.pdf', import.meta.url).href
+const certBrgyClearance = computed(() => {
+  if (session.isRoleResident()) {
+    return new URL('../../../../assets/pdf/cert-clearance-w.pdf', import.meta.url).href
+  }
+  return new URL('../../../../assets/pdf/cert-clearance.pdf', import.meta.url).href
+})
+
+const certIndigency = computed(() => {
+  if (session.isRoleResident()) {
+    return new URL('../../../../assets/pdf/cert-indigency-w.pdf', import.meta.url).href
+  }
+  return new URL('../../../../assets/pdf/cert-indigency-w.pdf', import.meta.url).href
+})
+
+const certResidency = computed(() => {
+  if (session.isRoleResident()) {
+    return new URL('../../../../assets/pdf/cert-residency-w.pdf', import.meta.url).href
+  }
+  return new URL('../../../../assets/pdf/cert-residency.pdf', import.meta.url).href
+})
+
 
 const templateMap: Record<string, string> = {
-  clearance: certBrgyClearance,
-  indigency: certIndigency,
-  residency: certResidency,
+  clearance: certBrgyClearance.value,
+  indigency: certIndigency.value,
+  residency: certResidency.value,
 }
 
 const pdfTemplateUrl = computed(() => {
@@ -38,7 +57,7 @@ const isLoading = ref<boolean>(false)
 const errorMessage = ref<string | null>(null)
 const payload = ref<Record<string, any> | null>(null)
 const router = useRouter()
-const session = useSessionStore();
+
 
 type CertificateData = Record<string, any>
 

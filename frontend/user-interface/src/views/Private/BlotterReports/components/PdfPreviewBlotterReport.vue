@@ -17,7 +17,9 @@ const pdfService = PdfRelatedService.getInstance()
 const { incidentTypeOptions } = useBlotterReports();
 
 // Static PDF template
-const pdfTemplateUrl = new URL('../../../../assets/pdf/blotter-form.pdf', import.meta.url).href
+const pdfTemplateUrl = computed(() => {
+  return session.isRoleResident() ? new URL('../../../../assets/pdf/blotter-form-w.pdf', import.meta.url).href : new URL('../../../../assets/pdf/blotter-form.pdf', import.meta.url).href
+})
 
 const pdfUrl = ref<string | null>(null)
 const isLoading = ref<boolean>(false)
@@ -131,7 +133,7 @@ const formatPeopleInvolved = (value: unknown): string => {
 }
 
 const buildPdfWithData = async (data: BlotterData) => {
-  const templateBytes = await fetch(pdfTemplateUrl).then((res) => res.arrayBuffer())
+  const templateBytes = await fetch(pdfTemplateUrl.value).then((res) => res.arrayBuffer())
   const pdfDoc = await PDFDocument.load(templateBytes)
   const page = pdfDoc.getPages()[0]
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica)

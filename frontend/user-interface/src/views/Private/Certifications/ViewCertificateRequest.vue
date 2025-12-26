@@ -269,13 +269,65 @@ const handlerName = computed(() => {
   return formatName(handler.first_name, handler.middle_name, handler.last_name);
 });
 
+const showHandlerName = computed(() => {
+  if (handlerName.value === 'Awaiting assignment') {
+    return ''
+  }
+  return `by ${handlerName.value} `
+})
+
 const handlerRole = computed(() => certificateInfo.value?.handler?.user?.role || '—');
 const purposeText = computed(() => certificateInfo.value?.cert_request_reason || 'No stated purpose.');
-const timelineStatuses: StatusOptions[] = ['pending', 'approved', 'released', 'done'];
+
+// Timeline logic similar to ViewBlotterReportInfo
+const timelineStatuses = ['pending', 'approved', 'released', 'done'] as StatusOptions[];
+const statusTimestamps = ref<Partial<Record<StatusOptions, string>>>({});
+const statusTimeline = computed(() => {
+  const currentStatus = certificateInfo.value?.status;
+  const currentIndex = currentStatus ? timelineStatuses.indexOf(currentStatus as StatusOptions) : -1;
+  return timelineStatuses.map((status, index) => {
+    const isReached = currentIndex >= 0 ? index <= currentIndex : false;
+    const recordedDate = statusTimestamps.value[status];
+    return {
+      status,
+      label: statusLabelMap[status] || status,
+      date: recordedDate,
+      isCurrent: status === currentStatus,
+      isReached,
+    };
+  });
+});
+const recordStatusTimestamps = (info: CertificateRequestsResponse) => {
+  const currentStatus = info.status;
+  const currentDate = info.updated_at ?? info.created_at;
+  const createdDate = info.created_at ?? currentDate;
+  if (currentDate && !statusTimestamps.value[currentStatus as StatusOptions]) {
+    statusTimestamps.value[currentStatus as StatusOptions] = currentDate;
+  }
+  const currentIndex = timelineStatuses.indexOf(currentStatus as StatusOptions);
+  if (currentIndex > 0) {
+    timelineStatuses.slice(0, currentIndex).forEach((status) => {
+      if (!statusTimestamps.value[status] && createdDate) {
+        statusTimestamps.value[status] = createdDate;
+      }
+    });
+  }
+};
 
 onMounted(() => {
   fetchCertificateRequestInfo();
-})
+});
+
+import { watch } from 'vue';
+watch(
+  () => certificateInfo.value,
+  (newVal) => {
+    if (newVal) {
+      recordStatusTimestamps(newVal);
+    }
+  },
+  { immediate: true }
+);
 
 </script>
 <template>
@@ -332,9 +384,11 @@ onMounted(() => {
               </div>
             </div>
             <div class="row g-3 mt-2">
-              <div class="col-md-6">
+              <div class="col-md-6" v-if="certificateInfo?.cert_request_type === 'residency'">
                 <p class="text-muted small mb-1">Residency</p>
                 <p class="fw-semibold mb-0">{{ residencyRange }}</p>
+              </div>
+              <div class="col-md-6" v-else>
               </div>
               <div class="col-md-6" v-if="certificateInfo?.handler">
                 <p class="text-muted small mb-1">Assigned Handler</p>
@@ -378,16 +432,19 @@ onMounted(() => {
       </div>
 
       <div class="col-lg-4">
-        <div class="card shadow-sm border-0 mb-4">
+        <div class="card shadow-sm border-0 mb-4" v-if="certificateInfo?.status !== 'rejected'">
           <div class="card-body">
             <h5 class="fw-semibold mb-3">Status Progress</h5>
             <ul class="list-unstyled timeline mb-0">
-              <li v-for="status in timelineStatuses" :key="status"
-                :class="['timeline-item', { active: certificateInfo?.status === status }]">
-                <p class="mb-0 fw-semibold text-capitalize">{{ statusLabelMap[status] || status }}</p>
+              <li v-for="item in statusTimeline" :key="item.status"
+                :class="['timeline-item', { active: item.isCurrent, reached: item.isReached }]">
+                <p class="mb-0 fw-semibold text-capitalize">{{ item.label }}</p>
                 <small class="text-muted">
-                  <template v-if="certificateInfo?.status === status">
-                    Updated {{ formatDateToHuman(certificateInfo?.updated_at ?? '') || '—' }}
+                  <template v-if="item.isReached && item.date">
+                    Updated {{ formatDateToHuman(item.date) || '-' }} {{ showHandlerName }}
+                  </template>
+                  <template v-else-if="item.isReached">
+                    Completed
                   </template>
                   <template v-else>
                     Pending
