@@ -6,10 +6,12 @@ withDefaults(defineProps<{
   multiple: boolean
   accept: string
   isDisabled?: boolean
+  hasError?: boolean
 }>(), {
   multiple: false,
   accept: "",
-  isDisabled: false
+  isDisabled: false,
+  hasError: false
 })
 
 const emit = defineEmits(["files-selected"]);
@@ -44,8 +46,8 @@ const onDrop = (event: DragEvent) => {
 
 </script>
 <template>
-  <div class="border rounded p-4 text-center bg-blue"
-    :class="{ 'border-primary': isDragging && !isDisabled, 'bg-opacity': isDragging && !isDisabled, 'upload-box--disabled': isDisabled }"
+  <div class="border rounded p-4 text-center"
+    :class="['bg-blue', { 'border-primary bg-opacity': isDragging && !isDisabled, 'upload-box--disabled': isDisabled, 'border-danger bg-red': hasError }]"
     @dragover.prevent="onDragOver" @dragleave.prevent="onDragLeave" @drop.prevent="!isDisabled && onDrop($event)"
     @click="!isDisabled && openFileDialog()" :style="{ cursor: isDisabled ? 'not-allowed' : 'pointer' }">
     <input ref="fileInput" type="file" class="d-none" :accept="accept" :multiple="multiple" @change="onFileSelect"
@@ -66,12 +68,20 @@ const onDrop = (event: DragEvent) => {
   box-shadow: 0 0 10px rgba(0, 123, 255, 0.25);
 }
 
+.border-danger {
+  box-shadow: 0 0 10px rgba(220, 53, 69, 0.25);
+}
+
 .bg-opacity {
   opacity: 75%;
 }
 
 .bg-blue {
   background-color: #0d6dfd0e;
+}
+
+.bg-red {
+  background-color: rgba(248, 137, 148, 0.25);
 }
 
 .upload-box--disabled {

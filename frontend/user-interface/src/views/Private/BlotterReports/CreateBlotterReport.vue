@@ -417,7 +417,10 @@ const filteredErrors = computed(() => {
                     maxLength="500" />
                 </div>
                 <div class="col-12">
-                  <UploadFiles v-model="form.evidences" />
+                  <UploadFiles v-model="form.evidences" :has-error="hasError" />
+                  <p class="text-danger small mt-2 mb-0" v-if="hasError && errors.evidences">
+                    {{ errorMessages.evidences.error }}
+                  </p>
                   <p class="text-muted small mt-2 mb-0">Attach up to 10 files. Evidence strengthens your report.</p>
                 </div>
               </div>
