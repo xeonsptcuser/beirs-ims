@@ -148,6 +148,12 @@ export function useBlotterReports() {
       isValid = false
     }
 
+    if (form.value.evidences.length === 0) {
+      errors.value.evidences = true
+      errorMessages.value.evidences.error = 'Please provide evidences to support your claims.'
+      isValid = false
+    }
+
     return isValid
   }
 

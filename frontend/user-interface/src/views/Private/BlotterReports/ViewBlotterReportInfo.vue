@@ -329,6 +329,11 @@ const statusTimeline = computed(() => {
   });
 });
 
+const handlerName = computed(() => {
+  return blotterReport.value?.handler?.first_name ? `by ${blotterReport.value?.handler?.first_name}
+                    ${blotterReport.value?.handler?.last_name}` : ''
+})
+
 const recordStatusTimestamps = (report: BlotterReportResponse) => {
   const currentStatus = report.status;
   const currentDate = report.updated_at ?? report.created_at;
@@ -388,7 +393,7 @@ watch(
           {{ blotterReport?.status }}
         </span>
         <p class="text-secondary small mt-2 mb-0">Filed on {{ formatDateToHuman(blotterReport?.created_at ?? '') || '—'
-          }}</p>
+        }}</p>
       </div>
     </div>
 
@@ -530,7 +535,8 @@ watch(
             <div>
               <p class="text-muted small mb-1">Assigned Handler</p>
               <p class="fw-semibold mb-0 text-capitalize">
-                {{ blotterReport?.handler?.first_name ? `${blotterReport?.handler?.first_name}
+                {{ blotterReport?.handler?.first_name && blotterReport?.handler?.last_name ?
+                  `${blotterReport?.handler?.first_name}
                 ${blotterReport?.handler?.last_name}` : 'Unassigned' }}
               </p>
             </div>
@@ -546,7 +552,7 @@ watch(
                 <p class="mb-0 fw-semibold text-capitalize">{{ item.label }}</p>
                 <small class="text-muted">
                   <template v-if="item.isReached && item.date">
-                    Updated {{ formatDateToHuman(item.date) || '-' }}
+                    Updated {{ formatDateToHuman(item.date) || '-' }} {{ handlerName }}
                   </template>
                   <template v-else-if="item.isReached">
                     Completed

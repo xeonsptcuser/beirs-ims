@@ -20,6 +20,7 @@ const props = withDefaults(defineProps<{
   maxVideoSizeBytes?: number
   allowedImageTypes?: string[]
   allowedVideoTypes?: string[]
+  hasError?: boolean
 }>(), {
   isDisabled: false,
   multiple: true,
@@ -155,7 +156,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="bg-white p-3 border rounded">
-    <DragAndDropUploadFiles :accept :multiple @files-selected="handleFiles" :is-disabled="isDisabled" />
+    <DragAndDropUploadFiles :accept :multiple @files-selected="handleFiles" :is-disabled="isDisabled" :hasError />
     <p v-if="uploadError" class="text-danger small mt-2 mb-0">{{ uploadError }}</p>
 
     <div v-if="filePreviews.length" class="mt-3">
