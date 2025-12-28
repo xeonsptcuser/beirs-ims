@@ -43,29 +43,47 @@ class HeatmapController extends Controller
     {
         $sections = $this->initializeSections();
 
-        BlotterReport::query()
-            ->select(['incident_type', 'location', 'landmark'])
-            ->orderBy('id')
-            ->chunk(500, function ($reports) use (&$sections) {
-                foreach ($reports as $report) {
-                    $sectionId = $this->matchSection($report->location ?? '', $report->landmark);
+        $address = request('address');
+        $year = request('year');
+        $month = request('month');
 
-                    if (!$sectionId || !isset($sections[$sectionId])) {
-                        continue;
-                    }
+        $query = BlotterReport::query()
+            ->select(['incident_type', 'location', 'landmark', 'datetime_of_incident'])
+            ->orderBy('id');
 
-                    $type = Str::of($report->incident_type ?? '')
-                        ->lower()
-                        ->trim()
-                        ->toString();
-
-                    if (!$type || !in_array($type, self::CASE_TYPES, true)) {
-                        continue;
-                    }
-
-                    $sections[$sectionId]['cases'][$type] = ($sections[$sectionId]['cases'][$type] ?? 0) + 1;
-                }
+        if ($address) {
+            $query->where(function ($q) use ($address) {
+                $q->where('location', 'like', "%$address%")
+                    ->orWhere('landmark', 'like', "%$address%");
             });
+        }
+        if ($year) {
+            $query->whereYear('datetime_of_incident', $year);
+        }
+        if ($month) {
+            $query->whereMonth('datetime_of_incident', $month);
+        }
+
+        $query->chunk(500, function ($reports) use (&$sections) {
+            foreach ($reports as $report) {
+                $sectionId = $this->matchSection($report->location ?? '', $report->landmark);
+
+                if (!$sectionId || !isset($sections[$sectionId])) {
+                    continue;
+                }
+
+                $type = Str::of($report->incident_type ?? '')
+                    ->lower()
+                    ->trim()
+                    ->toString();
+
+                if (!$type || !in_array($type, self::CASE_TYPES, true)) {
+                    continue;
+                }
+
+                $sections[$sectionId]['cases'][$type] = ($sections[$sectionId]['cases'][$type] ?? 0) + 1;
+            }
+        });
 
         return response()->json([
             'status' => 'success',

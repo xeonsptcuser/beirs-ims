@@ -270,12 +270,25 @@ export function useHeatMap() {
     })
   }
 
-  const fetchSections = async () => {
+  /**
+   * Fetch heatmap sections from backend, with optional filters.
+   * @param filters { address?: string, year?: string|number, month?: string|number }
+   */
+  const fetchSections = async (filters?: { address?: string; year?: string|number; month?: string|number }) => {
     isLoadingSections.value = true
     sectionsError.value = null
 
     try {
-      const response = await heatmapService.getSections(endpoints.GET_HEATMAP_SECTIONS)
+      let url = endpoints.GET_HEATMAP_SECTIONS
+      if (filters) {
+        const params = new URLSearchParams()
+        if (filters.address) params.append('address', filters.address)
+        if (filters.year) params.append('year', String(filters.year))
+        if (filters.month) params.append('month', String(filters.month))
+        const query = params.toString()
+        if (query) url += `?${query}`
+      }
+      const response = await heatmapService.getSections(url)
       const remoteSections = response?.data ?? []
       sections.value = mergeSectionData(remoteSections)
     } catch (error) {
