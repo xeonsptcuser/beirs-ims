@@ -20,6 +20,9 @@ echo "Running Dump Auto-load..."
 composer dump-autoload
 
 echo "Running migrations..."
+echo "Ensuring cache table migration exists..."
+php artisan cache:table
+
 php artisan migrate --force
 
 echo "Running Server"
