@@ -14,12 +14,12 @@ class BarangayAddressSeeder extends Seeder
             'abbra',
             'liong',
             'mabolo',
-            'sacred heart',
-            'pulang bukid',
-            'tres rosas',
+            'sacred-heart',
+            'pulang-bukid',
+            'tres-rosas',
             'tinago',
             'sudlon',
-            'perez compd.',
+            'perez',
 
         ];
 
