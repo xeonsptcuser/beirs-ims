@@ -128,6 +128,7 @@ watch([selectedAddress, selectedYear, selectedMonth], fetchWithFilters);
 
       <!-- Severity color descriptions -->
       <div class="severity-desc-block mt-3 mb-2">
+        <h5 class="severity-desc-title mb-3">Severity Level Descriptions & Notes</h5>
         <div class="severity-desc-item">
           <span class="desc-dot desc-yellow"></span>
           <strong>Low Severity (Yellow):</strong> Corresponds mainly to 1-10 incidents. These are isolated and
@@ -135,14 +136,18 @@ watch([selectedAddress, selectedYear, selectedMonth], fetchWithFilters);
         </div>
         <div class="severity-desc-item">
           <span class="desc-dot desc-orange"></span>
-          <strong>Medium Severity (Orange):</strong> Often linked to 11-20 incidents or frequent minor cases.
-          Indicates recurring patterns that require preventive actions, closer supervision, and early intervention.
+          <strong>Medium Severity (Orange):</strong> Often linked to 11-20 incidents or frequent minor cases. Indicates
+          recurring patterns that require preventive actions, closer supervision, and early intervention.
         </div>
         <div class="severity-desc-item">
           <span class="desc-dot desc-red"></span>
           <strong>High Severity (Red):</strong> Dominated by 21 or more incidents, especially with significant or
-          critical impact. Represents concentrated incident patterns requiring immediate attention, strategic
-          planning, and possible coordination with law enforcement agencies.
+          critical impact. Represents concentrated incident patterns requiring immediate attention, strategic planning,
+          and possible coordination with law enforcement agencies.
+        </div>
+        <div class="severity-desc-notes mt-3">
+          <span class="fw-bold">Notes:</span> Severity levels are based on incident frequency and impact. Use these
+          guidelines to interpret the heatmap and prioritize barangay actions.
         </div>
       </div>
 
@@ -292,6 +297,19 @@ watch([selectedAddress, selectedYear, selectedMonth], fetchWithFilters);
 </template>
 
 <style scoped>
+.severity-desc-title {
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #222;
+  text-align: left;
+}
+
+.severity-desc-notes {
+  font-size: 0.98rem;
+  color: #444;
+  margin-top: 0.7em;
+}
+
 .severity-desc-block {
   max-width: 100%;
   margin: 0.5rem auto 0 auto;
