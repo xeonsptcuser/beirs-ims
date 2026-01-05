@@ -54,7 +54,7 @@ const props = defineProps({
 const model = defineModel<string>()
 
 const formattedLabel = computed(() => {
-  return props.optional ? `${props.label}` : `${props.label}*`
+  return props.optional ? `${props.label}` : `${props.label}(required)`
 });
 </script>
 

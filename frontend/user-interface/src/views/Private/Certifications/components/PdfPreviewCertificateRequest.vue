@@ -27,7 +27,7 @@ const certIndigency = computed(() => {
   if (session.isRoleResident()) {
     return new URL('../../../../assets/pdf/cert-indigency-w.pdf', import.meta.url).href
   }
-  return new URL('../../../../assets/pdf/cert-indigency-w.pdf', import.meta.url).href
+  return new URL('../../../../assets/pdf/cert-indigency.pdf', import.meta.url).href
 })
 
 const certResidency = computed(() => {
@@ -73,10 +73,10 @@ type FieldPosition = {
 }
 
 const basePositions: CertificateFieldMap = {
-  full_name: { x: 290, y: 536, size: 12 },
-  last_name: { x: 417, y: 402, size: 10 },
+  full_name: { x: 290, y: 536, size: 8 },
+  last_name: { x: 417, y: 402, size: 9 },
   age: { x: 495, y: 536, size: 12 },
-  address: { x: 295, y: 515, size: 7.8 },
+  address: { x: 297, y: 515, size: 7.8 },
   month: { x: 215, y: 218, size: 12 },
   day: { x: 540, y: 240, size: 12 },
 
@@ -85,15 +85,15 @@ const basePositions: CertificateFieldMap = {
 const positionMap: Record<string, CertificateFieldMap> = {
   clearance: basePositions,
   indigency: {
-    full_name: { x: 270, y: 532, size: 12 },
-    address: { x: 160, y: 510, size: 7.7 },
+    full_name: { x: 270, y: 532, size: 8 },
+    address: { x: 162, y: 510, size: 7.7 },
     purpose: { x: 200, y: 402, size: 12 },
     month: { x: 380, y: 305, size: 12 },
     day: { x: 305, y: 305, size: 10 },
   },
   residency: {
-    full_name: { x: 300, y: 515, size: 12 },
-    address: { x: 238, y: 500, size: 9 },
+    full_name: { x: 295, y: 515, size: 8 },
+    address: { x: 240, y: 500, size: 9 },
     age: { x: 480, y: 515, size: 12 },
     purpose: { x: 200, y: 415, size: 12 },
     month: { x: 275, y: 260, size: 12 },
