@@ -344,6 +344,11 @@ const formattedAddress = computed(() => {
   return parts.length ? parts.join(', ') : 'N/A'
 })
 
+const setUploadable = () => {
+  isNotEditableUser.value.governmentIdentity = !isNotEditableUser.value.governmentIdentity
+
+}
+
 watchEffect(() => {
   fetchUserProfile()
   setTimeout(() => {
@@ -507,12 +512,16 @@ onBeforeUnmount(() => {
                     v-model="form.govtIdentityType" :error-message="errorMessages.govtIdentityType.error"
                     :has-error="errors.govtIdentityType" :is-capitalized="false" />
                 </div>
-                <UploadFiles
-                  v-if="canEditProfile && form.govtIdentityType && form.govtIdentityType !== 'Secondary Ids' && [...primaryGovernmentIds, ...secondaryGovernmentIds].includes(form.govtIdentityType)"
-                  v-model="form.governmentIdentity" :has-error="errors.governmentIdentity"
-                  :error-message="errorMessages.governmentIdentity.error"
-                  :is-disabled="isNotEditableUser.governmentIdentity" accept=".png,.jpg,.jpeg,.pdf" :multiple="false"
-                  :enforce-evidence-rules="false" :max-files="1" />
+                <button class="btn btn-outline-primary mb-2 w-100" type="button" @click="() => setUploadable()">
+                  {{ isNotEditableUser.governmentIdentity ? 'Disable Upload' : ' Enable Upload' }}
+                </button>
+                <div v-if="canEditProfile || !isNotEditableUser.governmentIdentity">
+
+                  <UploadFiles v-model="form.governmentIdentity" :has-error="errors.governmentIdentity"
+                    :error-message="errorMessages.governmentIdentity.error"
+                    :is-disabled="!isNotEditableUser.governmentIdentity" accept=".png,.jpg,.jpeg,.pdf" :multiple="false"
+                    :enforce-evidence-rules="false" :max-files="1" />
+                </div>
               </div>
             </div>
           </div>
@@ -617,8 +626,9 @@ onBeforeUnmount(() => {
               </div>
 
               <div class="d-flex flex-column flex-md-row justify-content-center gap-3 mt-3" v-if="canEditProfile">
-                <FormButton label="Save Changes" :is-disabled="isEditableSubmit"
-                  :btn-display="isEditableSubmit ? 'secondary' : 'primary'" />
+                <FormButton label="Save Changes"
+                  :is-disabled="isEditableSubmit && !isNotEditableUser.governmentIdentity"
+                  :btn-display="isEditableSubmit && !isNotEditableUser.governmentIdentity ? 'secondary' : 'primary'" />
               </div>
             </form>
           </div>
