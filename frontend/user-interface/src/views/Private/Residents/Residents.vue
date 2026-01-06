@@ -104,6 +104,10 @@ const handleSoftDelete = async (resident: User) => {
   }
 };
 
+const isGovntIdNotFound = (resident: User) => {
+  return resident.profile.government_identity === undefined || resident.profile.government_identity === null
+}
+
 const handleSearchResidentByName = () => {
   pagination.current = 1;
   fetchResidentUsers(pagination.current, searchByNameKeyWord.value.trim() || undefined);
@@ -235,8 +239,8 @@ onMounted(() => {
                 </router-link>
               </div>
               <button v-if="isAdmin" class="btn btn-sm"
-                :class="resident.profile.is_active ? 'btn-outline-danger' : 'btn-outline-success'" type="button"
-                @click="handleToggleUserStatus(resident)">
+                :class="[resident.profile.is_active ? 'btn-outline-danger' : isGovntIdNotFound(resident) ? 'btn-outline-secondary' : 'btn-outline-success']"
+                type="button" @click="handleToggleUserStatus(resident)" :disabled="isGovntIdNotFound(resident)">
                 <span v-if="resident.profile.is_active"><i class="bi bi-slash-circle me-1"></i>Deactivate</span>
                 <span v-else><i class="bi bi-check-circle me-1"></i>Activate</span>
               </button>
