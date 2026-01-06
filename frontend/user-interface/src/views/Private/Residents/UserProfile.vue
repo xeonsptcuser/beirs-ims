@@ -507,19 +507,20 @@ onBeforeUnmount(() => {
                   <img :src="governmentIdUrl || nationalId" alt="Government ID" class="img-fluid" />
                   <p class="text-muted small mb-0 mt-2">Uploading a new file will replace the existing ID.</p>
                 </div>
-                <div class="mb-2" v-if="canEditProfile && !isEditableSubmit">
+                <button class="btn btn-outline-primary mb-2 w-100" type="button" @click="() => setUploadable()">
+                  {{ isNotEditableUser.governmentIdentity ? 'Enable Upload' : 'Disable Upload' }}
+                </button>
+                <div class="mb-2" v-if="canEditProfile && (!isEditableSubmit || !isNotEditableUser.governmentIdentity)">
                   <DropdownInput :options="govtIdentityTypeOption" label="Type" id="govt-id-type"
                     v-model="form.govtIdentityType" :error-message="errorMessages.govtIdentityType.error"
                     :has-error="errors.govtIdentityType" :is-capitalized="false" />
                 </div>
-                <button class="btn btn-outline-primary mb-2 w-100" type="button" @click="() => setUploadable()">
-                  {{ isNotEditableUser.governmentIdentity ? 'Disable Upload' : ' Enable Upload' }}
-                </button>
-                <div v-if="canEditProfile || !isNotEditableUser.governmentIdentity">
+
+                <div v-if="canEditProfile && (!isNotEditableUser.governmentIdentity || !isEditableSubmit)">
 
                   <UploadFiles v-model="form.governmentIdentity" :has-error="errors.governmentIdentity"
                     :error-message="errorMessages.governmentIdentity.error"
-                    :is-disabled="!isNotEditableUser.governmentIdentity" accept=".png,.jpg,.jpeg,.pdf" :multiple="false"
+                    :is-disabled="isNotEditableUser.governmentIdentity" accept=".png,.jpg,.jpeg,.pdf" :multiple="false"
                     :enforce-evidence-rules="false" :max-files="1" />
                 </div>
               </div>
@@ -626,9 +627,8 @@ onBeforeUnmount(() => {
               </div>
 
               <div class="d-flex flex-column flex-md-row justify-content-center gap-3 mt-3" v-if="canEditProfile">
-                <FormButton label="Save Changes"
-                  :is-disabled="isEditableSubmit && !isNotEditableUser.governmentIdentity"
-                  :btn-display="isEditableSubmit && !isNotEditableUser.governmentIdentity ? 'secondary' : 'primary'" />
+                <FormButton label="Save Changes" :is-disabled="isEditableSubmit && isNotEditableUser.governmentIdentity"
+                  :btn-display="isEditableSubmit && isNotEditableUser.governmentIdentity ? 'secondary' : 'primary'" />
               </div>
             </form>
           </div>
