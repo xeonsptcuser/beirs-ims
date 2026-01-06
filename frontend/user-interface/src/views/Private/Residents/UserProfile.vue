@@ -456,66 +456,69 @@ onBeforeUnmount(() => {
                 {{ isPasswordChangeable ? 'Cancel Password Update' : 'Change Password' }}
               </button>
             </div>
+            <div class="card shadow-sm border-0">
+              <!-- inside the Government ID card -->
+              <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <h6 class="fw-semibold mb-3 mb-lg-0">Government ID</h6>
+                  <button ref="govtIdTooltipButton" type="button" class="btn btn-link text-muted p-0"
+                    data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true"
+                    data-bs-title="Upload a clear photo or scan of your valid government ID.<br>Accepted files: PNG, JPG, JPEG, PDF.<br>Uploading a new file will replace the existing ID.">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <span class="visually-hidden">Government ID upload instructions</span>
+                  </button>
+                </div>
+                <div class="mb-3">
+                  <div class="d-flex align-items-center justify-content-between gap-2">
+                    <div>
+                      <p class="text-muted small mb-0">Accepted IDs</p>
+                      <p class="text-muted small mb-0">Tap to view the full list of options.</p>
+                    </div>
+                    <button class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1"
+                      type="button" :aria-expanded="isGovtIdListOpen" :aria-controls="govtIdCollapseId"
+                      @click="toggleGovtIdList">
+                      <i class="bi" :class="isGovtIdListOpen ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                      <span>{{ isGovtIdListOpen ? 'Hide' : 'View' }}</span>
+                    </button>
+                  </div>
+                  <div class="collapse mt-2" :id="govtIdCollapseId" ref="govtIdCollapseRef">
+                    <div class="bg-light border rounded p-3">
+                      <p class="text-muted text-sm mb-1">List of acceptable Primary IDs</p>
+                      <ul class="small mb-3 ps-3">
+                        <li v-for="(id, index) in primaryGovernmentIds" :key="`primary-id-${index}`">{{ id }}</li>
+                      </ul>
+                      <p class="text-muted text-sm mb-1">(If no primary ID is available, At least one with photo and
+                        signature, must be presented)</p>
+                      <ul class="small mb-0 ps-3">
+                        <li v-for="(id, index) in secondaryGovernmentIds" :key="`secondary-id-${index}`">{{ id }}</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <div v-if="hasGovernmentId" class="border rounded text-center p-3 mb-2">
+                  <p v-if="governmentIdType" class="text-uppercase text-muted small fw-semibold mb-2">{{
+                    governmentIdType }}
+                  </p>
+                  <img :src="governmentIdUrl || nationalId" alt="Government ID" class="img-fluid" />
+                  <p class="text-muted small mb-0 mt-2">Uploading a new file will replace the existing ID.</p>
+                </div>
+                <div class="mb-2" v-if="canEditProfile && !isEditableSubmit">
+                  <DropdownInput :options="govtIdentityTypeOption" label="Type" id="govt-id-type"
+                    v-model="form.govtIdentityType" :error-message="errorMessages.govtIdentityType.error"
+                    :has-error="errors.govtIdentityType" :is-capitalized="false" />
+                </div>
+                <UploadFiles
+                  v-if="canEditProfile && form.govtIdentityType && form.govtIdentityType !== 'Secondary Ids' && [...primaryGovernmentIds, ...secondaryGovernmentIds].includes(form.govtIdentityType)"
+                  v-model="form.governmentIdentity" :has-error="errors.governmentIdentity"
+                  :error-message="errorMessages.governmentIdentity.error"
+                  :is-disabled="isNotEditableUser.governmentIdentity" accept=".png,.jpg,.jpeg,.pdf" :multiple="false"
+                  :enforce-evidence-rules="false" :max-files="1" />
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="card shadow-sm border-0">
-          <!-- inside the Government ID card -->
-          <div class="card-body">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <h6 class="fw-semibold mb-3 mb-lg-0">Government ID</h6>
-              <button ref="govtIdTooltipButton" type="button" class="btn btn-link text-muted p-0"
-                data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true"
-                data-bs-title="Upload a clear photo or scan of your valid government ID.<br>Accepted files: PNG, JPG, JPEG, PDF.<br>Uploading a new file will replace the existing ID.">
-                <i class="bi bi-info-circle-fill"></i>
-                <span class="visually-hidden">Government ID upload instructions</span>
-              </button>
-            </div>
-            <div class="mb-3">
-              <div class="d-flex align-items-center justify-content-between gap-2">
-                <div>
-                  <p class="text-muted small mb-0">Accepted IDs</p>
-                  <p class="text-muted small mb-0">Tap to view the full list of options.</p>
-                </div>
-                <button class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1" type="button"
-                  :aria-expanded="isGovtIdListOpen" :aria-controls="govtIdCollapseId" @click="toggleGovtIdList">
-                  <i class="bi" :class="isGovtIdListOpen ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
-                  <span>{{ isGovtIdListOpen ? 'Hide' : 'View' }}</span>
-                </button>
-              </div>
-              <div class="collapse mt-2" :id="govtIdCollapseId" ref="govtIdCollapseRef">
-                <div class="bg-light border rounded p-3">
-                  <p class="text-muted text-sm mb-1">List of acceptable Primary IDs</p>
-                  <ul class="small mb-3 ps-3">
-                    <li v-for="(id, index) in primaryGovernmentIds" :key="`primary-id-${index}`">{{ id }}</li>
-                  </ul>
-                  <p class="text-muted text-sm mb-1">(If no primary ID is available, At least one with photo and
-                    signature, must be presented)</p>
-                  <ul class="small mb-0 ps-3">
-                    <li v-for="(id, index) in secondaryGovernmentIds" :key="`secondary-id-${index}`">{{ id }}</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            <div v-if="hasGovernmentId" class="border rounded text-center p-3 mb-2">
-              <p v-if="governmentIdType" class="text-uppercase text-muted small fw-semibold mb-2">{{ governmentIdType }}
-              </p>
-              <img :src="governmentIdUrl || nationalId" alt="Government ID" class="img-fluid" />
-              <p class="text-muted small mb-0 mt-2">Uploading a new file will replace the existing ID.</p>
-            </div>
-            <div class="mb-2" v-if="canEditProfile && !isEditableSubmit">
-              <DropdownInput :options="govtIdentityTypeOption" label="Type" id="govt-id-type"
-                v-model="form.govtIdentityType" :error-message="errorMessages.govtIdentityType.error"
-                :has-error="errors.govtIdentityType" :is-capitalized="false" />
-            </div>
-            <UploadFiles
-              v-if="canEditProfile && form.govtIdentityType && form.govtIdentityType !== 'Secondary Ids' && [...primaryGovernmentIds, ...secondaryGovernmentIds].includes(form.govtIdentityType)"
-              v-model="form.governmentIdentity" :has-error="errors.governmentIdentity"
-              :error-message="errorMessages.governmentIdentity.error"
-              :is-disabled="isNotEditableUser.governmentIdentity" accept=".png,.jpg,.jpeg,.pdf" :multiple="false"
-              :enforce-evidence-rules="false" :max-files="1" />
-          </div>
-        </div>
+
       </div>
 
       <div class="col-lg-8">
@@ -523,7 +526,8 @@ onBeforeUnmount(() => {
           <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
             <h5 class="mb-0">Profile Details</h5>
             <div class="d-flex gap-2" v-if="canEditProfile">
-              <button class="btn btn-outline-danger btn-sm" type="button"
+              <button class="btn btn-sm" :class="useSession.isRoleResident() ? 'd-none' : 'btn-outline-danger'"
+                type="button" :disabled="useSession.isRoleResident()"
                 @click.prevent="setisNotEditableUser(canEditRole)">
                 <i class="bi bi-pencil-square me-1"></i>{{ isNotEditableUser.name ? 'Enable Editing' : 'Cancel' }}
               </button>
