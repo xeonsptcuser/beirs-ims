@@ -28,7 +28,7 @@ export function useEditUserAccount() {
     streetAddress: true,
     addressLine: true,
     mobileNumber: true,
-    governmentIdentity: false,
+    governmentIdentity: true,
   })
 
   const isEditableSubmit = ref<boolean>(true)

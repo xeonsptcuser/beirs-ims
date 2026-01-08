@@ -40,6 +40,7 @@ const {
 
 const navigation = useGlobalLoadingStore();
 const isPasswordChangeable = ref<boolean>(false);
+const isGovtIdEditing = ref<boolean>(false)
 const localErrorMsg = ref<string>('')
 const hasGovernmentId = ref<boolean>(false)
 const govtIdTooltipButton = ref<HTMLElement | null>(null)
@@ -345,7 +346,11 @@ const formattedAddress = computed(() => {
 })
 
 const setUploadable = () => {
+  // Prevent enabling upload when a government ID already exists
+  if (hasGovernmentId.value && !useSession.isRoleAdmin()) return
+
   isNotEditableUser.value.governmentIdentity = !isNotEditableUser.value.governmentIdentity
+  isGovtIdEditing.value = !isGovtIdEditing.value
 
 }
 
@@ -456,6 +461,11 @@ onBeforeUnmount(() => {
               <span>{{ formatDateToHuman(form.date_of_birth) || '—' }} ({{ age }} yrs)</span>
             </div>
             <div class="mt-3" v-if="canEditProfile">
+              <button class="btn  mb-2 w-100"
+                :class="[hasGovernmentId && !useSession.isRoleAdmin() ? 'btn-outline-secondary' : 'btn-outline-primary']"
+                type="button" @click="setUploadable" :disabled="hasGovernmentId && !useSession.isRoleAdmin()">
+                {{ hasGovernmentId && !useSession.isRoleAdmin() ? 'ID Uploaded' : 'Upload ID' }}
+              </button>
               <button class="btn btn-outline-secondary w-100" type="button" @click="handleShowPasswordChange">
                 <i class="bi bi-shield-lock me-2"></i>
                 {{ isPasswordChangeable ? 'Cancel Password Update' : 'Change Password' }}
@@ -507,9 +517,7 @@ onBeforeUnmount(() => {
                   <img :src="governmentIdUrl || nationalId" alt="Government ID" class="img-fluid" />
                   <p class="text-muted small mb-0 mt-2">Uploading a new file will replace the existing ID.</p>
                 </div>
-                <button class="btn btn-outline-primary mb-2 w-100" type="button" @click="() => setUploadable()">
-                  {{ isNotEditableUser.governmentIdentity ? 'Enable Upload' : 'Disable Upload' }}
-                </button>
+
                 <div class="mb-2" v-if="canEditProfile && (!isEditableSubmit || !isNotEditableUser.governmentIdentity)">
                   <DropdownInput :options="govtIdentityTypeOption" label="Type" id="govt-id-type"
                     v-model="form.govtIdentityType" :error-message="errorMessages.govtIdentityType.error"
@@ -626,7 +634,8 @@ onBeforeUnmount(() => {
                 </div>
               </div>
 
-              <div class="d-flex flex-column flex-md-row justify-content-center gap-3 mt-3" v-if="canEditProfile">
+              <div class="d-flex flex-column flex-md-row justify-content-center gap-3 mt-3"
+                v-if="canEditProfile && (isPasswordChangeable || isGovtIdEditing)">
                 <FormButton label="Save Changes" :is-disabled="isEditableSubmit && isNotEditableUser.governmentIdentity"
                   :btn-display="isEditableSubmit && isNotEditableUser.governmentIdentity ? 'secondary' : 'primary'" />
               </div>

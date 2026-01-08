@@ -220,7 +220,7 @@ watch(isLoggedIn, (loggedIn) => {
             </router-link>
             <div class="d-flex align-items-center gap-3" v-if="isLoggedIn">
               <div class="dropdown" ref="notificationDropdownRef" :class="{ show: showNotifications }">
-                <button class="btn btn-outline-light btn-sm position-relative" type="button"
+                <button class="btn btn-outline-light btn-sm position-relative dropdown-toggle" type="button"
                   @click="toggleNotifications" v-if="session.isRoleResident()">
                   <i class="bi bi-bell"></i>
                   <span v-if="unreadCount"
@@ -332,6 +332,8 @@ watch(isLoggedIn, (loggedIn) => {
   width: 320px;
   max-height: 360px;
   overflow: hidden;
+  right: 0 !important;
+  left: auto !important;
 }
 
 .notification-content {

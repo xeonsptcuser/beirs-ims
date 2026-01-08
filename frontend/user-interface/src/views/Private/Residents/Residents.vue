@@ -20,6 +20,12 @@ const hasError = ref<boolean>(false);
 const errorMessage = ref<string>('');
 const sortMode = ref<'default' | 'address'>('default');
 
+// Modal state
+const showConfirmModal = ref<boolean>(false);
+const confirmAction = ref<'activate' | 'deactivate' | 'delete'>('activate');
+const confirmResidentId = ref<number | null>(null);
+const confirmResidentEmail = ref<string>('');
+
 const pagination = reactive({
   current: 1,
   last: 1,
@@ -68,18 +74,22 @@ const activeResidents = computed(() => residents.value.filter((user) => user.pro
 const inactiveResidents = computed(() => residents.value.filter((user) => !user.profile?.is_active).length);
 
 const handleToggleUserStatus = async (resident: User) => {
-  const targetStatus = !resident.profile.is_active;
-  const actionLabel = targetStatus ? 'activate' : 'deactivate';
-  const shouldProceed = globalThis.confirm(`Are you sure you want to ${actionLabel} this user?`);
+  const isActive = resident.profile.is_active;
+  confirmAction.value = isActive ? 'deactivate' : 'activate';
+  confirmResidentId.value = resident.id;
+  confirmResidentEmail.value = resident.email;
+  showConfirmModal.value = true;
+};
 
-  if (!shouldProceed) {
-    return;
-  }
+const handleConfirmToggleStatus = async () => {
+  if (!confirmResidentId.value) return;
 
   navigation.startNavigation();
   try {
-    await toggleUserAccountStatus(resident.id, targetStatus);
+    const targetStatus = confirmAction.value === 'activate';
+    await toggleUserAccountStatus(confirmResidentId.value, targetStatus);
     await fetchResidentUsers(pagination.current);
+    showConfirmModal.value = false;
   } catch (error: any) {
     hasError.value = true;
     errorMessage.value = error.message ?? 'Failed to update user status.';
@@ -89,13 +99,20 @@ const handleToggleUserStatus = async (resident: User) => {
 };
 
 const handleSoftDelete = async (resident: User) => {
-  const shouldProceed = globalThis.confirm(`Soft delete ${resident.email}? This will hide their account without permanent removal.`);
-  if (!shouldProceed) return;
+  confirmAction.value = 'delete';
+  confirmResidentId.value = resident.id;
+  confirmResidentEmail.value = resident.email;
+  showConfirmModal.value = true;
+};
+
+const handleConfirmDelete = async () => {
+  if (!confirmResidentId.value) return;
 
   navigation.startNavigation();
   try {
-    await softDeleteUserAccount(resident.id);
+    await softDeleteUserAccount(confirmResidentId.value);
     await fetchResidentUsers(pagination.current);
+    showConfirmModal.value = false;
   } catch (error: any) {
     hasError.value = true;
     errorMessage.value = error?.message ?? 'Failed to delete user.';
@@ -259,4 +276,64 @@ onMounted(() => {
         @change="fetchResidentUsers" />
     </div>
   </div>
+
+  <!-- Confirmation Modal -->
+  <div v-if="showConfirmModal" class="modal fade show d-block" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header" :class="{
+          'bg-danger-subtle': confirmAction === 'deactivate' || confirmAction === 'delete',
+          'bg-success-subtle': confirmAction === 'activate'
+        }">
+          <h5 class="modal-title" :class="{
+            'text-danger': confirmAction === 'deactivate' || confirmAction === 'delete',
+            'text-success': confirmAction === 'activate'
+          }">
+            <i class="bi me-2" :class="{
+              'bi-exclamation-triangle': confirmAction === 'deactivate' || confirmAction === 'delete',
+              'bi-check-circle': confirmAction === 'activate'
+            }"></i>
+            <span v-if="confirmAction === 'activate'">Activate Account</span>
+            <span v-else-if="confirmAction === 'deactivate'">Deactivate Account</span>
+            <span v-else>Delete Account</span>
+          </h5>
+          <button type="button" class="btn-close" aria-label="Close" @click="showConfirmModal = false"></button>
+        </div>
+
+        <div class="modal-body">
+          <p class="mb-2" v-if="confirmAction === 'activate'">
+            Are you sure you want to <strong>activate</strong> this account?
+          </p>
+          <p class="mb-2" v-else-if="confirmAction === 'deactivate'">
+            Are you sure you want to <strong>deactivate</strong> this account?
+          </p>
+          <p class="mb-2" v-else>
+            Are you sure you want to <strong>delete</strong> this account? This will hide their account without
+            permanent removal.
+          </p>
+          <p class="text-muted small">
+            <strong>Resident:</strong> {{ confirmResidentEmail }}
+          </p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @click="showConfirmModal = false">
+            Cancel
+          </button>
+          <button type="button" class="btn" :class="{
+            'btn-danger': confirmAction === 'deactivate' || confirmAction === 'delete',
+            'btn-success': confirmAction === 'activate'
+          }" :disabled="navigation.isNavigating"
+            @click="confirmAction === 'activate' || confirmAction === 'deactivate' ? handleConfirmToggleStatus() : handleConfirmDelete()">
+            <span v-if="confirmAction === 'activate'">Activate</span>
+            <span v-else-if="confirmAction === 'deactivate'">Deactivate</span>
+            <span v-else>Delete</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Backdrop -->
+  <div v-if="showConfirmModal" class="modal-backdrop fade show"></div>
 </template>
