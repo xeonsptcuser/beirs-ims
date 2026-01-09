@@ -131,12 +131,12 @@ watch([selectedAddress, selectedYear, selectedMonth], fetchWithFilters);
         <h5 class="severity-desc-title mb-3">Severity Level Descriptions & Notes</h5>
         <div class="severity-desc-item">
           <span class="desc-dot desc-yellow"></span>
-          <strong>Low Severity (Yellow):</strong> Corresponds mainly to 1-10 incidents. These are isolated and
+          <strong>Low Severity (Yellow):</strong> Corresponds mainly to 1-20 incidents. These are isolated and
           manageable through routine monitoring and standard barangay procedures.
         </div>
         <div class="severity-desc-item">
           <span class="desc-dot desc-orange"></span>
-          <strong>Medium Severity (Orange):</strong> Often linked to 11-20 incidents or frequent minor cases. Indicates
+          <strong>Medium Severity (Orange):</strong> Often linked to 1-20 incidents or frequent minor cases. Indicates
           recurring patterns that require preventive actions, closer supervision, and early intervention.
         </div>
         <div class="severity-desc-item">
@@ -169,7 +169,7 @@ watch([selectedAddress, selectedYear, selectedMonth], fetchWithFilters);
           <tbody>
             <tr>
               <th class="impact-label">Critical Impact</th>
-              <td class="cell-brown">Rare but serious incidents, requires monitoring and preparedness planning.
+              <td class="cell-orange">Rare but serious incidents, requires monitoring and preparedness planning.
               </td>
               <td class="cell-orange">Recurring serious incidents, needs urgent preventive measures and
                 barangay-level coordination.</td>
@@ -252,7 +252,7 @@ watch([selectedAddress, selectedYear, selectedMonth], fetchWithFilters);
                           <select id="sitioSelect" class="form-select text-capitalize" v-model="selectedAddress">
                             <option value="">All</option>
                             <option v-for="opt in addressOptions" :key="opt" :value="opt" class="text-capitalize">{{ opt
-                            }}</option>
+                              }}</option>
                           </select>
                         </div>
                         <div class="mb-3">

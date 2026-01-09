@@ -635,7 +635,7 @@ onBeforeUnmount(() => {
               </div>
 
               <div class="d-flex flex-column flex-md-row justify-content-center gap-3 mt-3"
-                v-if="canEditProfile && (isPasswordChangeable || isGovtIdEditing)">
+                v-if="canEditProfile && (isPasswordChangeable || isGovtIdEditing || (canEditRole && !isNotEditableUser.name))">
                 <FormButton label="Save Changes" :is-disabled="isEditableSubmit && isNotEditableUser.governmentIdentity"
                   :btn-display="isEditableSubmit && isNotEditableUser.governmentIdentity ? 'secondary' : 'primary'" />
               </div>
