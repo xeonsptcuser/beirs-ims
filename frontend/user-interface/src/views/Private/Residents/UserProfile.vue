@@ -53,6 +53,7 @@ const otpError = ref('')
 const isRequestingOtp = ref(false)
 const isVerifyingOtp = ref(false)
 const mobileVerificationPending = ref(false)
+const isGovIdModalVisible = ref(false)
 let govtIdTooltipInstance: Tooltip | null = null
 let govtIdCollapseInstance: Collapse | null = null
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '');
@@ -263,6 +264,9 @@ const fetchUserProfile = async () => {
 
     responseData.value = response.data
     hasGovernmentId.value = !!responseData.value.profile?.government_identity;
+    if (!hasGovernmentId.value && isProfileOwner.value) {
+      isGovIdModalVisible.value = true
+    }
     form.name.firstName = responseData.value.profile.first_name
     form.name.middleName = responseData.value.profile.middle_name
     form.name.lastName = responseData.value.profile.last_name
@@ -676,6 +680,30 @@ onBeforeUnmount(() => {
           <button class="btn btn-primary" type="button" @click="verifyOtpForMobileChange" :disabled="isVerifyingOtp">
             {{ isVerifyingOtp ? 'Verifying...' : 'Verify' }}
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Backdrop -->
+    <div class="modal-backdrop fade show" style="z-index: 1055;"></div>
+  </div>
+
+  <div v-if="isGovIdModalVisible" class="modal fade show d-block" tabindex="-1" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content" style="z-index: 1056;">
+        <div class="modal-header">
+          <h5 class="modal-title">Government ID Required</h5>
+          <button type="button" class="btn-close" aria-label="Close" @click="isGovIdModalVisible = false"></button>
+        </div>
+
+        <div class="modal-body">
+          <p class="text-muted mb-3">
+            To verify your account, please upload a valid government-issued ID.
+          </p>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-primary" type="button" @click="isGovIdModalVisible = false">OK</button>
         </div>
       </div>
     </div>
