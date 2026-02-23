@@ -10,8 +10,8 @@ composer install --no-dev --optimize-autoloader
 echo "Clearing Config..."
 php artisan config:clear
 
-echo "Clearing Cache..."
-php artisan cache:clear
+# echo "Clearing Cache..."
+# php artisan cache:clear
 
 echo "Optimized Clearing..."
 php artisan optimize:clear
