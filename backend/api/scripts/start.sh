@@ -13,7 +13,6 @@ php artisan migrate --force
 echo "Force Seeding Users..."
 php artisan db:seed --class=DatabaseSeeder --force
 
-
 echo "Clearing Config..."
 php artisan config:clear
 
