@@ -48,22 +48,6 @@ class UsersSeeders extends Seeder
             ],
         );
 
-        $this->ensureUser(
-            email: 'test@resident.com',
-            role: 'resident',
-            password: 'resident123',
-            profile: [
-                'first_name' => 'Resident',
-                'last_name' => 'User',
-                'middle_name' => null,
-                'street_address' => null,
-                'address_line' => null,
-                'mobile_number' => null,
-                'date_of_birth' => '1990-01-01',
-                'is_active' => true,
-            ],
-        );
-
     }
 
     private function ensureUser(string $email, string $role, string $password, array $profile): void

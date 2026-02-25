@@ -10,6 +10,9 @@ composer install --no-dev --optimize-autoloader
 echo "Running migrations..."
 php artisan migrate --force
 
+echo "Force Seeding..."
+php artisan db:seed --force
+
 echo "Clearing Config..."
 php artisan config:clear
 
