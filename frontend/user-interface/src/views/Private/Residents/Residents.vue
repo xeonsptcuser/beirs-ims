@@ -238,10 +238,10 @@ onMounted(() => {
             <div class="text-secondary small mb-3">
               <p class="mb-1 text-capitalize"><i class="bi bi-geo-alt me-2 text-primary"></i>{{
                 resident.profile?.street_address ||
-                'Noaddress provided' }}</p>
+                'No address provided' }}</p>
               <p class="mb-1"><i class="bi bi-telephone me-2 text-primary"></i>{{
                 resident.profile?.mobile_number ||
-                'Nocontact info' }}</p>
+                'No contact info provided' }}</p>
             </div>
             <div class="mt-auto d-flex flex-column gap-2">
               <div class="d-flex align-items-center justify-content-between">
